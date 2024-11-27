@@ -21,7 +21,7 @@ RUN chmod +x /wait-for-it.sh
 COPY . .
 
 # Compilar aplicativo Go com otimizações para produção
-RUN CGO_ENABLED=0 GOOS=linux go build -o app_edsb -ldflags="-s -w"
+RUN CGO_ENABLED=0 GOOS=linux go build -o app_superviso -ldflags="-s -w"
 
 # Expor porta 8080
 EXPOSE 8080
