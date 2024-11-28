@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"superviso/models"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(db *sql.DB) http.HandlerFunc {
@@ -17,11 +19,19 @@ func Register(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Hashear a senha
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
+		if err != nil {
+			http.Error(w, "Erro ao processar a senha", http.StatusInternalServerError)
+			return
+		}
+		user.PasswordHash = string(hashedPassword)
+
 		query := `
-			INSERT INTO users (first_name, last_name, email, password_hash, crp, cpf, theory_approach, user_role)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		`
-		_, err = db.Exec(query, user.FirstName, user.LastName, user.Email, user.PasswordHash, user.CRP, user.CPF, user.TheoryApproach, user.UserRole)
+            INSERT INTO users (first_name, last_name, email, password_hash, crp, cpf, theory_approach, user_role, qualifications, price_per_session, sessions_availability)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        `
+		_, err = db.Exec(query, user.FirstName, user.LastName, user.Email, user.PasswordHash, user.CRP, user.CPF, user.TheoryApproach, user.UserRole, user.Qualifications, user.PricePerSession, user.SessionsAvailability)
 		if err != nil {
 			http.Error(w, "Erro ao salvar usuário", http.StatusInternalServerError)
 			return
