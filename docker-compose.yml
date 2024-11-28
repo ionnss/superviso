@@ -6,22 +6,16 @@ services:
       - "8081:8080"
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=osivrepus_ions
-      - DB_PASSWORD=osivrepus!61451916566145191656!osivrepus
-      - DB_NAME=superviso
+    env_file:
+      - .env
     command: ["/wait-for-it.sh", "db:5432", "-t", "30", "--", "./app_superviso"]
     networks:
       - osivrepus_network
 
   db:
     image: postgres:16.4
-    environment:
-      POSTGRES_USER: osivrepus_ions
-      POSTGRES_PASSWORD: osivrepus!61451916566145191656!osivrepus
-      POSTGRES_DB: superviso  # Consistente com DB_NAME do app
+    env_file:
+      - .env
     ports:
       - "5433:5432"
     volumes:
