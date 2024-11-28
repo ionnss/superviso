@@ -3,14 +3,14 @@ services:
   app:
     build: .
     ports:
-      - "8081:8080"
+      - "8080:8080"
     depends_on:
       - db
     env_file:
       - .env
     command: ["/wait-for-it.sh", "db:5432", "-t", "30", "--", "./app_superviso"]
     networks:
-      - osivrepus_network
+      - superviso_network
 
   db:
     image: postgres:16.4

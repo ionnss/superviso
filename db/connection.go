@@ -11,7 +11,7 @@ import (
 
 var DB *sql.DB
 
-// Connect initializes the database connection
+// Connect inicializa a conexão com o banco de dados
 func Connect() {
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -34,4 +34,26 @@ func Connect() {
 	}
 
 	log.Println("Conexão com o banco de dados estabelecida com sucesso!")
+}
+
+// ExecuteMigrations executa os scripts de migração no banco
+func ExecuteMigrations() {
+	files := []string{
+		"db/migrations/create_users_table.sql",
+		// Adicione outros scripts de migração aqui, se necessário
+	}
+
+	for _, file := range files {
+		content, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("Erro ao ler o arquivo de migração %s: %v", file, err)
+		}
+
+		_, err = DB.Exec(string(content))
+		if err != nil {
+			log.Fatalf("Erro ao executar o script de migração %s: %v", file, err)
+		}
+
+		log.Printf("Migração executada com sucesso: %s", file)
+	}
 }
