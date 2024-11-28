@@ -1,3 +1,4 @@
+// superviso/db/connection.go
 package db
 
 import (
@@ -37,7 +38,7 @@ func Connect() (*sql.DB, error) {
 }
 
 // ExecuteMigrations executa os scripts de migração no banco
-func ExecuteMigrations() {
+func ExecuteMigrations(conn *sql.DB) {
 	files := []string{
 		"db/migrations/create_users_table.sql",
 		// Adicione outros scripts de migração aqui, se necessário
@@ -49,7 +50,7 @@ func ExecuteMigrations() {
 			log.Fatalf("Erro ao ler o arquivo de migração %s: %v", file, err)
 		}
 
-		_, err = DB.Exec(string(content))
+		_, err = conn.Exec(string(content))
 		if err != nil {
 			log.Fatalf("Erro ao executar o script de migração %s: %v", file, err)
 		}

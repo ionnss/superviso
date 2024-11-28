@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     crp VARCHAR(20) UNIQUE NOT NULL,
     theory_approach VARCHAR(100) NOT NULL,
-    qualifications TEXT NOT NULL,
+    qualifications TEXT, --NOT NULL
     user_role VARCHAR(20) NOT NULL,
     price_per_session NUMERIC(10, 2),
     sessions_availability TEXT,

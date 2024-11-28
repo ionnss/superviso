@@ -1,3 +1,4 @@
+// superviso/main.go
 package main
 
 import (
@@ -17,11 +18,14 @@ func main() {
 	}
 	defer conn.Close()
 
+	// Executa as migrações
+	db.ExecuteMigrations(conn)
+
 	// Configura o roteador
 	r := mux.NewRouter()
 	routes.ConfigureRoutes(r, conn)
 
 	// Inicia o servidor
-	log.Println("Servidor rodando na porta :8080")
+	log.Println("Servidor rodando na porta :8080 em http://localhost:8080/")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
