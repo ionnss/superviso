@@ -4,7 +4,7 @@ package main
 import (
 	"log"
 
-	"github.com/ionnss/superviso/db"
+	"superviso/db"
 )
 
 func main() {
