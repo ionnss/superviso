@@ -1,0 +1,119 @@
+<div class="container py-5 mt-4">
+    <h2 class="text-center mb-4">Crie sua conta</h2>
+    <form class="row justify-content-center gx-3 gy-2" hx-post="/users/register" hx-swap="outerHTML" hx-encoding="json">
+        <div class="col-md-6">
+            <label for="firstName" class="form-label">Nome</label>
+            <input type="text" class="form-control" id="firstName" name="firstname" required>
+        </div>
+        <div class="col-md-6">
+            <label for="lastName" class="form-label">Sobrenome</label>
+            <input type="text" class="form-control" id="lastName" name="lastname" required>
+        </div>
+        <div class="col-md-6">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="col-md-6">
+            <label for="password" class="form-label">Senha</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="col-md-6">
+            <label for="cpf" class="form-label">CPF</label>
+            <input type="text" class="form-control" id="cpf" name="cpf">
+        </div>
+        <div class="col-md-6">
+            <label for="crp" class="form-label">CRP (opcional)</label>
+            <input type="text" class="form-control" id="crp" name="crp">
+        </div>
+        <div class="col-md-6">
+            <label for="theoryApproach" class="form-label">Abordagem Teórica</label>
+            <input type="text" class="form-control" id="theoryApproach" name="approach" required>
+        </div>
+        <div class="col-md-6">
+            <label for="qualifications" class="form-label">Qualificações</label>
+            <textarea class="form-control" id="qualifications" name="qualifications"></textarea>
+        </div>
+        <div class="col-md-6">
+            <label for="role" class="form-label">Eu quero ser</label>
+            <select class="form-select" id="role" name="usertype">
+                <option value="supervisor">Supervisor</option>
+                <option value="supervisando">Supervisando</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="price" class="form-label">Preço por Sessão</label>
+            <input type="number" class="form-control" id="price" name="price_per_session" step="0.01">
+        </div>
+
+        <!-- Dias de Disponibilidade -->
+        <div class="container py-5 mt-3">
+            <h3 class="text-center mb-4">Quais melhores dias e horários para você?</h3>
+            <form class="row gx-3 gy-2" hx-post="/users/register" hx-swap="outerHTML" hx-encoding="json">
+                <div class="col-md-12">
+                    <!-- Segunda-feira -->
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="monday" class="form-label">Segunda-feira</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="monday" name="availability[segunda]" placeholder="Horário">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="tuesday" class="form-label">Terça-feira</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="tuesday" name="availability[terça]" placeholder="Horário">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="wednesday" class="form-label">Quarta-feira</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="wednesday" name="availability[quarta]" placeholder="Horário">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="thursday" class="form-label">Quinta-feira</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="thursday" name="availability[quinta]" placeholder="Horário">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="friday" class="form-label">Sexta-feira</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="friday" name="availability[sexta]" placeholder="Horário">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="saturday" class="form-label">Sábado</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="saturday" name="availability[sábado]" placeholder="Horário">
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label for="sunday" class="form-label">Domingo</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="time" class="form-control" id="sunday" name="availability[domingo]" placeholder="Horário">
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+        </div>
+    </form>
+</div>
