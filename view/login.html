@@ -1,0 +1,19 @@
+<div class="container py-5 mb-4"></div>
+
+<div class="container py-5 mt-4">
+    <h2 class="text-center mb-4">Login</h2>
+    <form class="row justify-content-center gx-3 gy-2" hx-post="/users/login" hx-swap="outerHTML" hx-encoding="json">
+        <div class="col-md-6">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="col-md-6">
+            <label for="password" class="form-label">Senha</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </div>
+    </form>
+</div>

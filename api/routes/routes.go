@@ -28,6 +28,11 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/register.html")
 	}).Methods("GET")
 
+	// Rota login para servir o arquivo HTML
+	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/login.html")
+	}).Methods("GET")
+
 	// Rotas públicas
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
 	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
