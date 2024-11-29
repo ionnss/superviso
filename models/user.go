@@ -16,7 +16,6 @@ type User struct {
 	TheoryApproach       string    `json:"approach"`
 	Qualifications       string    `json:"qualifications"`
 	UserRole             string    `json:"usertype"`
-	PricePerSession      float64   `json:"price_per_session"`
 	SessionsAvailability string    `json:"availability"`
 	CreatedAt            time.Time `json:"createdat"`
 }
@@ -26,4 +25,5 @@ type SupervisorAvailability struct {
 	UserID           int       `json:"user_id"`
 	AvailabilityDay  string    `json:"availability_day"`
 	AvailabilityTime time.Time `json:"availability_time"`
+	PricePerSession  float64   `json:"price_per_session"`
 }

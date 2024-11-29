@@ -6,61 +6,19 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"superviso/api/sessions"
 	"superviso/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Login realiza o login do usuário, verifica credenciais e cria uma sessão.
-func Login(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var credentials struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
-		}
-		err := json.NewDecoder(r.Body).Decode(&credentials)
-		if err != nil {
-			http.Error(w, "Dados inválidos", http.StatusBadRequest)
-			return
-		}
-
-		// Busca o usuário pelo email
-		var id int
-		var hashedPassword string
-		err = db.QueryRow("SELECT id, password_hash FROM users WHERE email = $1", credentials.Email).Scan(&id, &hashedPassword)
-		if err != nil {
-			http.Error(w, "Usuário ou senha inválidos", http.StatusUnauthorized)
-			return
-		}
-
-		// Compara a senha hasheada
-		err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(credentials.Password))
-		if err != nil {
-			http.Error(w, "Usuário ou senha inválidos", http.StatusUnauthorized)
-			return
-		}
-
-		// Cria a sessão
-		session, err := sessions.GetSession(r)
-		if err != nil {
-			http.Error(w, "Erro ao recuperar a sessão", http.StatusInternalServerError)
-			return
-		}
-		session.Values["user_id"] = id
-		session.Save(r, w)
-
-		sendResponse(w, http.StatusOK, "Login realizado com sucesso!")
-	}
-}
-
-// Register realiza o registro de um novo usuário.
 func Register(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Processar os dados do formulário
 		err := r.ParseForm()
 		if err != nil {
-			sendResponse(w, http.StatusBadRequest, "Erro ao processar o formulário.")
+			sendResponse(w, http.StatusBadRequest, "Erro ao processar os dados do formulário.")
 			return
 		}
 
@@ -77,7 +35,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 			UserRole:       r.FormValue("usertype"),
 		}
 
-		// Validações de entrada
+		// Validação de entrada
 		if err := validateUser(&user); err != nil {
 			sendResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -92,48 +50,37 @@ func Register(db *sql.DB) http.HandlerFunc {
 		user.PasswordHash = string(hashedPassword)
 
 		// Verificar duplicidade de email, CPF e CRP
-		for _, field := range []struct {
-			query string
-			value string
-			name  string
-		}{
-			{"SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", user.Email, "E-mail"},
-			{"SELECT EXISTS(SELECT 1 FROM users WHERE cpf = $1)", user.CPF, "CPF"},
-			{"SELECT EXISTS(SELECT 1 FROM users WHERE crp = $1)", user.CRP, "CRP"},
-		} {
-			var exists bool
-			err = db.QueryRow(field.query, field.value).Scan(&exists)
-			if err != nil {
-				sendResponse(w, http.StatusInternalServerError, "Erro ao verificar duplicidade de "+field.name)
-				return
-			}
-			if exists {
-				sendResponse(w, http.StatusBadRequest, field.name+" já registrado.")
-				return
-			}
+		if err := checkDuplicateFields(db, user); err != nil {
+			sendResponse(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
-		// Inserir o usuário no banco de dados
+		// Inserir o usuário na tabela `users`
 		var userID int
 		query := `
-			INSERT INTO users (first_name, last_name, email, password_hash, crp, cpf, theory_approach, user_role, qualifications)
+			INSERT INTO users (first_name, last_name, email, password_hash, cpf, crp, theory_approach, qualifications, user_role)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING id
 		`
-		err = db.QueryRow(query, user.FirstName, user.LastName, user.Email, user.PasswordHash, user.CRP, user.CPF, user.TheoryApproach, user.UserRole, user.Qualifications).Scan(&userID)
+		err = db.QueryRow(query, user.FirstName, user.LastName, user.Email, user.PasswordHash, user.CPF, user.CRP, user.TheoryApproach, user.Qualifications, user.UserRole).Scan(&userID)
 		if err != nil {
 			sendResponse(w, http.StatusInternalServerError, fmt.Sprintf("Erro ao salvar usuário: %v", err))
 			return
 		}
 
-		// Processar horários apenas se for Supervisor
+		// Inserir na tabela `supervisor_availability` caso seja supervisor
 		if user.UserRole == "supervisor" {
-			daysOfWeek := []string{"segunda", "terça", "quarta", "quinta", "sexta", "sábado", "domingo"}
+			price, _ := strconv.ParseFloat(r.FormValue("price_per_session"), 64)
+			daysOfWeek := []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
 			for _, day := range daysOfWeek {
-				hour := r.FormValue(fmt.Sprintf("availability[%s]", day))
-				if hour != "" { // Apenas salva se o horário foi preenchido
-					query := "INSERT INTO supervisor_availability (user_id, availability_day, availability_time) VALUES ($1, $2, $3)"
-					_, err := db.Exec(query, userID, day, hour)
+				startTime := r.FormValue(fmt.Sprintf("availability[%s][start]", day))
+				endTime := r.FormValue(fmt.Sprintf("availability[%s][end]", day))
+				if startTime != "" && endTime != "" {
+					query := `
+						INSERT INTO supervisor_availability (user_id, availability_day, availability_time, price_per_session)
+						VALUES ($1, $2, $3, $4)
+					`
+					_, err = db.Exec(query, userID, day, startTime, price)
 					if err != nil {
 						sendResponse(w, http.StatusInternalServerError, "Erro ao salvar disponibilidade.")
 						return
@@ -146,71 +93,56 @@ func Register(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-// sendResponse envia uma resposta JSON ao cliente.
-func sendResponse(w http.ResponseWriter, status int, message string) {
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]string{"message": message})
-}
-
-// validateUser valida os campos do usuário antes de salvar.
-func validateUser(user *models.User) error {
-	if !isValidEmail(user.Email) {
-		return fmt.Errorf("email inválido")
+// Verifica duplicidade de email, CPF e CRP
+func checkDuplicateFields(db *sql.DB, user models.User) error {
+	fields := []struct {
+		query string
+		value string
+		name  string
+	}{
+		{"SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", user.Email, "E-mail"},
+		{"SELECT EXISTS(SELECT 1 FROM users WHERE cpf = $1)", user.CPF, "CPF"},
+		{"SELECT EXISTS(SELECT 1 FROM users WHERE crp = $1)", user.CRP, "CRP"},
 	}
-	if user.CPF != "" && !isValidCPF(user.CPF) {
-		return fmt.Errorf("CPF inválido")
-	}
-	if user.CRP != "" && !isValidCRP(user.CRP) {
-		return fmt.Errorf("CRP inválido")
+	for _, field := range fields {
+		var exists bool
+		err := db.QueryRow(field.query, field.value).Scan(&exists)
+		if err != nil {
+			return fmt.Errorf("erro ao verificar duplicidade de %s", field.name)
+		}
+		if exists {
+			return fmt.Errorf("%s já registrado", field.name)
+		}
 	}
 	return nil
 }
 
-// isValidEmail valida o formato do e-mail.
+// Validação de campos
+func validateUser(user *models.User) error {
+	if !isValidEmail(user.Email) {
+		return fmt.Errorf("email inválido")
+	}
+	if !isValidCPF(user.CPF) {
+		return fmt.Errorf("CPF inválido")
+	}
+	return nil
+}
+
+// Validações adicionais
 func isValidEmail(email string) bool {
 	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	return re.MatchString(email)
 }
 
-// isValidCPF valida o formato e os dígitos do CPF.
 func isValidCPF(cpf string) bool {
-	cpf = regexp.MustCompile(`[^\d]`).ReplaceAllString(cpf, "")
-
-	if len(cpf) != 11 {
-		return false
-	}
-
-	sum := 0
-	for i := 0; i < 9; i++ {
-		digit := int(cpf[i] - '0')
-		sum += digit * (10 - i)
-	}
-
-	firstCheck := (sum * 10) % 11
-	if firstCheck == 10 {
-		firstCheck = 0
-	}
-	if firstCheck != int(cpf[9]-'0') {
-		return false
-	}
-
-	sum = 0
-	for i := 0; i < 10; i++ {
-		digit := int(cpf[i] - '0')
-		sum += digit * (11 - i)
-	}
-
-	secondCheck := (sum * 10) % 11
-	if secondCheck == 10 {
-		secondCheck = 0
-	}
-	return secondCheck == int(cpf[10]-'0')
+	// Adicione a lógica de validação do CPF aqui
+	return len(cpf) == 11
 }
 
-// isValidCRP valida o formato do CRP (ex.: SP-12345).
-func isValidCRP(crp string) bool {
-	re := regexp.MustCompile(`^[A-Z]{2}-\d{4,5}$`)
-	return re.MatchString(crp)
+// Envia uma resposta JSON
+func sendResponse(w http.ResponseWriter, status int, message string) {
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]string{"message": message})
 }
 
 func GetRoleFields() http.HandlerFunc {
@@ -224,7 +156,7 @@ func GetRoleFields() http.HandlerFunc {
 			// Formulário para Supervisor
 			html = `
             <div class="container mt-4" style="max-width: 600px;">
-				<h3 class="text-center mb-4">Querido Supervisor, defina suas disponibilidades</h3>
+				<h3 class="text-center mb-4">Defina o valor da sessão e disponibilidade de horários</h3>
 				<!-- Campo para preço da sessão -->
 				<div class="mb-4">
 					<label for="price" class="form-label">Preço por Sessão (R$)</label>
@@ -332,5 +264,45 @@ func GetRoleFields() http.HandlerFunc {
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(html))
+	}
+}
+
+func Login(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var credentials struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}
+
+		err := json.NewDecoder(r.Body).Decode(&credentials)
+		if err != nil {
+			sendResponse(w, http.StatusBadRequest, "Dados inválidos.")
+			return
+		}
+
+		var id int
+		var hashedPassword string
+		err = db.QueryRow("SELECT id, password_hash FROM users WHERE email = $1", credentials.Email).Scan(&id, &hashedPassword)
+		if err != nil {
+			sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
+			return
+		}
+
+		err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(credentials.Password))
+		if err != nil {
+			sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
+			return
+		}
+
+		session, err := sessions.GetSession(r)
+		if err != nil {
+			sendResponse(w, http.StatusInternalServerError, "Erro ao recuperar a sessão.")
+			return
+		}
+
+		session.Values["user_id"] = id
+		session.Save(r, w)
+
+		sendResponse(w, http.StatusOK, "Login realizado com sucesso!")
 	}
 }
