@@ -10,15 +10,14 @@ CREATE TABLE IF NOT EXISTS users (
     theory_approach VARCHAR(100), --NOT NULL
     qualifications TEXT, --NOT NULL
     user_role VARCHAR(20), --NOT NULL
-    price_per_session NUMERIC(10, 2),
-    sessions_availability TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS user_availability (
+CREATE TABLE IF NOT EXISTS supervisor_availability (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    day VARCHAR(20) NOT NULL, -- Dias da semana (segunda, terça, etc.)
-    time TIME NOT NULL,       -- Horário correspondente
+    availability_day VARCHAR(20) NOT NULL, -- Dias da semana (segunda, terça, etc.)
+    availability_time TIME NOT NULL,       -- Horário correspondente
+    price_per_session NUMERIC(10, 2),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

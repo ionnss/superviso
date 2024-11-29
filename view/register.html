@@ -35,84 +35,23 @@
             <label for="qualifications" class="form-label">Qualificações</label>
             <textarea class="form-control" id="qualifications" name="qualifications"></textarea>
         </div>
+
         <div class="col-md-6">
             <label for="role" class="form-label">Eu quero ser</label>
-            <select class="form-select" id="role" name="usertype">
+            <select 
+                class="form-select" 
+                id="role" 
+                name="usertype" 
+                hx-get="/users/role-fields" 
+                hx-target="#availabilityFields" 
+                hx-swap="innerHTML">
+                <option value="supervisando">Supervisionado</option>
                 <option value="supervisor">Supervisor</option>
-                <option value="supervisando">Supervisando</option>
             </select>
         </div>
-        <div class="col-md-6">
-            <label for="price" class="form-label">Preço por Sessão</label>
-            <input type="number" class="form-control" id="price" name="price_per_session" step="0.01">
-        </div>
-
-        <!-- Dias de Disponibilidade -->
-        <div class="container py-5 mt-3">
-            <h3 class="text-center mb-4">Quais melhores dias e horários para você?</h3>
-            <form class="row gx-3 gy-2" hx-post="/users/register" hx-swap="outerHTML" hx-encoding="json">
-                <div class="col-md-12">
-                    <!-- Segunda-feira -->
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="monday" class="form-label">Segunda-feira</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="monday" name="availability[segunda]" placeholder="Horário">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="tuesday" class="form-label">Terça-feira</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="tuesday" name="availability[terça]" placeholder="Horário">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="wednesday" class="form-label">Quarta-feira</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="wednesday" name="availability[quarta]" placeholder="Horário">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="thursday" class="form-label">Quinta-feira</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="thursday" name="availability[quinta]" placeholder="Horário">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="friday" class="form-label">Sexta-feira</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="friday" name="availability[sexta]" placeholder="Horário">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="saturday" class="form-label">Sábado</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="saturday" name="availability[sábado]" placeholder="Horário">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mb-2">
-                        <div class="col-md-6">
-                            <label for="sunday" class="form-label">Domingo</label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="time" class="form-control" id="sunday" name="availability[domingo]" placeholder="Horário">
-                        </div>
-                    </div>
-                    
-                </div>
-            </form>
-        </div>
+        
+        
+        <div id="availabilityFields"></div>
         
         <div class="col-md-4">
             <button type="submit" class="btn btn-primary w-100">Registrar</button>

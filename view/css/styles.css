@@ -88,3 +88,8 @@ footer {
     background-color: #ff6b6b !important;
     color: #fff !important;
 }
+
+.footer-logo {
+    max-width: 200px;
+    height: auto;
+}

@@ -33,9 +33,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/#about">Sobre</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/#features">Funcionalidades</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/#signup">Cadastre-se</a></li>
+                    <li class="nav-item"><a class="nav-link" href="//#about">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="//#features">Funcionalidades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/register" hx-get="/register" hx-target="#dynamic-content" hx-swap="innerHTML">Cadastre-se</a></li>
                     <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2 px-3 py-1" href="/login" hx-get="/login" hx-target="#dynamic-content" hx-swap="innerHTML">Login</a>
 
                     </li>
@@ -44,6 +44,7 @@
         </div>
     </nav>
 
+    <!-- Início Container Dinâmico usado pelo HTMX -->
     <div id="dynamic-content" class="mt-2">
 
     <!-- Header -->
@@ -100,7 +101,8 @@
     
     <!-- FIM Container Dinâmico -->
     </div>
- 
+    
+
     <!-- SVG Divider -->
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="#212529">
         <g transform="rotate(180, 500, 50)">
@@ -115,16 +117,19 @@
     <!-- Footer -->
     <footer class="py-4 bg-dark text-white text-center">
         <div class="container">
-            
             <p class="mb-0">Copyright &copy; Superviso 2024. Todos os direitos reservados.</p>
             <p class="mt-4">De um psicólogo, para psicólogos 💜</p>
-            <div class="mt-4">
+            <div class="mt-4 mb-4">
                 <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
                 <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
                 <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
             </div>
+            <div class="d-flex justify-content-center">
+                <img class="footer-logo rounded" src="assets/img/logo.png" alt="Superviso">
+            </div>
         </div>
-    </footer>    
+    </footer>
+  
 
     </body>
 </html>

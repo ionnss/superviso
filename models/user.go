@@ -20,3 +20,10 @@ type User struct {
 	SessionsAvailability string    `json:"availability"`
 	CreatedAt            time.Time `json:"createdat"`
 }
+
+type SupervisorAvailability struct {
+	ID               int       `json:"id"`
+	UserID           int       `json:"user_id"`
+	AvailabilityDay  string    `json:"availability_day"`
+	AvailabilityTime time.Time `json:"availability_time"`
+}

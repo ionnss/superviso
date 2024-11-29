@@ -33,6 +33,9 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/login.html")
 	}).Methods("GET")
 
+	// Rota para registro supervisando ou supervisor
+	r.HandleFunc("/users/role-fields", user.GetRoleFields()).Methods("GET")
+
 	// Rotas públicas
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
 	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
