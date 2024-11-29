@@ -10,12 +10,13 @@ type User struct {
 	LastName             string    `json:"lastname"`
 	CPF                  string    `json:"cpf"`
 	Email                string    `json:"email"`
-	PasswordHash         string    `json:"-"` // Omissão em respostas json
+	Password             string    `json:"-"` // Apenas para JSON
+	PasswordHash         string    `json:"-"` // Armazenado no banco
 	CRP                  string    `json:"crp"`
-	TheoryApproach       string    `json:"approach"`          // Abordagem teórica
-	Qualifications       string    `json:"qualifications"`    // Qualificações do usuário
-	UserRole             string    `json:"usertype"`          // Supervisando ou Supervisor
-	PricePerSession      float64   `json:"price_per_session"` // Preço por sessão
-	SessionsAvailability string    `json:"availability"`      // Disponibilidade
+	TheoryApproach       string    `json:"approach"`
+	Qualifications       string    `json:"qualifications"`
+	UserRole             string    `json:"usertype"`
+	PricePerSession      float64   `json:"price_per_session"`
+	SessionsAvailability string    `json:"availability"`
 	CreatedAt            time.Time `json:"createdat"`
 }

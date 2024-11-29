@@ -3,19 +3,20 @@ package routes
 
 import (
 	"database/sql"
-	"superviso/api/user"
-
+	"superviso/api/sessions"
 	"superviso/api/supervisor"
+	"superviso/api/user"
 
 	"github.com/gorilla/mux"
 )
 
 func ConfigureRoutes(r *mux.Router, db *sql.DB) {
-	// Rotas para usuários
+	// Rotas públicas
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
-	//r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
+	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
 
-	// Rotas para supervisores
-	r.HandleFunc("/supervisors", supervisor.GetSupervisors(db)).Methods("GET")
-	//r.HandleFunc("/supervisors/register", supervisor.RegisterSupervisor(db)).Methods("POST")
+	// Rotas protegidas
+	protected := r.PathPrefix("/").Subrouter()
+	protected.Use(sessions.AuthMiddleware)
+	protected.HandleFunc("/supervisors", supervisor.GetSupervisors(db)).Methods("GET")
 }
