@@ -26,6 +26,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	// Rotas públicas
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
 	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
+	r.HandleFunc("/users/login-form", user.LoginForm()).Methods("GET")
 	r.HandleFunc("/users/logout", sessions.Logout).Methods("POST")
 
 	// Rotas protegidas

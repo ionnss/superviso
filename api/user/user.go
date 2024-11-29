@@ -86,3 +86,9 @@ func Register(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Usuário registrado com sucesso!"))
 	}
 }
+
+func LoginForm() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/login.html")
+	}
+}
