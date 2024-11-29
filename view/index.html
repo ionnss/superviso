@@ -1,104 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>One Page Wonder - Start Bootstrap Template</title>
-        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-        <!-- Font Awesome icons (free version)-->
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-        <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="css/styles.css" rel="stylesheet" />
-    </head>
-    <body id="page-top">
-        <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
-            <div class="container px-5">
-                <a class="navbar-brand" href="#page-top">Superviso</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#!">Sign Up</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">Log In</a></li>
-                    </ul>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Superviso - Conectando psicólogos e supervisores" />
+    <meta name="author" content="Superviso Team" />
+    <title>Superviso - Sua plataforma de supervisão</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@300;600&family=Lato:wght@300;700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container px-5">
+            <a class="navbar-brand" href="#page-top">Superviso
+                <img src="assets/img/logo.png"> <!-- Ajuste a altura da logo -->
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#about">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Funcionalidades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#signup">Cadastre-se</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2 px-3 py-1" href="#login">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="masthead text-center text-white bg-dark py-5">
+        <div class="container px-5">
+            <h1 class="display-4 fw-bold">Conectando Psicólogos</h1>
+            <p class="lead mb-4">Uma plataforma para supervisores e supervisandos se encontrarem de forma fácil e confiável.</p>
+            <a class="btn btn-light btn-lg rounded-pill" href="#signup">Cadastre-se agora</a>
+        </div>
+    </header>
+
+    <!-- SVG Divider -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="#212529"><path d="M0 1v99c134.3 0 153.7-99 296-99H0Z" opacity=".5"></path><path d="M1000 4v86C833.3 90 833.3 3.6 666.7 3.6S500 90 333.3 90 166.7 4 0 4h1000Z" opacity=".5"></path><path d="M617 1v86C372 119 384 1 196 1h421Z" opacity=".5"></path><path d="M1000 0H0v52C62.5 28 125 4 250 4c250 0 250 96 500 96 125 0 187.5-24 250-48V0Z"></path></svg>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-transparent">
+        <div class="container px-5">
+            <div class="row gx-5 align-items-center">
+                <div class="col-lg-6">
+                    <img class="img-fluid rounded" src="assets/img/logo.png" alt="Superviso" />
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="fw-bold">Sobre o Superviso</h2>
+                    <p class="lead">O Superviso é uma plataforma que conecta psicólogos a supervisores experientes, promovendo o desenvolvimento profissional e o suporte técnico.</p>
                 </div>
             </div>
-        </nav>
-        <!-- Header-->
-        <header class="masthead text-center text-white">
-            <div class="masthead-content">
-                <img src="/Users/ions/superviso/view/assets/img/logo.png" alt="">
-                <div class="container px-5">
-                    <h1 class="masthead-heading mb-0">Um lugar</h1>
-                    <h2 class="masthead-subheading mb-0">Duas mentes</h2>
-                    <a class="btn btn-primary btn-xl rounded-pill mt-5" href="#scroll">Sobre</a>
+        </div>
+    </section>
+
+    
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container px-5">
+            <h2 class="text-center fw-bold mb-4">Funcionalidades</h2>
+            <div class="row gx-5 text-center">
+                <div class="col-lg-4">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <h4 class="fw-bold">Encontre Supervisores</h4>
+                    <p class="lead">Filtre por abordagem, localidade e experiência.</p>
+                </div>
+                <div class="col-lg-4">
+                    <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                    <h4 class="fw-bold">Agende Sessões</h4>
+                    <p class="lead">Agende supervisões diretamente pela plataforma.</p>
+                </div>
+                <div class="col-lg-4">
+                    <i class="fas fa-lock fa-3x mb-3"></i>
+                    <h4 class="fw-bold">Ambiente Seguro</h4>
+                    <p class="lead">Privacidade e segurança garantidas para todos os usuários.</p>
                 </div>
             </div>
-            <div class="bg-circle-1 bg-circle"></div>
-            <div class="bg-circle-2 bg-circle"></div>
-            <div class="bg-circle-3 bg-circle"></div>
-            <div class="bg-circle-4 bg-circle"></div>
-        </header>
-        <!-- Content section 1-->
-        <section id="scroll">
-            <div class="container px-5">
-                <div class="row gx-5 align-items-center">
-                    <div class="col-lg-6 order-lg-2">
-                        <div class="p-5"><img class="img-fluid rounded-circle" src="assets/img/01.jpg" alt="..." /></div>
-                    </div>
-                    <div class="col-lg-6 order-lg-1">
-                        <div class="p-5">
-                            <h2 class="display-4">For those about to rock...</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.</p>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </section>
+    
+    <!-- SVG Divider -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="#212529">
+        <g transform="rotate(180, 500, 50)">
+            <path d="M0 0v84l500 16 500-16V0H0z" opacity=".2"></path>
+            <path d="M0 0v64l500 36 500-36V0H0z" opacity=".4"></path>
+            <path d="M0 0v44l500 56 500-56V0H0z" opacity=".4"></path>
+            <path d="M0 0v24l500 76 500-76V0H0z" opacity=".5"></path>
+            <path d="M0 0v4l500 96 500-96V0H0z"></path>
+        </g>
+    </svg>
+    
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-white text-center">
+        <div class="container">
+            
+            <p class="mb-0">Copyright &copy; Superviso 2024. Todos os direitos reservados.</p>
+            <p class="mt-4">De um psicólogo, para psicólogos 💜</p>
+            <div class="mt-4">
+                <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
             </div>
-        </section>
-        <!-- Content section 2-->
-        <section>
-            <div class="container px-5">
-                <div class="row gx-5 align-items-center">
-                    <div class="col-lg-6">
-                        <div class="p-5"><img class="img-fluid rounded-circle" src="assets/img/02.jpg" alt="..." /></div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="p-5">
-                            <h2 class="display-4">We salute you!</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Content section 3-->
-        <section>
-            <div class="container px-5">
-                <div class="row gx-5 align-items-center">
-                    <div class="col-lg-6 order-lg-2">
-                        <div class="p-5"><img class="img-fluid rounded-circle" src="assets/img/03.jpg" alt="..." /></div>
-                    </div>
-                    <div class="col-lg-6 order-lg-1">
-                        <div class="p-5">
-                            <h2 class="display-4">Let there be rock!</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod aliquid, mollitia odio veniam sit iste esse assumenda amet aperiam exercitationem, ea animi blanditiis recusandae! Ratione voluptatum molestiae adipisci, beatae obcaecati.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Footer-->
-        <footer class="py-5 bg-black">
-            <div class="container px-5"><p class="m-0 text-center text-white small">Copyright &copy; Your Website 2023</p></div>
-        </footer>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="js/scripts.js"></script>
+        </div>
+    </footer>    
+
     </body>
 </html>
