@@ -36,29 +36,7 @@
                     <li class="nav-item"><a class="nav-link" href="#about">Sobre</a></li>
                     <li class="nav-item"><a class="nav-link" href="#features">Funcionalidades</a></li>
                     <li class="nav-item"><a class="nav-link" href="#signup">Cadastre-se</a></li>
-                    <li class="nav-item">
-                        <!-- Botão de Login -->
-                        <a class="nav-link btn btn-primary text-white ms-2 px-3 py-1" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body" hx-get="/users/login-form" hx-target="#loginModal .modal-body" hx-swap="innerHTML">
-                                        <!-- Placeholder enquanto o conteúdo é carregado -->
-                                        <div class="text-center">
-                                            <p>Carregando...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2 px-3 py-1" href="#loginModal">Login</a>
 
                     </li>
                 </ul>
