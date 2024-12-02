@@ -1,0 +1,103 @@
+<div class="container mt-4" style="max-width: 600px;">
+    
+    <h3 class="text-center mb-4">Defina o valor da sessão e disponibilidade de horários</h3>
+    
+    <!-- Campo para preço da sessão -->
+    <div class="mb-4">
+        <label for="price" class="form-label">Preço por Sessão (R$)</label>
+        <input type="number" class="form-control" id="price" name="price_per_session" step="0.01" placeholder="Ex: 150.00">
+    </div>
+    
+    <!-- Disponibilidade por dia -->
+    <div class="mb-3">
+        <label for="monday" class="form-label">Segunda-Feira</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[monday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[monday][end]" required>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="tuesday" class="form-label">Terça-Feira</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[tuesday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[tuesday][end]" required>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="wednesday" class="form-label">Quarta-Feira</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[wednesday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[wednesday][end]" required>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="thursday" class="form-label">Quinta-Feira</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[thursday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[thursday][end]" required>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="friday" class="form-label">Sexta-Feira</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[friday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[friday][end]" required>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="saturday" class="form-label">Sábado</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[saturday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[saturday][end]" required>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="sunday" class="form-label">Domingo</label>
+        <div class="row g-2">
+            <div class="col">
+                <label class="form-label small">Das</label>
+                <input type="time" class="form-control" name="availability[sunday][start]" required>
+            </div>
+            <div class="col">
+                <label class="form-label small">Até</label>
+                <input type="time" class="form-control" name="availability[sunday][end]" required>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS supervisor (
     theory_approach VARCHAR(100) NOT NULL,
     qualifications TEXT NOT NULL,
     user_role VARCHAR(20) NOT NULL DEFAULT 'supervisor',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    failed_login_attempts INT DEFAULT 0,
+    last_failed_login TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- tabela usuários supervisionados
@@ -27,7 +29,9 @@ CREATE TABLE IF NOT EXISTS supervisionated (
     theory_approach VARCHAR(100) NOT NULL,
     qualifications TEXT NOT NULL,
     user_role VARCHAR(20) NOT NULL DEFAULT 'supervisionado',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    failed_login_attempts INT DEFAULT 0,
+    last_failed_login TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- tabela de disponibilidade de supervisores

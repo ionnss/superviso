@@ -24,6 +24,11 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	}).Methods("GET")
 
 	// Rota register para servir o arquivo HTML
+	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/role_register.html")
+	}).Methods("GET")
+
+	// Rota register para servir o arquivo HTML
 	r.HandleFunc("/register_supervisor", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "view/register_supervisor.html")
 	}).Methods("GET")
@@ -39,7 +44,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 
 	// Rotas públicas
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
-	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
+	r.HandleFunc("/users/login", user.LoginHandler(db)).Methods("POST")
 	r.HandleFunc("/users/logout", sessions.Logout).Methods("POST")
 
 	// Rotas protegidas

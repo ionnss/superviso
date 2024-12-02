@@ -8,7 +8,7 @@ import (
 
 func GetSupervisors(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		query := `SELECT * FROM users WHERE user_role = 'supervisor'`
+		query := `SELECT * FROM supervisor`
 		rows, err := db.Query(query)
 		if err != nil {
 			http.Error(w, "Erro ao buscar supervisores", http.StatusInternalServerError)

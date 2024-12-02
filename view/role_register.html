@@ -1,16 +1,21 @@
-<div class="container py-5 mb-4"></div>
+<div class="min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center">
+        <h2 class="display-4 mb-5">Eu quero ser</h2>
+        
+        <div class="d-grid gap-4 col-12 mx-auto" style="max-width: 300px;">
+            <button class="btn btn-outline-primary btn-lg py-3 rounded-pill"
+                    hx-get="/register_supervisor"
+                    hx-target="#dynamic-content"
+                    hx-swap="innerHTML">
+                Supervisor
+            </button>
 
-<div class="container py-5 mt-4">
-    <h2 class="text-center mb-4">Eu quero ser</h2>
-
-        <div class="col-md-6">
-            <!-- Supervisor -->
-            <button class="btn btn-light btn-lg rounded-pill" href="/register_supervisor" hx-get="/register" hx-target="#dynamic-content" hx-swap="innerHTML">Supervisor</a>
+            <button class="btn btn-outline-primary btn-lg py-3 rounded-pill"
+                    hx-get="/register_supervisionated"
+                    hx-target="#dynamic-content"
+                    hx-swap="innerHTML">
+                Supervisionado
+            </button>
         </div>
-
-        <div class="col-md-4">
-            <!-- Supervisionado -->
-            <button class="btn btn-light btn-lg rounded-pill" href="/register_supervisionated" hx-get="/register" hx-target="#dynamic-content" hx-swap="innerHTML">Supervisionado</a>
-        </div>
-    </form>
+    </div>
 </div>
