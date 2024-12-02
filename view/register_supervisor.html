@@ -1,0 +1,43 @@
+<div class="container py-5 mb-4"></div>
+
+<div class="container py-5 mt-4">
+    <h2 class="text-center mb-4">Crie sua conta</h2>
+    <form class="row justify-content-center gx-3 gy-2" hx-post="/users/register" hx-swap="outerHTML" hx-encoding="json">
+        <div class="col-md-6">
+            <label for="firstName" class="form-label">Nome</label>
+            <input type="text" class="form-control" id="firstName" name="firstname" required>
+        </div>
+        <div class="col-md-6">
+            <label for="lastName" class="form-label">Sobrenome</label>
+            <input type="text" class="form-control" id="lastName" name="lastname" required>
+        </div>
+        <div class="col-md-6">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="col-md-6">
+            <label for="password" class="form-label">Senha</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="col-md-6">
+            <label for="cpf" class="form-label">CPF</label>
+            <input type="text" class="form-control" id="cpf" name="cpf">
+        </div>
+        <div class="col-md-6">
+            <label for="crp" class="form-label">CRP</label>
+            <input type="text" class="form-control" id="crp" name="crp">
+        </div>
+        <div class="col-md-6">
+            <label for="theoryApproach" class="form-label">Abordagem Teórica</label>
+            <input type="text" class="form-control" id="theoryApproach" name="approach" required>
+        </div>
+        <div class="col-md-6">
+            <label for="qualifications" class="form-label">Qualificações</label>
+            <textarea class="form-control" id="qualifications" name="qualifications"></textarea>
+        </div>
+        
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+        </div>
+    </form>
+</div>

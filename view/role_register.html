@@ -4,21 +4,13 @@
     <h2 class="text-center mb-4">Eu quero ser</h2>
 
         <div class="col-md-6">
-            <label for="role" class="form-label">Eu quero ser</label>
-            <select 
-                class="form-select" 
-                id="role" 
-                name="usertype" 
-                hx-get="/users/role-fields" 
-                hx-target="#registerFields" 
-                hx-swap="innerHTML">
-                <option value="supervisando">Supervisionado</option>
-                <option value="supervisor">Supervisor</option>
-            </select>
+            <!-- Supervisor -->
+            <button class="btn btn-light btn-lg rounded-pill" href="/register_supervisor" hx-get="/register" hx-target="#dynamic-content" hx-swap="innerHTML">Supervisor</a>
         </div>
 
         <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">Conitnuar</button>
+            <!-- Supervisionado -->
+            <button class="btn btn-light btn-lg rounded-pill" href="/register_supervisionated" hx-get="/register" hx-target="#dynamic-content" hx-swap="innerHTML">Supervisionado</a>
         </div>
     </form>
 </div>
