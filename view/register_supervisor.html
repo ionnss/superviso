@@ -1,15 +1,21 @@
 <div class="container py-5 mb-4"></div>
 
 <div class="container py-5 mt-4">
-    <h2 class="text-center mb-4">Crie sua conta</h2>
-    <form class="row justify-content-center gx-3 gy-2" hx-post="/users/register" hx-swap="outerHTML" hx-encoding="json">
+    <h2 class="text-center mb-4">Crie sua conta de Supervisor</h2>
+    <form class="row justify-content-center gx-3 gy-2" 
+          hx-post="/users/register/supervisor" 
+          hx-swap="outerHTML" 
+          hx-encoding="multipart/form-data">
+        
+        <input type="hidden" name="user_role" value="supervisor">
+        
         <div class="col-md-6">
             <label for="firstName" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="firstName" name="firstname" required>
+            <input type="text" class="form-control" id="firstName" name="first_name" required>
         </div>
         <div class="col-md-6">
             <label for="lastName" class="form-label">Sobrenome</label>
-            <input type="text" class="form-control" id="lastName" name="lastname" required>
+            <input type="text" class="form-control" id="lastName" name="last_name" required>
         </div>
         <div class="col-md-6">
             <label for="email" class="form-label">E-mail</label>
@@ -21,23 +27,25 @@
         </div>
         <div class="col-md-6">
             <label for="cpf" class="form-label">CPF</label>
-            <input type="text" class="form-control" id="cpf" name="cpf">
+            <input type="text" class="form-control" id="cpf" name="cpf" required>
         </div>
         <div class="col-md-6">
             <label for="crp" class="form-label">CRP</label>
-            <input type="text" class="form-control" id="crp" name="crp">
+            <input type="text" class="form-control" id="crp" name="crp" required>
         </div>
         <div class="col-md-6">
             <label for="theoryApproach" class="form-label">Abordagem Teórica</label>
-            <input type="text" class="form-control" id="theoryApproach" name="approach" required>
+            <input type="text" class="form-control" id="theoryApproach" name="theory_approach" required>
         </div>
         <div class="col-md-6">
             <label for="qualifications" class="form-label">Qualificações</label>
-            <textarea class="form-control" id="qualifications" name="qualifications"></textarea>
+            <textarea class="form-control" id="qualifications" name="qualifications" required></textarea>
         </div>
         
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                Cadastre-se
+            </button>
         </div>
     </form>
 </div>

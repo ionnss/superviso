@@ -1,0 +1,15 @@
+# Comandos para iniciar o projeto
+## Parar os containers
+```shell
+docker compose down
+```
+
+## Remover o volume do banco de dados para limpar os dados
+```shell
+docker compose down -v
+```
+
+## Reconstruir e iniciar
+```shell
+docker compose up --build
+```

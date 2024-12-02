@@ -43,7 +43,8 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	}).Methods("GET")
 
 	// Rotas públicas
-	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
+	r.HandleFunc("/users/register/supervisor", user.Register(db)).Methods("POST")
+	r.HandleFunc("/users/register/supervisionated", user.Register(db)).Methods("POST")
 	r.HandleFunc("/users/login", user.LoginHandler(db)).Methods("POST")
 	r.HandleFunc("/users/logout", sessions.Logout).Methods("POST")
 
