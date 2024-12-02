@@ -33,12 +33,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="//#about">Sobre</a></li>
-                    <li class="nav-item"><a class="nav-link" href="//#features">Funcionalidades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#about" hx-target="#dynamic-content" hx-swap="innerHTML">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#features" hx-target="#dynamic-content" hx-swap="innerHTML">Funcionalidades</a></li>
                     <li class="nav-item"><a class="nav-link" href="/register" hx-get="/register" hx-target="#dynamic-content" hx-swap="innerHTML">Cadastre-se</a></li>
-                    <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2 px-3 py-1" href="/login" hx-get="/login" hx-target="#dynamic-content" hx-swap="innerHTML">Login</a>
-
-                    </li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2 px-3 py-1" href="/login" hx-get="/login" hx-target="#dynamic-content" hx-swap="innerHTML">Login</a></li>
                 </ul>
             </div>
         </div>

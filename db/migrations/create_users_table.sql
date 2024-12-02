@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS users (
     theory_approach VARCHAR(100) NOT NULL,
     qualifications TEXT NOT NULL,
     user_role VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    failed_login_attempts INTEGER DEFAULT 0,
+    last_failed_login TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS supervisor_availability (

@@ -18,6 +18,8 @@ type User struct {
 	UserRole             string    `json:"usertype"`
 	SessionsAvailability string    `json:"availability"`
 	CreatedAt            time.Time `json:"createdat"`
+	FailedLoginAttempts  int       `json:"failed_login_attempts"`
+	LastFailedLogin      time.Time `json:"last_failed_login"`
 }
 
 type SupervisorAvailability struct {

@@ -9,8 +9,14 @@ import (
 	"strconv"
 	"superviso/api/sessions"
 	"superviso/models"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	MinPasswordLength = 8
+	MaxLoginAttempts  = 5
 )
 
 func Register(db *sql.DB) http.HandlerFunc {
@@ -119,12 +125,26 @@ func checkDuplicateFields(db *sql.DB, user models.User) error {
 
 // Validação de campos
 func validateUser(user *models.User) error {
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
+		return fmt.Errorf("todos os campos obrigatórios devem ser preenchidos")
+	}
+
+	if len(user.Password) < MinPasswordLength {
+		return fmt.Errorf("a senha deve ter pelo menos %d caracteres", MinPasswordLength)
+	}
+
 	if !isValidEmail(user.Email) {
 		return fmt.Errorf("email inválido")
 	}
+
 	if !isValidCPF(user.CPF) {
 		return fmt.Errorf("CPF inválido")
 	}
+
+	if user.UserRole == "supervisor" && !isValidCRP(user.CRP) {
+		return fmt.Errorf("CRP inválido")
+	}
+
 	return nil
 }
 
@@ -137,6 +157,10 @@ func isValidEmail(email string) bool {
 func isValidCPF(cpf string) bool {
 	// Adicione a lógica de validação do CPF aqui
 	return len(cpf) == 11
+}
+
+func isValidCRP(crp string) bool {
+	return len(crp) >= 4
 }
 
 // Envia uma resposta JSON
@@ -274,34 +298,84 @@ func Login(db *sql.DB) http.HandlerFunc {
 			Password string `json:"password"`
 		}
 
-		err := json.NewDecoder(r.Body).Decode(&credentials)
-		if err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
 			sendResponse(w, http.StatusBadRequest, "Dados inválidos.")
 			return
 		}
 
-		var id int
-		var hashedPassword string
-		err = db.QueryRow("SELECT id, password_hash FROM users WHERE email = $1", credentials.Email).Scan(&id, &hashedPassword)
-		if err != nil {
+		// Check if email exists and get user data
+		var user models.User
+		err := db.QueryRow(`
+			SELECT id, password_hash, user_role, failed_login_attempts, last_failed_login 
+			FROM users WHERE email = $1`,
+			credentials.Email).Scan(
+			&user.ID, &user.PasswordHash, &user.UserRole,
+			&user.FailedLoginAttempts, &user.LastFailedLogin)
+
+		if err == sql.ErrNoRows {
+			sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
+			return
+		} else if err != nil {
+			sendResponse(w, http.StatusInternalServerError, "Erro ao processar login.")
+			return
+		}
+
+		// Check for too many failed attempts
+		if user.FailedLoginAttempts >= MaxLoginAttempts {
+			// Check if enough time has passed since last failed attempt
+			if time.Since(user.LastFailedLogin) < 15*time.Minute {
+				sendResponse(w, http.StatusTooManyRequests, "Muitas tentativas de login. Tente novamente mais tarde.")
+				return
+			}
+			// Reset counter after timeout
+			_, err = db.Exec("UPDATE users SET failed_login_attempts = 0 WHERE id = $1", user.ID)
+			if err != nil {
+				sendResponse(w, http.StatusInternalServerError, "Erro ao processar login.")
+				return
+			}
+		}
+
+		// Verify password using constant-time comparison
+		if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(credentials.Password)); err != nil {
+			// Increment failed attempts
+			_, err = db.Exec(`
+				UPDATE users 
+				SET failed_login_attempts = failed_login_attempts + 1,
+					last_failed_login = CURRENT_TIMESTAMP
+				WHERE id = $1`, user.ID)
+			if err != nil {
+				sendResponse(w, http.StatusInternalServerError, "Erro ao processar login.")
+				return
+			}
 			sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
 			return
 		}
 
-		err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(credentials.Password))
+		// Reset failed attempts on successful login
+		_, err = db.Exec("UPDATE users SET failed_login_attempts = 0 WHERE id = $1", user.ID)
 		if err != nil {
-			sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
+			sendResponse(w, http.StatusInternalServerError, "Erro ao processar login.")
 			return
 		}
 
+		// Create session
 		session, err := sessions.GetSession(r)
 		if err != nil {
-			sendResponse(w, http.StatusInternalServerError, "Erro ao recuperar a sessão.")
+			sendResponse(w, http.StatusInternalServerError, "Erro ao criar sessão.")
 			return
 		}
 
-		session.Values["user_id"] = id
-		session.Save(r, w)
+		// Set session values
+		session.Values["user_id"] = user.ID
+		session.Values["user_role"] = user.UserRole
+		session.Options.MaxAge = 3600 * 24 // 24 hours
+		session.Options.Secure = true      // Only send cookie over HTTPS
+		session.Options.HttpOnly = true    // Prevent XSS
+
+		if err := session.Save(r, w); err != nil {
+			sendResponse(w, http.StatusInternalServerError, "Erro ao salvar sessão.")
+			return
+		}
 
 		sendResponse(w, http.StatusOK, "Login realizado com sucesso!")
 	}
