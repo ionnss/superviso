@@ -43,23 +43,50 @@ func sendHTMLResponse(w http.ResponseWriter, status int, message string, isError
 // Register handles user registration for both supervisor and supervisionated
 func Register(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
+		// Parse form data
+		if err := r.ParseForm(); err != nil {
 			log.Printf("Erro ao processar formulário: %v", err)
 			sendHTMLResponse(w, http.StatusBadRequest, "Erro ao processar os dados do formulário.", true)
 			return
 		}
 
 		// Log dos dados recebidos
-		log.Printf("Dados do formulário: %+v", r.Form)
+		log.Printf("URL Path: %s", r.URL.Path)
+		log.Printf("Form values: %+v", r.Form)
+		log.Printf("PostForm values: %+v", r.PostForm)
 
 		// Determina o tipo de usuário baseado na URL
-		userType := "supervisionado" // valor padrão
+		userType := "supervisionated" // valor padrão
 		if r.URL.Path == "/users/register/supervisor" {
 			userType = "supervisor"
 		}
 
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
+		// Coleta os dados do formulário
+		formData := map[string]string{
+			"first_name":      r.PostForm.Get("first_name"),
+			"last_name":       r.PostForm.Get("last_name"),
+			"email":           r.PostForm.Get("email"),
+			"password":        r.PostForm.Get("password"),
+			"cpf":             r.PostForm.Get("cpf"),
+			"crp":             r.PostForm.Get("crp"),
+			"theory_approach": r.PostForm.Get("theory_approach"),
+			"qualifications":  r.PostForm.Get("qualifications"),
+		}
+
+		// Log dos dados processados
+		log.Printf("Dados processados: %+v", formData)
+
+		// Validação de campos obrigatórios
+		for field, value := range formData {
+			if value == "" {
+				log.Printf("Campo obrigatório faltando: %s", field)
+				sendHTMLResponse(w, http.StatusBadRequest, "Todos os campos são obrigatórios.", true)
+				return
+			}
+		}
+
+		// Gera o hash da senha
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(formData["password"]), bcrypt.DefaultCost)
 		if err != nil {
 			log.Printf("Erro ao gerar hash da senha: %v", err)
 			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao processar a senha.", true)
@@ -78,14 +105,14 @@ func Register(db *sql.DB) http.HandlerFunc {
 		var userID int
 		err = db.QueryRow(
 			query,
-			r.FormValue("first_name"),
-			r.FormValue("last_name"),
-			r.FormValue("email"),
+			formData["first_name"],
+			formData["last_name"],
+			formData["email"],
 			string(hashedPassword),
-			r.FormValue("cpf"),
-			r.FormValue("crp"),
-			r.FormValue("theory_approach"),
-			r.FormValue("qualifications"),
+			formData["cpf"],
+			formData["crp"],
+			formData["theory_approach"],
+			formData["qualifications"],
 			userType,
 		).Scan(&userID)
 
@@ -95,7 +122,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Usuário registrado com sucesso. ID: %d", userID)
+		log.Printf("Usuário registrado com sucesso. ID: %d, Type: %s", userID, userType)
 		sendHTMLResponse(w, http.StatusCreated, "Usuário registrado com sucesso!", false)
 	}
 }

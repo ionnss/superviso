@@ -50,3 +50,34 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('htmx:configRequest', function(evt) {
+    console.log('Request configuration:', evt.detail);
+});
+
+document.addEventListener('htmx:beforeRequest', function(evt) {
+    let form = evt.detail.requestConfig.elt;
+    let formData = new FormData(form);
+    console.log('Form data:');
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+});
+
+document.addEventListener('htmx:afterRequest', function(evt) {
+    console.log('Response:', evt.detail.xhr.responseText);
+});
+</script>
+
+<style>
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+</style>
