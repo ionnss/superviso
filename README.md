@@ -13,7 +13,39 @@ docker compose down -v
 ```shell
 docker compose up --build
 ```
+EM CASOS ESPECIAIS, PARA REMOVER TODAS AS IMAGENS RELACIONADAS AO PROJETO:
+### Remover todas as imagens relacionadas ao projeto
+```shell
+docker rmi $(docker images -q superviso_app)
+docker rmi $(docker images -q postgres:16.4)
+```
+
+### Limpar containers parados, networks não usadas, imagens e volumes
+```shell
+docker system prune -a --volumes
+```
+
 ---
+
+# Comando para acessar o container do banco de dados
+```shell
+docker exec -it superviso-db-1 bash
+```
+```shell
+psql -U osivrepus_ions -d superviso
+
+```
+ou somente:
+```shell
+docker-compose exec db psql -U osivrepus_ions -d superviso
+```
+```shell
+\dt
+```
+Para sair:
+```shell
+\q
+```
 
 # Supervisão Online - Sistema de Gerenciamento de Supervisão Psicológica
 

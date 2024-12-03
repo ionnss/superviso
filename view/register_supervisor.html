@@ -2,12 +2,13 @@
 
 <div class="container py-5 mt-4">
     <h2 class="text-center mb-4">Crie sua conta de Supervisor</h2>
+    
+    <div id="message-container"></div>
+    
     <form class="row justify-content-center gx-3 gy-2" 
           hx-post="/users/register/supervisor" 
-          hx-swap="outerHTML" 
-          hx-encoding="multipart/form-data">
-        
-        <input type="hidden" name="user_role" value="supervisor">
+          hx-target="#message-container"
+          hx-swap="innerHTML">
         
         <div class="col-md-6">
             <label for="firstName" class="form-label">Nome</label>
@@ -44,7 +45,7 @@
         
         <div class="col-12 text-center mt-4">
             <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
-                Cadastre-se
+                Cadastrar
             </button>
         </div>
     </form>

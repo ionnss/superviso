@@ -2,12 +2,13 @@ package user
 
 import (
 	"database/sql"
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
+
 	"superviso/api/sessions"
 	"superviso/models"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,11 +18,26 @@ const (
 	MaxLoginAttempts  = 5
 )
 
-// sendResponse é uma função auxiliar para enviar respostas JSON padronizadas
-func sendResponse(w http.ResponseWriter, status int, message string) {
-	w.Header().Set("Content-Type", "application/json")
+// sendHTMLResponse envia uma resposta HTML com uma mensagem estilizada
+func sendHTMLResponse(w http.ResponseWriter, status int, message string, isError bool) {
+	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]string{"message": message})
+
+	alertClass := "alert-success"
+	if isError {
+		alertClass = "alert-danger"
+	}
+
+	html := fmt.Sprintf(`
+		<div class="container mt-3">
+			<div class="alert %s alert-dismissible fade show" role="alert">
+				%s
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+		</div>
+	`, alertClass, message)
+
+	fmt.Fprint(w, html)
 }
 
 // Register handles user registration for both supervisor and supervisionated
@@ -29,40 +45,30 @@ func Register(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
-			sendResponse(w, http.StatusBadRequest, "Erro ao processar os dados do formulário.")
+			log.Printf("Erro ao processar formulário: %v", err)
+			sendHTMLResponse(w, http.StatusBadRequest, "Erro ao processar os dados do formulário.", true)
 			return
 		}
 
-		userType := r.FormValue("user_role")
+		// Log dos dados recebidos
+		log.Printf("Dados do formulário: %+v", r.Form)
+
+		// Determina o tipo de usuário baseado na URL
+		userType := "supervisionado" // valor padrão
+		if r.URL.Path == "/users/register/supervisor" {
+			userType = "supervisor"
+		}
+
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
 		if err != nil {
-			sendResponse(w, http.StatusInternalServerError, "Erro ao processar a senha.")
+			log.Printf("Erro ao gerar hash da senha: %v", err)
+			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao processar a senha.", true)
 			return
-		}
-
-		// Dados comuns para ambos os tipos
-		userData := map[string]interface{}{
-			"first_name":      r.FormValue("first_name"),
-			"last_name":       r.FormValue("last_name"),
-			"email":           r.FormValue("email"),
-			"password_hash":   string(hashedPassword),
-			"cpf":             r.FormValue("cpf"),
-			"crp":             r.FormValue("crp"),
-			"theory_approach": r.FormValue("theory_approach"),
-			"qualifications":  r.FormValue("qualifications"),
-			"user_role":       userType,
-		}
-
-		var table string
-		if userType == "supervisor" {
-			table = "supervisor"
-		} else {
-			table = "supervisionated"
 		}
 
 		// Construir query dinamicamente
 		query := `
-			INSERT INTO ` + table + ` (
+			INSERT INTO ` + userType + ` (
 				first_name, last_name, email, password_hash, 
 				cpf, crp, theory_approach, qualifications, user_role
 			) VALUES (
@@ -72,41 +78,52 @@ func Register(db *sql.DB) http.HandlerFunc {
 		var userID int
 		err = db.QueryRow(
 			query,
-			userData["first_name"],
-			userData["last_name"],
-			userData["email"],
-			userData["password_hash"],
-			userData["cpf"],
-			userData["crp"],
-			userData["theory_approach"],
-			userData["qualifications"],
-			userData["user_role"],
+			r.FormValue("first_name"),
+			r.FormValue("last_name"),
+			r.FormValue("email"),
+			string(hashedPassword),
+			r.FormValue("cpf"),
+			r.FormValue("crp"),
+			r.FormValue("theory_approach"),
+			r.FormValue("qualifications"),
+			userType,
 		).Scan(&userID)
 
 		if err != nil {
-			log.Printf("Erro ao registrar usuário: %v", err)
-			sendResponse(w, http.StatusInternalServerError, "Erro ao registrar usuário.")
+			log.Printf("Erro ao inserir usuário no banco: %v", err)
+			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao registrar usuário no banco de dados.", true)
 			return
 		}
 
-		sendResponse(w, http.StatusCreated, "Usuário registrado com sucesso!")
+		log.Printf("Usuário registrado com sucesso. ID: %d", userID)
+		sendHTMLResponse(w, http.StatusCreated, "Usuário registrado com sucesso!", false)
 	}
 }
 
+// LoginHandler handles the login process
 func LoginHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var credentials models.LoginCredentials
-		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
-			sendResponse(w, http.StatusBadRequest, "Dados inválidos.")
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("Erro ao processar formulário: %v", err)
+			sendHTMLResponse(w, http.StatusBadRequest, "Erro ao processar os dados do formulário.", true)
+			return
+		}
+
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+
+		if email == "" || password == "" {
+			sendHTMLResponse(w, http.StatusBadRequest, "Email e senha são obrigatórios.", true)
 			return
 		}
 
 		// Primeiro tenta encontrar na tabela de supervisores
 		var supervisor models.Supervisor
-		err := db.QueryRow(`
+		err = db.QueryRow(`
 			SELECT id, email, password_hash, user_role, failed_login_attempts, last_failed_login 
 			FROM supervisor WHERE email = $1`,
-			credentials.Email).Scan(
+			email).Scan(
 			&supervisor.ID, &supervisor.Email, &supervisor.PasswordHash,
 			&supervisor.UserRole, &supervisor.FailedLoginAttempts, &supervisor.LastFailedLogin)
 
@@ -117,20 +134,22 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			err = db.QueryRow(`
 				SELECT id, email, password_hash, user_role, failed_login_attempts, last_failed_login 
 				FROM supervisionated WHERE email = $1`,
-				credentials.Email).Scan(
+				email).Scan(
 				&supervisionated.ID, &supervisionated.Email, &supervisionated.PasswordHash,
 				&supervisionated.UserRole, &supervisionated.FailedLoginAttempts, &supervisionated.LastFailedLogin)
 
 			if err == sql.ErrNoRows {
-				sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
+				sendHTMLResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.", true)
 				return
 			} else if err != nil {
-				sendResponse(w, http.StatusInternalServerError, "Erro ao processar login.")
+				log.Printf("Erro ao buscar supervisionado: %v", err)
+				sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao processar login.", true)
 				return
 			}
 			user = &supervisionated
 		} else if err != nil {
-			sendResponse(w, http.StatusInternalServerError, "Erro ao processar login.")
+			log.Printf("Erro ao buscar supervisor: %v", err)
+			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao processar login.", true)
 			return
 		} else {
 			user = &supervisor
@@ -140,7 +159,7 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		if user.GetFailedLoginAttempts() >= 5 {
 			lastAttempt := user.GetLastFailedLogin()
 			if time.Since(lastAttempt) < 15*time.Minute {
-				sendResponse(w, http.StatusTooManyRequests, "Conta bloqueada. Tente novamente mais tarde.")
+				sendHTMLResponse(w, http.StatusTooManyRequests, "Conta bloqueada. Tente novamente mais tarde.", true)
 				return
 			}
 		}
@@ -148,7 +167,7 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		// Verifica a senha
 		if err := bcrypt.CompareHashAndPassword(
 			[]byte(user.GetPasswordHash()),
-			[]byte(credentials.Password)); err != nil {
+			[]byte(password)); err != nil {
 
 			// Atualiza contagem de tentativas falhas
 			var table string
@@ -168,7 +187,7 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 				log.Printf("Erro ao atualizar tentativas de login: %v", err)
 			}
 
-			sendResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.")
+			sendHTMLResponse(w, http.StatusUnauthorized, "Usuário ou senha inválidos.", true)
 			return
 		}
 
@@ -193,7 +212,8 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		// Cria sessão
 		session, err := sessions.GetSession(r)
 		if err != nil {
-			sendResponse(w, http.StatusInternalServerError, "Erro ao criar sessão.")
+			log.Printf("Erro ao criar sessão: %v", err)
+			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao criar sessão.", true)
 			return
 		}
 
@@ -203,10 +223,11 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		session.Values["email"] = user.GetEmail()
 
 		if err := session.Save(r, w); err != nil {
-			sendResponse(w, http.StatusInternalServerError, "Erro ao salvar sessão.")
+			log.Printf("Erro ao salvar sessão: %v", err)
+			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao salvar sessão.", true)
 			return
 		}
 
-		sendResponse(w, http.StatusOK, "Login realizado com sucesso!")
+		sendHTMLResponse(w, http.StatusOK, "Login realizado com sucesso!", false)
 	}
 }
