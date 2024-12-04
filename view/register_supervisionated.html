@@ -6,9 +6,9 @@
     <div id="message-container"></div>
     
     <form class="row justify-content-center gx-3 gy-2" 
-          hx-post="/users/register/supervisionated" 
-          hx-target="#message-container"
-          hx-swap="innerHTML">
+          method="POST"
+          action="/users/register/supervisionated"
+          enctype="application/x-www-form-urlencoded">
         
         <div class="col-md-6">
             <label for="firstName" class="form-label">Nome</label>

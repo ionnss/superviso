@@ -46,7 +46,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 		// Parse form data
 		if err := r.ParseForm(); err != nil {
 			log.Printf("Erro ao processar formulário: %v", err)
-			sendHTMLResponse(w, http.StatusBadRequest, "Erro ao processar os dados do formulário.", true)
+			http.Error(w, "Erro ao processar os dados do formulário.", http.StatusBadRequest)
 			return
 		}
 
@@ -80,7 +80,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 		for field, value := range formData {
 			if value == "" {
 				log.Printf("Campo obrigatório faltando: %s", field)
-				sendHTMLResponse(w, http.StatusBadRequest, "Todos os campos são obrigatórios.", true)
+				http.Error(w, "Todos os campos são obrigatórios.", http.StatusBadRequest)
 				return
 			}
 		}
@@ -89,7 +89,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(formData["password"]), bcrypt.DefaultCost)
 		if err != nil {
 			log.Printf("Erro ao gerar hash da senha: %v", err)
-			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao processar a senha.", true)
+			http.Error(w, "Erro ao processar a senha.", http.StatusInternalServerError)
 			return
 		}
 
@@ -118,12 +118,12 @@ func Register(db *sql.DB) http.HandlerFunc {
 
 		if err != nil {
 			log.Printf("Erro ao inserir usuário no banco: %v", err)
-			sendHTMLResponse(w, http.StatusInternalServerError, "Erro ao registrar usuário no banco de dados.", true)
+			http.Error(w, "Erro ao registrar usuário no banco de dados.", http.StatusInternalServerError)
 			return
 		}
 
 		log.Printf("Usuário registrado com sucesso. ID: %d, Type: %s", userID, userType)
-		sendHTMLResponse(w, http.StatusCreated, "Usuário registrado com sucesso!", false)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }
 
