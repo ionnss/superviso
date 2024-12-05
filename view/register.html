@@ -13,7 +13,7 @@
                         hx-post="/users/register"
                         hx-target="#message-container"
                         hx-swap="innerHTML"
-                        hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/login?msg=register_success', 1500)">
+                        hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/?msg=register_success', 1500)">
                         
                         <div class="col-md-6">
                             <label for="firstName" class="form-label">Nome</label>

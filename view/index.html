@@ -61,6 +61,11 @@
         </div>
     </nav>
 
+    <!-- Adicionar após a navigation e antes do dynamic-content -->
+    <div class="container mt-5 pt-4">
+        <div id="system-message"></div>
+    </div>
+
     <!-- Início Container Dinâmico usado pelo HTMX -->
     <div id="dynamic-content" class="mt-2">
 
@@ -175,14 +180,32 @@
         const urlParams = new URLSearchParams(window.location.search);
         const msg = urlParams.get('msg');
         
-        if (msg === 'logout_success') {
-            const messageContainer = document.getElementById('message-container');
-            messageContainer.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Logout realizado com sucesso!
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
+        if (msg) {
+            const messageContainer = document.getElementById('system-message');
+            switch(msg) {
+                case 'register_success':
+                    messageContainer.innerHTML = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Cadastro realizado com sucesso! Faça login para começar.
+                            <button type="button" class="btn btn-primary btn-sm ms-3" 
+                                    onclick="window.location.href='/login'">
+                                Fazer Login
+                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+                    break;
+                case 'logout_success':
+                    messageContainer.innerHTML = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Logout realizado com sucesso!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+                    break;
+            }
         }
     </script>
 
