@@ -1,21 +1,161 @@
-<div class="container py-5">
-    <h2>Bem-vindo ao seu Dashboard</h2>
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Seu Perfil</h5>
-                    <p class="card-text">Gerencie suas informações pessoais e profissionais.</p>
-                    <a href="#" class="btn btn-primary">Editar Perfil</a>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Dashboard - Superviso</title>
+    <!-- Font Awesome icons -->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@300;600&family=Lato:wght@300;700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container px-5">
+            <a class="navbar-brand" href="/dashboard">
+                Superviso
+                <img src="/assets/img/logo.png">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#perfil" hx-get="/profile" hx-target="#main-content">
+                            <i class="fas fa-user"></i> Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#supervisores" hx-get="/supervisors" hx-target="#main-content">
+                            <i class="fas fa-search"></i> Buscar Supervisores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#agendamentos" hx-get="/appointments" hx-target="#main-content">
+                            <i class="fas fa-calendar-alt"></i> Agendamentos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#notificacoes" hx-get="/notifications" hx-target="#main-content">
+                            <i class="fas fa-bell"></i> Notificações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#" hx-post="/users/logout">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5 mt-5">
+        <div id="main-content">
+            <!-- Dashboard Overview -->
+            <div class="row">
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-uppercase">Próxima Supervisão</h6>
+                                    <h4 class="mb-0">Em breve</h4>
+                                </div>
+                                <i class="fas fa-calendar fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-uppercase">Supervisões Realizadas</h6>
+                                    <h4 class="mb-0">0</h4>
+                                </div>
+                                <i class="fas fa-check-circle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-uppercase">Notificações</h6>
+                                    <h4 class="mb-0">0</h4>
+                                </div>
+                                <i class="fas fa-bell fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card bg-warning text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-uppercase">Supervisores Favoritos</h6>
+                                    <h4 class="mb-0">0</h4>
+                                </div>
+                                <i class="fas fa-star fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Atividades Recentes</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Nenhuma atividade recente.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Adicione mais cards conforme necessário -->
     </div>
-    <button hx-get="/api/test-auth" 
-            hx-target="#auth-test-result"
-            class="btn btn-primary">
-        Testar Autenticação
-    </button>
-    <div id="auth-test-result"></div>
-</div> 
+
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-white text-center">
+        <div class="container">
+            <p class="mb-0">Copyright &copy; Superviso 2024. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('click', function(e) {
+        const navbar = document.getElementById('navbarResponsive');
+        const toggler = document.querySelector('.navbar-toggler');
+        
+        if (navbar.classList.contains('show') && 
+            !navbar.contains(e.target) && 
+            !toggler.contains(e.target)) {
+            bootstrap.Collapse.getInstance(navbar).hide();
+        }
+    });
+    </script>
+</body>
+</html> 

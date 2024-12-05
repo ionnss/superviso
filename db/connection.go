@@ -41,7 +41,8 @@ func Connect() (*sql.DB, error) {
 func ExecuteMigrations(conn *sql.DB) {
 	files := []string{
 		"db/migrations/create_users_table.sql",
-		// Adicione outros scripts de migração aqui, se necessário
+		"db/migrations/update_users_table.sql",
+		"db/migrations/create_schedules_table.sql",
 	}
 
 	for _, file := range files {

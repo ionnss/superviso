@@ -6,18 +6,14 @@ import (
 	"net/http"
 )
 
-func GetSupervisors(db *sql.DB) http.HandlerFunc {
+func ConfigureSchedule(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		query := `SELECT * FROM supervisor`
-		rows, err := db.Query(query)
-		if err != nil {
-			http.Error(w, "Erro ao buscar supervisores", http.StatusInternalServerError)
+		if r.Method == "GET" {
+			http.ServeFile(w, r, "view/supervisor/schedule.html")
 			return
 		}
-		defer rows.Close()
 
-		// Transformar resultados em JSON e retornar
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Lista de supervisores"))
+		// Lógica para POST será implementada depois
+		http.Error(w, "Método não implementado", http.StatusNotImplemented)
 	}
 }
