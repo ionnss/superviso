@@ -28,8 +28,29 @@ func UpdateProfile(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Se for supervisor, atualiza ou insere perfil de supervisor
+		// Verifica se o modo supervisor está ativo
 		if r.FormValue("is_supervisor") == "on" {
+			// Validação do preço
+			if r.FormValue("session_price") == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`<div class="alert alert-danger">O valor da sessão é obrigatório</div>`))
+				return
+			}
+
+			// Validação dos dias
+			if len(r.Form["available_days"]) == 0 {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`<div class="alert alert-danger">Selecione pelo menos um dia disponível</div>`))
+				return
+			}
+
+			// Validação dos horários
+			if r.FormValue("start_time") == "" || r.FormValue("end_time") == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`<div class="alert alert-danger">Os horários são obrigatórios</div>`))
+				return
+			}
+
 			availableDays := strings.Join(r.Form["available_days"], ",")
 
 			_, err = db.Exec(`
@@ -52,6 +73,14 @@ func UpdateProfile(db *sql.DB) http.HandlerFunc {
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`<div class="alert alert-danger">Erro ao atualizar perfil de supervisor</div>`))
+				return
+			}
+		} else {
+			// Se não está ativo, remove o perfil de supervisor se existir
+			_, err = db.Exec(`DELETE FROM supervisor_profiles WHERE user_id = $1`, userID)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`<div class="alert alert-danger">Erro ao atualizar perfil</div>`))
 				return
 			}
 		}
@@ -149,12 +178,21 @@ func ToggleSupervisor(db *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			// Renderiza o template de campos do supervisor com os dados
-			tmpl := template.Must(template.ParseFiles("view/partials/supervisor_fields.html"))
+			// Adiciona função helper ao template
+			funcMap := template.FuncMap{
+				"contains": contains,
+			}
+
+			tmpl := template.Must(template.New("supervisor_fields.html").Funcs(funcMap).ParseFiles("view/partials/supervisor_fields.html"))
 			tmpl.Execute(w, profile)
 		} else {
-			// Se não existe, retorna o template vazio
-			http.ServeFile(w, r, "view/partials/supervisor_fields.html")
+			// Se não existe, retorna o template vazio com as funções
+			funcMap := template.FuncMap{
+				"contains": contains,
+			}
+
+			tmpl := template.Must(template.New("supervisor_fields.html").Funcs(funcMap).ParseFiles("view/partials/supervisor_fields.html"))
+			tmpl.Execute(w, nil)
 		}
 	}
 }

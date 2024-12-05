@@ -1,6 +1,6 @@
 <div class="container py-5">
     <!-- Breadcrumb e Botão Voltar -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded shadow-sm">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
@@ -50,7 +50,8 @@
                                        {{if .IsSupervisor}}checked{{end}}
                                        hx-post="/api/profile/toggle-supervisor"
                                        hx-target="#supervisorFields"
-                                       hx-swap="innerHTML">
+                                       hx-swap="innerHTML"
+                                       onchange="if(!this.checked) document.getElementById('supervisorFields').innerHTML = ''">
                                 <label class="form-check-label" for="supervisorToggle">
                                     Quero ser supervisor
                                 </label>

@@ -131,6 +131,11 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	// Redireciona para a página inicial com uma mensagem
-	http.Redirect(w, r, "/?msg=logout_success", http.StatusSeeOther)
+	// Se a requisição veio via HTMX, retorna um header especial
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/?msg=logout_success")
+	} else {
+		// Caso contrário, faz redirecionamento normal
+		http.Redirect(w, r, "/?msg=logout_success", http.StatusSeeOther)
+	}
 }
