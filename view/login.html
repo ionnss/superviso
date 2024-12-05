@@ -12,8 +12,7 @@
             <form hx-post="/users/login" 
                   hx-target="#message-container"
                   hx-swap="innerHTML"
-                  hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/dashboard', 1500)"
-                  >
+                  hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/dashboard', 1500)">
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail</label>
@@ -32,7 +31,14 @@
                 </div>
 
                 <div class="text-center mt-3">
-                    <p>Ainda não tem uma conta? <a href="/register" hx-get="/register" hx-target="body" hx-push-url="true">Registre-se</a></p>
+                    <p>Ainda não tem uma conta? 
+                        <a href="/register" 
+                           hx-get="/register" 
+                           hx-target="#dynamic-content" 
+                           hx-swap="innerHTML">
+                            Registre-se
+                        </a>
+                    </p>
                 </div>
             </form>
         </div>
