@@ -7,10 +7,12 @@
             
             <div id="message-container"></div>
             
+            <div id="system-message"></div>
+            
             <form hx-post="/users/login" 
                   hx-target="#message-container"
                   hx-swap="innerHTML"
-                  hx-on::after-request="if(event.detail.successful) window.location.href='/dashboard'"
+                  hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/dashboard', 1500)"
                   >
                 
                 <div class="mb-3">
@@ -36,3 +38,31 @@
         </div>
     </div>
 </div>
+
+<script>
+// Verifica se há mensagem na URL
+const urlParams = new URLSearchParams(window.location.search);
+const msg = urlParams.get('msg');
+
+if (msg) {
+    const messageContainer = document.getElementById('system-message');
+    switch(msg) {
+        case 'register_success':
+            messageContainer.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Cadastro realizado com sucesso! Por favor, faça login.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            break;
+        case 'logout_success':
+            messageContainer.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Logout realizado com sucesso!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            break;
+    }
+}
+</script>

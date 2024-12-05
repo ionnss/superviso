@@ -64,7 +64,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`<div class="alert alert-success">Usuário cadastrado com sucesso! Redirecionando...</div>`))
+		w.Write([]byte(`<div class="alert alert-success">Cadastro realizado com sucesso! Redirecionando para o login...</div>`))
 	}
 }
 
