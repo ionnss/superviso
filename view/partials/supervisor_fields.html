@@ -1,58 +1,80 @@
-<div class="border p-3 mb-3">
-    <h5>Configurações de Supervisor</h5>
+<div class="border p-3 mb-3 rounded shadow-sm">
+    <h5 class="border-bottom pb-2 mb-4">Configurações de Supervisor</h5>
     
-    <div class="mb-3">
-        <label class="form-label">Valor da Sessão (R$)</label>
-        <input type="number" class="form-control" name="session_price" step="0.01" min="0">
+    <div class="mb-4">
+        <label class="form-label fw-bold">Valor da Sessão</label>
+        <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input type="number" class="form-control" name="session_price" step="0.01" min="0" value="{{.SessionPrice}}">
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Dias Disponíveis</label>
-        <div class="d-flex gap-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="available_days" value="1">
-                <label class="form-check-label">Segunda</label>
+    <div class="mb-4">
+        <label class="form-label fw-bold">Dias Disponíveis</label>
+        <div class="row row-cols-2 row-cols-md-4 g-3">
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="1" {{if contains .AvailableDays "1"}}checked{{end}}>
+                    <label class="form-check-label">Segunda</label>
+                </div>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="available_days" value="2">
-                <label class="form-check-label">Terça</label>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="2" {{if contains .AvailableDays "2"}}checked{{end}}>
+                    <label class="form-check-label">Terça</label>
+                </div>
             </div>
-
-            <div class="form-check"></div>
-                <input class="form-check-input" type="checkbox" name="available_days" value="2">
-                <label class="form-check-label">Quarta</label>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="3" {{if contains .AvailableDays "3"}}checked{{end}}>
+                    <label class="form-check-label">Quarta</label>
+                </div>
             </div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="available_days" value="2">
-                <label class="form-check-label">Quinta</label>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="4" {{if contains .AvailableDays "4"}}checked{{end}}>
+                    <label class="form-check-label">Quinta</label>
+                </div>
             </div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="available_days" value="2">
-                <label class="form-check-label">Sexta</label>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="5" {{if contains .AvailableDays "5"}}checked{{end}}>
+                    <label class="form-check-label">Sexta</label>
+                </div>
             </div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="available_days" value="2">
-                <label class="form-check-label">Sábado</label>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="6" {{if contains .AvailableDays "6"}}checked{{end}}>
+                    <label class="form-check-label">Sábado</label>
+                </div>
             </div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="available_days" value="2">
-                <label class="form-check-label">Domingo</label>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="available_days" value="7" {{if contains .AvailableDays "7"}}checked{{end}}>
+                    <label class="form-check-label">Domingo</label>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-3">
         <div class="col-md-6">
-            <label class="form-label">Horário Início</label>
-            <input type="time" class="form-control" name="start_time">
+            <label class="form-label fw-bold">Horário Início</label>
+            <input type="time" class="form-control" name="start_time" value="{{.StartTime}}">
         </div>
         <div class="col-md-6">
-            <label class="form-label">Horário Fim</label>
-            <input type="time" class="form-control" name="end_time">
+            <label class="form-label fw-bold">Horário Fim</label>
+            <input type="time" class="form-control" name="end_time" value="{{.EndTime}}">
+        </div>
+    </div>
+
+    <div class="mt-4 p-3 bg-light rounded">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            <small class="text-muted">
+                Estas informações serão visíveis para potenciais supervisionados.
+                Mantenha seus horários atualizados.
+            </small>
         </div>
     </div>
 </div> 

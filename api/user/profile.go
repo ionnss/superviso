@@ -60,7 +60,12 @@ func UpdateProfile(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-// GetProfile retorna os dados do perfil para exibição
+// Adicione esta função
+func contains(list string, item string) bool {
+	return strings.Contains(list, item)
+}
+
+// Modifique GetProfile para incluir a função no template
 func GetProfile(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(auth.UserIDKey).(int)
@@ -100,8 +105,12 @@ func GetProfile(db *sql.DB) http.HandlerFunc {
 			user.IsSupervisor = true
 		}
 
-		// Renderiza o template com os dados
-		tmpl := template.Must(template.ParseFiles("view/profile.html"))
+		// Adiciona função helper ao template
+		funcMap := template.FuncMap{
+			"contains": contains,
+		}
+
+		tmpl := template.Must(template.New("profile.html").Funcs(funcMap).ParseFiles("view/profile.html"))
 		tmpl.Execute(w, user)
 	}
 }
