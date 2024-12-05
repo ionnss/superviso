@@ -29,10 +29,6 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/login.html")
 	}).Methods("GET")
 
-	r.HandleFunc("/dashboard", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "view/dashboard.html")
-	})).Methods("GET")
-
 	// API
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
 	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
@@ -44,4 +40,11 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		email := r.Context().Value(auth.EmailKey).(string)
 		w.Write([]byte(fmt.Sprintf("Autenticado! UserID: %d, Email: %s", userID, email)))
 	})).Methods("GET")
+
+	r.HandleFunc("/dashboard", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/dashboard.html")
+	})).Methods("GET")
+
+	r.HandleFunc("/profile", auth.AuthMiddleware(user.GetProfile(db))).Methods("GET")
+	r.HandleFunc("/api/profile/update", auth.AuthMiddleware(user.UpdateProfile(db))).Methods("POST")
 }

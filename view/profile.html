@@ -1,0 +1,61 @@
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Meu Perfil</h4>
+                </div>
+                <div class="card-body">
+                    <form hx-post="/api/profile/update" 
+                          hx-target="#message-container"
+                          hx-swap="innerHTML">
+                        
+                        <div id="message-container"></div>
+
+                        <!-- Informações Básicas -->
+                        <div class="mb-3">
+                            <label class="form-label">Nome</label>
+                            <input type="text" class="form-control" name="first_name" value="${user.FirstName}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Sobrenome</label>
+                            <input type="text" class="form-control" name="last_name" value="${user.LastName}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="${user.Email}" readonly>
+                        </div>
+
+                        <!-- Toggle Supervisor -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="is_supervisor" 
+                                       id="supervisorToggle"
+                                       hx-post="/api/profile/toggle-supervisor"
+                                       hx-target="#supervisorFields"
+                                       hx-swap="innerHTML">
+                                <label class="form-check-label" for="supervisorToggle">
+                                    Quero ser supervisor
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Campos de Supervisor (aparecem quando o toggle é ativado) -->
+                        <div id="supervisorFields">
+                            <!-- Será preenchido via HTMX quando o toggle for ativado -->
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
