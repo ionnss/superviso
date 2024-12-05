@@ -61,10 +61,7 @@
         </div>
     </nav>
 
-    <!-- Adicionar após a navigation e antes do dynamic-content -->
-    <div class="container mt-5 pt-4">
-        <div id="system-message"></div>
-    </div>
+    
 
     <!-- Início Container Dinâmico usado pelo HTMX -->
     <div id="dynamic-content" class="mt-2">
@@ -85,6 +82,10 @@
     <!-- Mensagem após logout ou outras ações --><!-- Mensagem após logout ou outras ações -->
     <div id="message-container" class="container mt-3 mb-4">
         <!-- Será preenchido via JavaScript -->
+    </div>
+
+    <div class="container mt-5 pt-4">
+        <div id="system-message"></div>
     </div>
 
     <!-- About Section -->
@@ -188,10 +189,6 @@
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="fas fa-check-circle me-2"></i>
                             Cadastro realizado com sucesso! Faça login para começar.
-                            <button type="button" class="btn btn-primary btn-sm ms-3" 
-                                    onclick="window.location.href='/login'">
-                                Fazer Login
-                            </button>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     `;
