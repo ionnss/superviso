@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"strings"
 	"superviso/api/auth"
@@ -209,5 +210,26 @@ func ToggleSupervisor(db *sql.DB) http.HandlerFunc {
 			tmpl := template.Must(template.New("supervisor_fields.html").Funcs(funcMap).ParseFiles("view/partials/supervisor_fields.html"))
 			tmpl.Execute(w, nil)
 		}
+	}
+}
+
+// Adicionar esta função
+func CheckUserRole(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(auth.UserIDKey).(int)
+
+		var hasRole bool
+		err := db.QueryRow(`
+			SELECT EXISTS(
+				SELECT 1 FROM supervisor_profiles WHERE user_id = $1
+			)`, userID).Scan(&hasRole)
+
+		if err != nil {
+			http.Error(w, "Erro ao verificar papel do usuário", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]bool{"hasRole": hasRole})
 	}
 }
