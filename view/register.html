@@ -10,9 +10,11 @@
                     <div id="message-container"></div>
                     
                     <form class="row justify-content-center gx-3 gy-2" 
-                        method="POST"
-                        action="/users/register"
-                        enctype="application/x-www-form-urlencoded">
+                        hx-post="/users/register"
+                        hx-target="#message-container"
+                        hx-swap="innerHTML"
+                        hx-on::after-request="if(event.detail.successful) window.location.href='/dashboard'"
+                        >
                         
                         <div class="col-md-6">
                             <label for="firstName" class="form-label">Nome</label>

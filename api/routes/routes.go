@@ -4,6 +4,7 @@ package routes
 import (
 	"database/sql"
 	"net/http"
+	"superviso/api/user"
 
 	"github.com/gorilla/mux"
 )
@@ -26,9 +27,13 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/login.html")
 	}).Methods("GET")
 
+	r.HandleFunc("/dashboard", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/dashboard.html")
+	}).Methods("GET")
+
 	// API
-	// r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
-	// r.HandleFunc("/users/login", user.LoginHandler(db)).Methods("POST")
+	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
+	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
 	// r.HandleFunc("/users/logout", sessions.Logout).Methods("POST")
 
 	// Rotas protegidas
