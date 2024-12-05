@@ -15,17 +15,17 @@
                         <!-- Informações Básicas -->
                         <div class="mb-3">
                             <label class="form-label">Nome</label>
-                            <input type="text" class="form-control" name="first_name" value="${user.FirstName}" required>
+                            <input type="text" class="form-control" name="first_name" value="{{.FirstName}}" required>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Sobrenome</label>
-                            <input type="text" class="form-control" name="last_name" value="${user.LastName}" required>
+                            <input type="text" class="form-control" name="last_name" value="{{.LastName}}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="${user.Email}" readonly>
+                            <input type="email" class="form-control" value="{{.Email}}" readonly>
                         </div>
 
                         <!-- Toggle Supervisor -->
@@ -34,6 +34,7 @@
                                 <input class="form-check-input" type="checkbox" 
                                        name="is_supervisor" 
                                        id="supervisorToggle"
+                                       {{if .IsSupervisor}}checked{{end}}
                                        hx-post="/api/profile/toggle-supervisor"
                                        hx-target="#supervisorFields"
                                        hx-swap="innerHTML">

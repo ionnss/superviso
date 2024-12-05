@@ -105,3 +105,47 @@ func GetProfile(db *sql.DB) http.HandlerFunc {
 		tmpl.Execute(w, user)
 	}
 }
+
+// Adicionar esta função
+func ToggleSupervisor(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(auth.UserIDKey).(int)
+
+		// Verifica se já é supervisor
+		var exists bool
+		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM supervisor_profiles WHERE user_id = $1)", userID).Scan(&exists)
+		if err != nil {
+			http.Error(w, "Erro ao verificar perfil", http.StatusInternalServerError)
+			return
+		}
+
+		if exists {
+			// Se já existe, retorna os dados atuais
+			var profile struct {
+				SessionPrice  float64
+				AvailableDays string
+				StartTime     string
+				EndTime       string
+			}
+
+			err := db.QueryRow(`
+				SELECT session_price, available_days, start_time, end_time 
+				FROM supervisor_profiles 
+				WHERE user_id = $1`,
+				userID,
+			).Scan(&profile.SessionPrice, &profile.AvailableDays, &profile.StartTime, &profile.EndTime)
+
+			if err != nil {
+				http.Error(w, "Erro ao buscar dados", http.StatusInternalServerError)
+				return
+			}
+
+			// Renderiza o template de campos do supervisor com os dados
+			tmpl := template.Must(template.ParseFiles("view/partials/supervisor_fields.html"))
+			tmpl.Execute(w, profile)
+		} else {
+			// Se não existe, retorna o template vazio
+			http.ServeFile(w, r, "view/partials/supervisor_fields.html")
+		}
+	}
+}
