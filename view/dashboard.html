@@ -31,22 +31,38 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#perfil" hx-get="/profile" hx-target="#main-content">
+                        <a class="nav-link" 
+                           href="#perfil" 
+                           hx-get="/profile" 
+                           hx-target="#main-content"
+                           onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
                             <i class="fas fa-user"></i> Perfil
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#supervisores" hx-get="/supervisors" hx-target="#main-content">
+                        <a class="nav-link" 
+                           href="#supervisores" 
+                           hx-get="/supervisors" 
+                           hx-target="#main-content"
+                           onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
                             <i class="fas fa-search"></i> Buscar Supervisores
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#agendamentos" hx-get="/appointments" hx-target="#main-content">
+                        <a class="nav-link" 
+                           href="#agendamentos" 
+                           hx-get="/appointments" 
+                           hx-target="#main-content"
+                           onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
                             <i class="fas fa-calendar-alt"></i> Agendamentos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#notificacoes" hx-get="/notifications" hx-target="#main-content">
+                        <a class="nav-link" 
+                           href="#notificacoes" 
+                           hx-get="/notifications" 
+                           hx-target="#main-content"
+                           onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
                             <i class="fas fa-bell"></i> Notificações
                         </a>
                     </li>
