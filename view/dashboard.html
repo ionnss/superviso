@@ -51,7 +51,10 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-danger" href="/users/logout">
+                        <a class="nav-link text-danger" 
+                           href="#" 
+                           hx-post="/users/logout"
+                           hx-redirect="/">
                             <i class="fas fa-sign-out-alt"></i> Sair
                         </a>
                     </li>
@@ -138,12 +141,12 @@
         </div>
     </div>
 
-    <!-- Footer -->
+    <!-- Footer 
     <footer class="py-4 bg-dark text-white text-center">
         <div class="container">
             <p class="mb-0">Copyright &copy; Superviso 2024. Todos os direitos reservados.</p>
         </div>
-    </footer>
+    </footer> -->
 
     <script>
     document.addEventListener('click', function(e) {

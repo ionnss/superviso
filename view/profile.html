@@ -51,15 +51,15 @@
                                        hx-post="/api/profile/toggle-supervisor"
                                        hx-target="#supervisorFields"
                                        hx-swap="innerHTML"
-                                       onchange="if(!this.checked) document.getElementById('supervisorFields').innerHTML = ''">
+                                       onchange="document.getElementById('supervisorFields').style.display = this.checked ? 'block' : 'none'">
                                 <label class="form-check-label" for="supervisorToggle">
                                     Quero ser supervisor
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Campos de Supervisor (aparecem quando o toggle é ativado) -->
-                        <div id="supervisorFields">
+                        <!-- Campos de Supervisor -->
+                        <div id="supervisorFields" class="{{if .IsSupervisor}}supervisor-visible{{else}}supervisor-hidden{{end}}">
                             <!-- Será preenchido via HTMX quando o toggle for ativado -->
                         </div>
 
