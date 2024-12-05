@@ -84,6 +84,35 @@
         <div id="main-content">
             <!-- Dashboard Overview -->
             <div class="row">
+                <!-- Card Informativo sobre Papel do Usuário -->
+                {{if not .HasRole}}
+                <div class="col-12 mb-4">
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle text-primary fa-2x me-3"></i>
+                                <div>
+                                    <h5 class="card-title mb-2">Defina seu papel no sistema!</h5>
+                                    <p class="card-text mb-2">
+                                        Você ainda não definiu seu papel no sistema. Acesse seu perfil para escolher entre:
+                                    </p>
+                                    <ul class="mb-3">
+                                        <li><strong>Supervisor:</strong> Profissional que oferece supervisão</li>
+                                        <li><strong>Supervisionado:</strong> Profissional que busca supervisão</li>
+                                    </ul>
+                                    <a href="#perfil" 
+                                       class="btn btn-primary"
+                                       hx-get="/profile" 
+                                       hx-target="#main-content">
+                                        <i class="fas fa-user-cog me-2"></i>Configurar Perfil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+                
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="card bg-primary text-white h-100">
                         <div class="card-body">

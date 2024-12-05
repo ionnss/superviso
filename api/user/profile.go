@@ -104,6 +104,7 @@ func GetProfile(db *sql.DB) http.HandlerFunc {
 			LastName      string
 			Email         string
 			IsSupervisor  bool
+			HasRole       bool
 			SessionPrice  float64
 			AvailableDays string
 			StartTime     string
@@ -133,6 +134,20 @@ func GetProfile(db *sql.DB) http.HandlerFunc {
 		if err != sql.ErrNoRows {
 			user.IsSupervisor = true
 		}
+
+		// Verifica se o usuário já tem um papel definido
+		var roleExists bool
+		err = db.QueryRow(`
+			SELECT EXISTS(
+				SELECT 1 FROM supervisor_profiles WHERE user_id = $1
+			)`, userID).Scan(&roleExists)
+
+		if err != nil {
+			http.Error(w, "Erro ao verificar papel do usuário", http.StatusInternalServerError)
+			return
+		}
+
+		user.HasRole = roleExists
 
 		// Adiciona função helper ao template
 		funcMap := template.FuncMap{

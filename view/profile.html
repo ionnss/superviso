@@ -51,10 +51,17 @@
                                        hx-post="/api/profile/toggle-supervisor"
                                        hx-target="#supervisorFields"
                                        hx-swap="innerHTML"
-                                       onchange="document.getElementById('supervisorFields').style.display = this.checked ? 'block' : 'none'">
+                                       onchange="toggleSupervisorWarning(this)">
                                 <label class="form-check-label" for="supervisorToggle">
                                     Quero ser supervisor
                                 </label>
+                            </div>
+                            
+                            <!-- Alerta informativo -->
+                            <div id="supervisorWarning" class="alert alert-info mt-2" style="display: none;">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Atenção:</strong> Ao ativar o modo supervisor, você não poderá ser supervisionado. 
+                                Esta escolha define seu papel principal no sistema.
                             </div>
                         </div>
 
@@ -76,3 +83,12 @@
         </div>
     </div>
 </div> 
+
+<!-- Adicione este script no final do arquivo -->
+<script>
+function toggleSupervisorWarning(checkbox) {
+    const warningDiv = document.getElementById('supervisorWarning');
+    document.getElementById('supervisorFields').style.display = checkbox.checked ? 'block' : 'none';
+    warningDiv.style.display = checkbox.checked ? 'block' : 'none';
+}
+</script> 
