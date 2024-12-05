@@ -132,38 +132,3 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-
-func SetRole(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Pega o ID do usuário do contexto
-		userID := r.Context().Value(auth.UserIDKey).(int)
-		role := r.FormValue("role")
-
-		// Valida o role
-		if role != "supervisor" && role != "supervisee" {
-			http.Error(w, "Função inválida", http.StatusBadRequest)
-			return
-		}
-
-		// Atualiza o usuário
-		_, err := db.Exec(`
-			UPDATE users 
-			SET role = $1, role_configured = true 
-			WHERE id = $2`,
-			role, userID)
-
-		if err != nil {
-			http.Error(w, "Erro ao atualizar função", http.StatusInternalServerError)
-			return
-		}
-
-		// Se for supervisor, redireciona para configuração de horários
-		if role == "supervisor" {
-			http.Redirect(w, r, "/supervisor/schedule", http.StatusSeeOther)
-			return
-		}
-
-		// Se for supervisionado, redireciona para busca de supervisores
-		http.Redirect(w, r, "/supervisors", http.StatusSeeOther)
-	}
-}

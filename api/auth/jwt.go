@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -62,7 +61,7 @@ func ValidateToken(tokenString string) (*Claims, error) {
 }
 
 // AuthMiddleware protege rotas que precisam de autenticação
-func AuthMiddleware(db *sql.DB, next http.HandlerFunc) http.HandlerFunc {
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("token")
 		if err != nil {
@@ -78,18 +77,7 @@ func AuthMiddleware(db *sql.DB, next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// Verifica se o usuário já configurou seu role
-		var roleConfigured bool
-		err = db.QueryRow("SELECT role_configured FROM users WHERE id = $1", claims.UserID).Scan(&roleConfigured)
-		if err != nil {
-			http.Error(w, "Erro ao verificar configuração do usuário", http.StatusInternalServerError)
-			return
-		}
-
-		if !roleConfigured && r.URL.Path != "/select-role" {
-			http.Redirect(w, r, "/select-role", http.StatusSeeOther)
-			return
-		}
+		log.Printf("Token válido para usuário ID: %d, Email: %s", claims.UserID, claims.Email)
 
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, UserIDKey, claims.UserID)

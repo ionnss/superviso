@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"superviso/api/auth"
-	"superviso/api/supervisor"
 	"superviso/api/user"
 
 	"github.com/gorilla/mux"
@@ -30,7 +29,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/login.html")
 	}).Methods("GET")
 
-	r.HandleFunc("/dashboard", auth.AuthMiddleware(db, func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/dashboard", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "view/dashboard.html")
 	})).Methods("GET")
 
@@ -40,19 +39,9 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/users/logout", user.Logout).Methods("POST")
 
 	// Rotas protegidas
-	r.HandleFunc("/api/test-auth", auth.AuthMiddleware(db, func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/api/test-auth", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(auth.UserIDKey).(int)
 		email := r.Context().Value(auth.EmailKey).(string)
 		w.Write([]byte(fmt.Sprintf("Autenticado! UserID: %d, Email: %s", userID, email)))
 	})).Methods("GET")
-
-	// Rota de seleção de role
-	r.HandleFunc("/select-role", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "view/select_role.html")
-	}).Methods("GET")
-
-	r.HandleFunc("/users/set-role", auth.AuthMiddleware(db, user.SetRole(db))).Methods("POST")
-
-	// Rotas específicas para supervisor
-	r.HandleFunc("/supervisor/schedule", auth.AuthMiddleware(db, supervisor.ConfigureSchedule(db))).Methods("GET", "POST")
 }
