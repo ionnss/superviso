@@ -1,0 +1,56 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center">
+        
+        <div class="d-grid gap-4 col-12 mx-auto" style="max-width: 300px;">
+            <div class="container py-5 mb-4"></div>
+
+                <div class="container py-5 mt-4">
+                    <h2 class="text-center mb-4">Crie sua conta</h2>
+                    
+                    <div id="message-container"></div>
+                    
+                    <form class="row justify-content-center gx-3 gy-2" 
+                        method="POST"
+                        action="/users/register"
+                        enctype="application/x-www-form-urlencoded">
+                        
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="firstName" name="first_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">Sobrenome</label>
+                            <input type="text" class="form-control" id="lastName" name="last_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cpf" class="form-label">CPF</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="crp" class="form-label">CRP</label>
+                            <input type="text" class="form-control" id="crp" name="crp" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="theoryApproach" class="form-label">Abordagem Teórica</label>
+                            <input type="text" class="form-control" id="theoryApproach" name="theory_approach" required>
+                        </div>
+                        
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                                Cadastrar
+                            </button>
+                        </div>
+                    </form>
+                </div> 
+            </form>
+        </div>
+    </div>
+</div>
