@@ -3,7 +3,9 @@ package routes
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
+	"superviso/api/auth"
 	"superviso/api/user"
 
 	"github.com/gorilla/mux"
@@ -27,14 +29,19 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/login.html")
 	}).Methods("GET")
 
-	r.HandleFunc("/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/dashboard", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "view/dashboard.html")
-	}).Methods("GET")
+	})).Methods("GET")
 
 	// API
 	r.HandleFunc("/users/register", user.Register(db)).Methods("POST")
 	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
-	// r.HandleFunc("/users/logout", sessions.Logout).Methods("POST")
+	r.HandleFunc("/users/logout", user.Logout).Methods("POST")
 
 	// Rotas protegidas
+	r.HandleFunc("/api/test-auth", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(auth.UserIDKey).(int)
+		email := r.Context().Value(auth.EmailKey).(string)
+		w.Write([]byte(fmt.Sprintf("Autenticado! UserID: %d, Email: %s", userID, email)))
+	})).Methods("GET")
 }

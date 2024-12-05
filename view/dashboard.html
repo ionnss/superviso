@@ -12,4 +12,10 @@
         </div>
         <!-- Adicione mais cards conforme necessário -->
     </div>
+    <button hx-get="/api/test-auth" 
+            hx-target="#auth-test-result"
+            class="btn btn-primary">
+        Testar Autenticação
+    </button>
+    <div id="auth-test-result"></div>
 </div> 

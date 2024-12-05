@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"net/http"
+	"superviso/api/auth"
 	"superviso/models"
 	"time"
 
@@ -96,9 +97,38 @@ func Login(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// TODO: Implementar geração de token JWT e cookie de sessão
+		// Gera o token
+		token, err := auth.GenerateToken(user.ID, user.Email)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`<div class="alert alert-danger">Erro ao gerar token</div>`))
+			return
+		}
+
+		// Define o cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "token",
+			Value:    token,
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   true, // Em produção
+			SameSite: http.SameSiteStrictMode,
+			MaxAge:   24 * 60 * 60, // 24 horas
+		})
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`<div class="alert alert-success">Login realizado com sucesso! Redirecionando...</div>`))
 	}
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
