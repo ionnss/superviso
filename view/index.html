@@ -161,5 +161,27 @@
     });
     </script>
 
-    </body>
+    <!-- Adicione logo após o <body> -->
+    <div id="message-container" class="container mt-3">
+        <!-- Será preenchido via JavaScript -->
+    </div>
+
+    <!-- Adicione antes do </body> -->
+    <script>
+        // Verifica se há mensagem na URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get('msg');
+        
+        if (msg === 'logout_success') {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Logout realizado com sucesso!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    </script>
+
+</body>
 </html>

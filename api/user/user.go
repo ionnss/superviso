@@ -122,6 +122,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
+	// Remove o cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    "",
@@ -130,5 +131,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	// Redireciona para a página inicial com uma mensagem
+	http.Redirect(w, r, "/?msg=logout_success", http.StatusSeeOther)
 }
