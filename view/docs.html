@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- Headers padrão -->
+    <title>Documentação - Superviso</title>
+    <!-- Adicionar CSS específico para docs -->
+    <link rel="stylesheet" href="/css/docs.css">
+</head>
+<body>
+    <!-- Navigation padrão -->
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <h5 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
+                        <i class="fas fa-book me-2"></i>Documentação
+                    </h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#terms">
+                                Termos de Serviço
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#privacy">
+                                Política de Privacidade
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#cancellation">
+                                Política de Cancelamento
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#fiscal">
+                                Diretrizes Fiscais
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contract">
+                                Contrato de Supervisor
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conteúdo Principal -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Documentação Legal</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchDocs" 
+                                   placeholder="Buscar na documentação...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conteúdo dos documentos -->
+                <div class="docs-content">
+                    <!-- Cada seção será carregada via JavaScript -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+    // Carregar documento
+    async function loadDocument(type) {
+        try {
+            const response = await fetch(`/api/docs?type=${type}`);
+            const data = await response.json();
+            
+            const content = document.querySelector('.docs-content');
+            content.innerHTML = `
+                <h1>${data.title}</h1>
+                <div class="doc-text">
+                    ${formatDocument(data.content)}
+                </div>
+            `;
+
+            // Atualizar links ativos
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[href="#${type}"]`).classList.add('active');
+
+        } catch (error) {
+            console.error('Erro ao carregar documento:', error);
+        }
+    }
+
+    // Formatar documento (converter texto para HTML)
+    function formatDocument(text) {
+        return text
+            .split('\n')
+            .map(line => {
+                if (line.match(/^\d+\./)) {
+                    return `<h2>${line}</h2>`;
+                } else if (line.match(/^\s+[a-z]\)/)) {
+                    return `<p class="ms-4">${line}</p>`;
+                } else {
+                    return `<p>${line}</p>`;
+                }
+            })
+            .join('');
+    }
+
+    // Carregar documento inicial
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDocument('terms');
+    });
+
+    // Adicionar listeners para links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const type = e.target.getAttribute('href').replace('#', '');
+            loadDocument(type);
+        });
+    });
+
+    // Implementar busca
+    const searchInput = document.getElementById('searchDocs');
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const content = document.querySelector('.docs-content');
+        
+        if (!searchTerm) {
+            content.querySelectorAll('p, h2').forEach(el => {
+                el.style.backgroundColor = '';
+            });
+            return;
+        }
+
+        content.querySelectorAll('p, h2').forEach(el => {
+            const text = el.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                el.style.backgroundColor = '#fff3cd';
+            } else {
+                el.style.backgroundColor = '';
+            }
+        });
+    });
+    </script>
+</body>
+</html> 

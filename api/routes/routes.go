@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"superviso/api/auth"
+	"superviso/api/docs"
 	"superviso/api/user"
 
 	"github.com/gorilla/mux"
@@ -49,4 +50,11 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/api/profile/update", auth.AuthMiddleware(user.UpdateProfile(db))).Methods("POST")
 	r.HandleFunc("/api/profile/toggle-supervisor", auth.AuthMiddleware(user.ToggleSupervisor(db))).Methods("POST")
 	r.HandleFunc("/api/profile/check-role", auth.AuthMiddleware(user.CheckUserRole(db))).Methods("GET")
+
+	// Adicionar nas rotas existentes
+	r.HandleFunc("/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/docs.html")
+	}).Methods("GET")
+
+	r.HandleFunc("/api/docs", docs.GetDocument).Methods("GET")
 }
