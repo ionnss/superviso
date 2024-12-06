@@ -1,0 +1,118 @@
+DIRETRIZES FISCAIS - PLATAFORMA SUPERVISO
+
+1. DISPOSIÇÕES GERAIS
+
+1.1. Este documento estabelece as diretrizes fiscais e tributárias para operações realizadas através da plataforma SUPERVISO.
+
+1.2. Todos os valores mencionados estão em Reais (BRL).
+
+2. RESPONSABILIDADES FISCAIS
+
+2.1. Da Plataforma SUPERVISO:
+   a) Emissão de Nota Fiscal de serviços de intermediação (15% do valor)
+   b) Recolhimento de impostos sobre a taxa de intermediação
+   c) Fornecimento de relatórios fiscais mensais
+   d) Manutenção de registros por 5 anos
+
+2.2. Dos Supervisores:
+   a) Emissão de Nota Fiscal/RPA para cada supervisão realizada
+   b) Recolhimento de impostos sobre os serviços prestados
+   c) Manutenção da documentação fiscal
+   d) Declaração de rendimentos anual
+
+3. DOCUMENTAÇÃO NECESSÁRIA
+
+3.1. Para Cadastro:
+   a) CNPJ (se pessoa jurídica)
+   b) CPF (se pessoa física)
+   c) Inscrição municipal
+   d) Comprovante de endereço
+   e) Dados bancários
+
+3.2. Para Operação:
+   a) Certificado digital (se aplicável)
+   b) Registro profissional ativo
+   c) Declaração de autônomo (se aplicável)
+
+4. EMISSÃO DE NOTAS FISCAIS
+
+4.1. Prazos:
+   a) Até 24 horas após a supervisão
+   b) Fechamento mensal todo dia 30
+   c) Envio de relatórios até dia 5
+
+4.2. Informações Obrigatórias:
+   a) Descrição do serviço
+   b) Valor da supervisão
+   c) Dados do supervisionado
+   d) Número de referência da plataforma
+
+5. IMPOSTOS E RETENÇÕES
+
+5.1. Para Pessoa Física:
+   a) IRRF conforme tabela progressiva
+   b) ISS conforme legislação municipal
+   c) INSS se aplicável
+
+5.2. Para Pessoa Jurídica:
+   a) ISS (conforme município)
+   b) PIS/COFINS
+   c) IRPJ/CSLL
+   d) Outros conforme regime tributário
+
+6. PAGAMENTOS E REPASSES
+
+6.1. Cronograma:
+   a) Processamento em D+1
+   b) Repasse em até 15 dias
+   c) Fechamento quinzenal
+
+6.2. Documentação para Repasse:
+   a) Nota Fiscal válida
+   b) Conta bancária verificada
+   c) Documentação fiscal em dia
+
+7. OBRIGAÇÕES ACESSÓRIAS
+
+7.1. Declarações Obrigatórias:
+   a) DMED (se aplicável)
+   b) DIRF
+   c) Livros fiscais digitais
+
+7.2. Prazos de Entrega:
+   a) Mensais até dia 10
+   b) Anuais conforme calendário fiscal
+   c) Eventuais conforme demanda
+
+8. SUPORTE FISCAL
+
+8.1. Canais de Atendimento:
+   a) E-mail fiscal: fiscal@superviso.com.br
+   b) Chat dedicado
+   c) Telefone: [NÚMERO]
+
+8.2. Horário de Atendimento:
+   a) Segunda a sexta: 9h às 18h
+   b) Plantão fiscal: conforme demanda
+
+9. PENALIDADES
+
+9.1. Por Não Conformidade:
+   a) Advertência formal
+   b) Suspensão temporária
+   c) Bloqueio de repasses
+   d) Desligamento da plataforma
+
+10. DISPOSIÇÕES FINAIS
+
+10.1. Atualizações:
+   a) Mediante comunicação prévia
+   b) Conforme alterações legislativas
+   c) Por necessidades operacionais
+
+10.2. Casos Omissos:
+   a) Análise individual
+   b) Consulta aos órgãos competentes
+   c) Decisão da administração
+
+Última atualização: [DATA]

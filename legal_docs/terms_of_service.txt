@@ -1,0 +1,94 @@
+TERMOS DE SERVIÇO - PLATAFORMA SUPERVISO
+
+1. DEFINIÇÕES
+
+1.1. PLATAFORMA: Sistema online denominado "SUPERVISO", destinado à intermediação de serviços de supervisão clínica em Psicologia.
+
+1.2. USUÁRIO: Pessoa física, profissional de Psicologia, devidamente registrada no Conselho Regional de Psicologia, que utiliza a plataforma seja como supervisor(a) ou supervisionado(a).
+
+1.3. SUPERVISOR(A): Usuário que presta serviços de supervisão clínica através da plataforma.
+
+1.4. SUPERVISIONADO(A): Usuário que contrata serviços de supervisão clínica através da plataforma.
+
+2. DO SERVIÇO
+
+2.1. A SUPERVISO é uma plataforma de intermediação que conecta supervisores e supervisionados para realização de supervisão clínica online.
+
+2.2. A plataforma não presta diretamente os serviços de supervisão, atuando apenas como intermediadora.
+
+2.3. Todas as supervisões são realizadas exclusivamente de forma online, através das ferramentas disponibilizadas pela plataforma.
+
+3. DO CADASTRO
+
+3.1. Para utilizar a plataforma, o usuário deve:
+   a) Ser profissional de Psicologia com registro ativo no CRP
+   b) Fornecer informações verdadeiras e atualizadas
+   c) Manter a confidencialidade de sua senha
+   d) Não transferir sua conta para terceiros
+
+3.2. A plataforma se reserva o direito de recusar, suspender ou cancelar cadastros que violem estes termos.
+
+4. DOS PAGAMENTOS
+
+4.1. Os valores das supervisões são definidos pelos supervisores em suas configurações de perfil.
+
+4.2. A plataforma retém 15% do valor de cada supervisão como taxa de serviço.
+
+4.3. Os pagamentos são processados através de gateway de pagamento integrado à plataforma.
+
+4.4. Em caso de cancelamento, aplicam-se as regras definidas na Política de Cancelamentos.
+
+5. DAS RESPONSABILIDADES
+
+5.1. Da Plataforma:
+   a) Manter a infraestrutura tecnológica
+   b) Processar os pagamentos
+   c) Fornecer suporte técnico
+   d) Proteger dados dos usuários
+
+5.2. Dos Usuários:
+   a) Manter registro profissional ativo
+   b) Respeitar horários agendados
+   c) Manter sigilo profissional
+   d) Utilizar a plataforma de forma ética
+
+6. DA PROPRIEDADE INTELECTUAL
+
+6.1. Todo o conteúdo da plataforma é protegido por direitos autorais.
+
+6.2. É proibida a cópia, distribuição ou modificação sem autorização.
+
+7. DA PRIVACIDADE
+
+7.1. O tratamento de dados pessoais segue a Política de Privacidade da plataforma.
+
+7.2. Os usuários concordam com a coleta e processamento de dados necessários ao funcionamento do serviço.
+
+8. DAS PROIBIÇÕES
+
+8.1. É expressamente proibido:
+   a) Usar a plataforma para fins ilegais
+   b) Compartilhar dados de acesso
+   c) Realizar pagamentos fora da plataforma
+   d) Assediar outros usuários
+   e) Violar o código de ética profissional
+
+9. DA SUSPENSÃO E CANCELAMENTO
+
+9.1. A plataforma pode suspender ou cancelar contas que:
+   a) Violem estes termos
+   b) Apresentem risco à comunidade
+   c) Realizem fraudes
+   d) Deixem de manter registro profissional ativo
+
+10. DAS ALTERAÇÕES
+
+10.1. Estes termos podem ser alterados a qualquer momento.
+
+10.2. Os usuários serão notificados sobre alterações significativas.
+
+11. DO FORO
+
+11.1. Fica eleito o foro da Comarca de [CIDADE] para dirimir quaisquer questões.
+
+Última atualização: [DATA]
