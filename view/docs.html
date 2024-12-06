@@ -1,45 +1,82 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!-- Headers padrão -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentação - Superviso</title>
-    <!-- Adicionar CSS específico para docs -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/docs.css">
 </head>
-<body>
-    <!-- Navigation padrão -->
-    
-    <div class="container-fluid">
+<body class="bg-dark">
+    <div class="container-fluid docs-container bg-dark text-light">
         <div class="row">
+            <!-- Botão Voltar -->
+            <div class="col-12 py-3 bg-dark border-bottom border-secondary">
+                <div class="container">
+                    <a href="/" 
+                       class="btn btn-outline-light btn-sm"
+                       hx-get="/" 
+                       hx-target="body" 
+                       hx-push-url="true">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar ao Início
+                    </a>
+                </div>
+            </div>
+
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <h5 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
-                        <i class="fas fa-book me-2"></i>Documentação
-                    </h5>
-                    <ul class="nav flex-column">
+            <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column mt-3">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#terms">
+                            <a class="nav-link" 
+                               hx-get="/api/docs?type=terms" 
+                               hx-target=".docs-content"
+                               hx-trigger="click"
+                               hx-push-url="true">
                                 Termos de Serviço
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#privacy">
+                            <a class="nav-link" 
+                               hx-get="/api/docs?type=privacy" 
+                               hx-target=".docs-content"
+                               hx-trigger="click"
+                               hx-push-url="true">
                                 Política de Privacidade
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#cancellation">
+                            <a class="nav-link" 
+                               hx-get="/api/docs?type=cancellation" 
+                               hx-target=".docs-content"
+                               hx-trigger="click"
+                               hx-push-url="true">
                                 Política de Cancelamento
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#fiscal">
+                            <a class="nav-link" 
+                               hx-get="/api/docs?type=fiscal" 
+                               hx-target=".docs-content"
+                               hx-trigger="click"
+                               hx-push-url="true">
                                 Diretrizes Fiscais
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#contract">
+                            <a class="nav-link" 
+                               hx-get="/api/docs?type=contract" 
+                               hx-target=".docs-content"
+                               hx-trigger="click"
+                               hx-push-url="true">
                                 Contrato de Supervisor
                             </a>
                         </li>
@@ -48,106 +85,34 @@
             </div>
 
             <!-- Conteúdo Principal -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Documentação Legal</h1>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-dark">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="searchDocs" 
-                                   placeholder="Buscar na documentação...">
-                            <button class="btn btn-outline-secondary" type="button">
+                            <input type="text" 
+                                   class="form-control form-control-sm" 
+                                   name="search"
+                                   placeholder="Buscar na documentação..."
+                                   hx-get="/api/docs/search"
+                                   hx-trigger="keyup changed delay:500ms"
+                                   hx-target=".docs-content">
+                            <button class="btn btn-outline-secondary btn-sm" type="button">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Conteúdo dos documentos -->
-                <div class="docs-content">
-                    <!-- Cada seção será carregada via JavaScript -->
+                <div class="docs-content" 
+                     hx-get="/api/docs?type=terms" 
+                     hx-trigger="load">
+                    <!-- Conteúdo carregado via HTMX -->
                 </div>
             </main>
         </div>
     </div>
 
-    <script>
-    // Carregar documento
-    async function loadDocument(type) {
-        try {
-            const response = await fetch(`/api/docs?type=${type}`);
-            const data = await response.json();
-            
-            const content = document.querySelector('.docs-content');
-            content.innerHTML = `
-                <h1>${data.title}</h1>
-                <div class="doc-text">
-                    ${formatDocument(data.content)}
-                </div>
-            `;
-
-            // Atualizar links ativos
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            document.querySelector(`[href="#${type}"]`).classList.add('active');
-
-        } catch (error) {
-            console.error('Erro ao carregar documento:', error);
-        }
-    }
-
-    // Formatar documento (converter texto para HTML)
-    function formatDocument(text) {
-        return text
-            .split('\n')
-            .map(line => {
-                if (line.match(/^\d+\./)) {
-                    return `<h2>${line}</h2>`;
-                } else if (line.match(/^\s+[a-z]\)/)) {
-                    return `<p class="ms-4">${line}</p>`;
-                } else {
-                    return `<p>${line}</p>`;
-                }
-            })
-            .join('');
-    }
-
-    // Carregar documento inicial
-    document.addEventListener('DOMContentLoaded', () => {
-        loadDocument('terms');
-    });
-
-    // Adicionar listeners para links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const type = e.target.getAttribute('href').replace('#', '');
-            loadDocument(type);
-        });
-    });
-
-    // Implementar busca
-    const searchInput = document.getElementById('searchDocs');
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const content = document.querySelector('.docs-content');
-        
-        if (!searchTerm) {
-            content.querySelectorAll('p, h2').forEach(el => {
-                el.style.backgroundColor = '';
-            });
-            return;
-        }
-
-        content.querySelectorAll('p, h2').forEach(el => {
-            const text = el.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                el.style.backgroundColor = '#fff3cd';
-            } else {
-                el.style.backgroundColor = '';
-            }
-        });
-    });
-    </script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

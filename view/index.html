@@ -23,6 +23,9 @@
 
 <body>
 
+    <!-- Início Container Dinâmico usado pelo HTMX -->
+    <div id="dynamic-content-docs" class="mt-2">
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container px-5">
@@ -156,7 +159,19 @@
     <footer class="py-4 bg-dark text-white text-center">
         <div class="container">
             <p class="mb-0">Copyright &copy; Superviso 2024. Todos os direitos reservados.</p>
-            <p class="mt-4">De um psicólogo, para psicólogos 💜</p>
+            <div class="mt-4 mb-4">
+                <a href="/docs" 
+                   class="text-white text-decoration-none mt-2 d-inline-block"
+                   hx-get="/docs" 
+                   hx-target="body" 
+                   hx-swap="outerHTML"
+                   hx-push-url="true">
+                    <i class="fas fa-book me-2"></i>Documentação Legal
+                </a>
+            </div>
+            <div class="mt-4 mb-4">
+                <p class="mt-4">De um psicólogo, para psicólogos 💜</p>
+            </div>
             <div class="mt-4 mb-4">
                 <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
                 <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
@@ -214,6 +229,9 @@
             }
         }
     </script>
+    
+    <!-- FIM Container Dinâmico DOCS -->
+    </div>
 
 </body>
 </html>
