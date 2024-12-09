@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"superviso/api/auth"
 	"superviso/api/docs"
+	"superviso/api/supervisor"
 	"superviso/api/user"
 
 	"github.com/gorilla/mux"
@@ -51,10 +52,19 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 		http.ServeFile(w, r, "view/dashboard.html")
 	})).Methods("GET")
 
+	r.HandleFunc("/supervisors", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/supervisors.html")
+	})).Methods("GET")
+
+	r.HandleFunc("/partials/supervisor-list", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/partials/supervisor_list.html")
+	})).Methods("GET")
+
 	// API protegidas
 	r.HandleFunc("/profile", auth.AuthMiddleware(user.GetProfile(db))).Methods("GET")
 	r.HandleFunc("/api/profile/update", auth.AuthMiddleware(user.UpdateProfile(db))).Methods("POST")
 	r.HandleFunc("/api/profile/toggle-supervisor", auth.AuthMiddleware(user.ToggleSupervisor(db))).Methods("POST")
 	r.HandleFunc("/api/profile/check-role", auth.AuthMiddleware(user.CheckUserRole(db))).Methods("GET")
+	r.HandleFunc("/api/supervisors", auth.AuthMiddleware(supervisor.GetSupervisors(db))).Methods("GET")
 
 }

@@ -1,0 +1,22 @@
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {{range .}}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{.FirstName}} {{.LastName}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">CRP: {{.CRP}}</h6>
+                <p class="card-text">
+                    <strong>Abordagem:</strong> {{.TheoryApproach}}<br>
+                    <strong>Valor:</strong> R$ {{.SessionPrice}}<br>
+                    <strong>Horários:</strong> {{.StartTime}} - {{.EndTime}}
+                </p>
+                <button class="btn btn-primary"
+                        hx-get="/appointments/new?supervisor_id={{.UserID}}"
+                        hx-target="#main-content">
+                    Agendar Supervisão
+                </button>
+            </div>
+        </div>
+    </div>
+    {{end}}
+</div> 

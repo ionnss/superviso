@@ -1,0 +1,36 @@
+<div class="container py-5">
+    <h2 class="mb-4">Supervisores Disponíveis</h2>
+    
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form hx-get="/api/supervisors" 
+                  hx-target="#supervisor-list"
+                  hx-trigger="change">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Abordagem</label>
+                        <input type="text" 
+                               name="approach" 
+                               class="form-control"
+                               placeholder="Ex: Psicanálise">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Valor Máximo</label>
+                        <input type="number" 
+                               name="max_price" 
+                               class="form-control"
+                               placeholder="R$">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Lista de Supervisores -->
+    <div id="supervisor-list" 
+         hx-get="/api/supervisors" 
+         hx-trigger="load">
+        <!-- Será preenchido via HTMX -->
+    </div>
+</div> 
