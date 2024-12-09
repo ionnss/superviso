@@ -27,6 +27,22 @@ services:
     networks:
       - superviso_network
 
+  backup:
+    image: postgres:16.4
+    volumes:
+      - ./backups:/backups
+      - ./scripts:/scripts
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    entrypoint: [""]
+    command: ["/bin/bash", "-c", "while true; do /scripts/backup.sh; sleep 86400; done"]
+    depends_on:
+      - db
+    networks:
+      - superviso_network
+
 networks:
   superviso_network:
 
