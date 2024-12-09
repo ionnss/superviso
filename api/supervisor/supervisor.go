@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+	"strings"
+	"time"
 
 	"superviso/models"
 )
@@ -71,7 +73,38 @@ func GetSupervisors(db *sql.DB) http.HandlerFunc {
 
 		// Se a requisição for HTMX, retorna HTML
 		if r.Header.Get("HX-Request") == "true" {
-			tmpl := template.Must(template.ParseFiles("view/partials/supervisor_list.html"))
+			funcMap := template.FuncMap{
+				"formatTime": func(t string) string {
+					timeObj, err := time.Parse("15:04:05", t)
+					if err != nil {
+						return t
+					}
+					return timeObj.Format("15:04")
+				},
+				"formatDays": func(days string) string {
+					dayMap := map[string]string{
+						"1": "Segunda",
+						"2": "Terça",
+						"3": "Quarta",
+						"4": "Quinta",
+						"5": "Sexta",
+						"6": "Sábado",
+						"7": "Domingo",
+					}
+
+					var result []string
+					for _, day := range strings.Split(days, ",") {
+						if name, ok := dayMap[day]; ok {
+							result = append(result, name)
+						}
+					}
+					return strings.Join(result, ", ")
+				},
+			}
+
+			tmpl := template.Must(template.New("supervisor_list.html").
+				Funcs(funcMap).
+				ParseFiles("view/partials/supervisor_list.html"))
 			tmpl.Execute(w, supervisors)
 			return
 		}

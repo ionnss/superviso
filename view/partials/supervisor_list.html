@@ -8,7 +8,8 @@
                 <p class="card-text">
                     <strong>Abordagem:</strong> {{.TheoryApproach}}<br>
                     <strong>Valor:</strong> R$ {{.SessionPrice}}<br>
-                    <strong>Horários:</strong> {{.StartTime}} - {{.EndTime}}
+                    <strong>Dias:</strong> {{formatDays .AvailableDays}}<br>
+                    <strong>Horários:</strong> {{formatTime .StartTime}} - {{formatTime .EndTime}}
                 </p>
                 <button class="btn btn-primary"
                         hx-get="/appointments/new?supervisor_id={{.UserID}}"

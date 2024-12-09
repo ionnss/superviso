@@ -28,3 +28,7 @@ EXPOSE 8080
 
 # Comando para rodar o executável com wait-for-it
 CMD ["/wait-for-it.sh", "db:5432", "--", "./app_superviso"]
+
+# Dar permissão aos scripts de backup
+COPY scripts/backup.sh /scripts/
+RUN chmod +x /scripts/backup.sh
