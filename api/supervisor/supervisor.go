@@ -4,8 +4,10 @@ package supervisor
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,15 +37,23 @@ func GetSupervisors(db *sql.DB) http.HandlerFunc {
 			WHERE 1=1
 		`
 		var params []interface{}
+		paramCount := 1
 
 		if approach != "" {
-			query += " AND u.theory_approach ILIKE $1"
+			query += fmt.Sprintf(" AND u.theory_approach ILIKE $%d", paramCount)
 			params = append(params, "%"+approach+"%")
+			paramCount++
 		}
 
 		if maxPrice != "" {
-			query += " AND sp.session_price <= $2"
-			params = append(params, maxPrice)
+			query += fmt.Sprintf(" AND sp.session_price <= $%d", paramCount)
+			price, err := strconv.ParseFloat(maxPrice, 64)
+			if err != nil {
+				http.Error(w, "Valor máximo inválido", http.StatusBadRequest)
+				return
+			}
+			params = append(params, price)
+			paramCount++
 		}
 
 		query += " ORDER BY sp.created_at DESC"
@@ -75,9 +85,13 @@ func GetSupervisors(db *sql.DB) http.HandlerFunc {
 		if r.Header.Get("HX-Request") == "true" {
 			funcMap := template.FuncMap{
 				"formatTime": func(t string) string {
-					timeObj, err := time.Parse("15:04:05", t)
+					timeObj, err := time.Parse(time.RFC3339, t)
 					if err != nil {
-						return t
+						// Tentar outro formato caso o primeiro falhe
+						timeObj, err = time.Parse("2006-01-02T15:04:05Z", t)
+						if err != nil {
+							return t
+						}
 					}
 					return timeObj.Format("15:04")
 				},

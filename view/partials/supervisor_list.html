@@ -9,7 +9,7 @@
                     <strong>Abordagem:</strong> {{.TheoryApproach}}<br>
                     <strong>Valor:</strong> R$ {{.SessionPrice}}<br>
                     <strong>Dias:</strong> {{formatDays .AvailableDays}}<br>
-                    <strong>Horários:</strong> {{formatTime .StartTime}} - {{formatTime .EndTime}}
+                    <strong>Horário de Atendimento:</strong> das {{formatTime .StartTime}} às {{formatTime .EndTime}}
                 </p>
                 <button class="btn btn-primary"
                         hx-get="/appointments/new?supervisor_id={{.UserID}}"
