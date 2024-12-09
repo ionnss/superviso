@@ -16,13 +16,12 @@ type Document struct {
 func GetDocument(w http.ResponseWriter, r *http.Request) {
 	docType := r.URL.Query().Get("type")
 
-	// Mapa de arquivos
 	docFiles := map[string]string{
-		"terms":        "legal_docs/terms_of_service.txt",
-		"privacy":      "legal_docs/privacy_policy.txt",
-		"cancellation": "legal_docs/cancellation_policy.txt",
-		"fiscal":       "legal_docs/fiscal_guidelines.txt",
-		"contract":     "legal_docs/supervisor_contract.txt",
+		"terms":        "legal_docs/terms_of_service.md",
+		"privacy":      "legal_docs/privacy_policy.md",
+		"cancellation": "legal_docs/cancellation_policy.md",
+		"fiscal":       "legal_docs/fiscal_guidelines.md",
+		"contract":     "legal_docs/supervisor_contract.md",
 	}
 
 	if filePath, exists := docFiles[docType]; exists {
@@ -32,11 +31,8 @@ func GetDocument(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Formatar o conteúdo como HTML
-		html := formatDocumentHTML(string(content), getDocTitle(docType))
-
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(html))
+		w.Write([]byte(content))
 	} else {
 		http.Error(w, "Tipo de documento inválido", http.StatusBadRequest)
 	}
