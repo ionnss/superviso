@@ -1,12 +1,46 @@
 /* Estilos personalizados para o Superviso */
 
 body {
-    background: linear-gradient(135deg, #ff6f61, #681b98, #1e88e5); /* Substitua pelas cores desejadas */
+    background: linear-gradient(135deg, #ff6f61, #1c1c1c, #1c1c1c); /* Substitua pelas cores desejadas */
     background-attachment: fixed; /* Paralaxe */
     background-size: cover; /* Cobre toda a tela */
     color: #ffffff; /* Ajusta a cor do texto se necessário */
 }
 
+/* Navbar com efeito translúcido */
+.navbar {
+    background-color: rgba(28, 28, 28, 0.8) !important; /* Usando o #1c1c1c com transparência */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Cards com efeito translúcido */
+#features .col-lg-4 {
+    padding: 20px;
+}
+
+#features .col-lg-4 > div {
+    background-color: rgba(28, 28, 28, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 25px;
+    transition: transform 0.3s ease;
+}
+
+#features .col-lg-4 > div:hover {
+    transform: translateY(-5px);
+}
 
 /* Header */
 .masthead-content h1 {
