@@ -1,3 +1,12 @@
+// Package auth fornece funcionalidades de autenticação e autorização.
+//
+// Implementa:
+//   - Geração e validação de tokens JWT
+//   - Middleware de autenticação
+//   - Controle de contexto para usuário autenticado
+
+// Claims define a estrutura do payload do JWT.
+// Inclui ID e email do usuário, além dos claims padrão do JWT.
 package auth
 
 import (
@@ -11,14 +20,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
-
-// Package auth fornece funcionalidades de autenticação e autorização.
+// jwtKey é a chave secreta para assinar e verificar tokens JWT.
 //
-// Implementa:
-//   - Geração e validação de tokens JWT
-//   - Middleware de autenticação
-//   - Controle de contexto para usuário autenticado
+// A chave é obtida do ambiente ou definida como uma string fixa.
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 // Claims define a estrutura do payload do JWT.
 // Inclui ID e email do usuário, além dos claims padrão do JWT.
@@ -28,8 +33,13 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+// ContextKey é um tipo personalizado para chaves de contexto
+// para evitar colisões com outras chaves no contexto.
 type ContextKey string
 
+// Constantes para chaves de contexto.
+// UserIDKey: chave para ID do usuário no contexto
+// EmailKey: chave para email do usuário no contexto
 const (
 	UserIDKey ContextKey = "user_id"
 	EmailKey  ContextKey = "email"
@@ -59,7 +69,14 @@ func GenerateToken(userID int, email string) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
-// ValidateToken verifica se o token é válido
+// ValidateToken verifica se o token JWT é válido e retorna suas claims.
+//
+// Parâmetros:
+//   - tokenString: token JWT em formato string
+//
+// Retorna:
+//   - *Claims: claims do token se válido
+//   - error: erro se token inválido ou expirado
 func ValidateToken(tokenString string) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -77,7 +94,16 @@ func ValidateToken(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
-// AuthMiddleware protege rotas que precisam de autenticação
+// AuthMiddleware protege rotas que precisam de autenticação.
+//
+// Verifica se existe um token JWT válido no cookie e adiciona
+// informações do usuário (ID e email) no contexto da requisição.
+//
+// Parâmetros:
+//   - next: próxima função handler a ser executada
+//
+// Retorna:
+//   - http.HandlerFunc que verifica autenticação
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("token")

@@ -1,4 +1,21 @@
-// superviso/main.go
+// Package main é o ponto de entrada da plataforma Superviso.
+//
+// Superviso é uma plataforma web que conecta psicólogos a supervisores clínicos.
+//
+// A plataforma oferece:
+//   - Sistema de cadastro e autenticação segura
+//   - Perfis especializados para supervisores
+//   - Busca de supervisores por abordagem e valor
+//   - Agendamento de supervisões online
+//   - Backup automático de dados
+//   - Interface responsiva com HTMX
+//
+// Principais funcionalidades:
+//   - Registro e autenticação de usuários
+//   - Gerenciamento de perfis de supervisor
+//   - Sistema de busca e filtros
+//   - Agendamento de supervisões
+//   - Backup automático
 package main
 
 import (
@@ -10,15 +27,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Superviso é uma plataforma de conexão entre supervisores e supervisionados em Psicologia.
+// main é o ponto de entrada da aplicação.
 //
-// Principais características:
-//   - Sistema de autenticação seguro
-//   - Gerenciamento de perfis de supervisores
-//   - Agendamento de supervisões
-//   - Backup automático de dados
-//   - Interface responsiva com HTMX
-
+// Inicializa o servidor HTTP, configura o banco de dados e define as rotas.
 func main() {
 	// Conecta ao banco de dados
 	conn, err := db.Connect()
