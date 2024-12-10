@@ -37,31 +37,43 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">CRP</label>
+                            <input type="text" class="form-control" name="last_name" value="{{.CPR}}" required>
+                        </div>
+
+                        <div class="mb-3"></div>
+                            <label class="form-label">Abordagem Teórica</label>
+                            <input type="text" class="form-control" name="last_name" value="{{.TheoryApproach}}" required>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input type="email" class="form-control" value="{{.Email}}" readonly>
                         </div>
 
                         <!-- Toggle Supervisor -->
                         <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" 
-                                       name="is_supervisor" 
-                                       id="supervisorToggle"
-                                       {{if .IsSupervisor}}checked{{end}}
-                                       hx-post="/api/profile/toggle-supervisor"
-                                       hx-target="#supervisorFields"
-                                       hx-swap="innerHTML"
-                                       onchange="toggleSupervisorWarning(this)">
-                                <label class="form-check-label" for="supervisorToggle">
-                                    Quero ser supervisor
-                                </label>
-                            </div>
-                            
-                            <!-- Alerta informativo -->
-                            <div id="supervisorWarning" class="alert alert-info mt-2" style="display: none;">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Atenção:</strong> Ao ativar o modo supervisor, você não poderá ser supervisionado. 
-                                Esta escolha define seu papel principal no sistema.
+                            <div class="border border-danger rounded p-3 bg-danger bg-opacity-10">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="is_supervisor" 
+                                           id="supervisorToggle"
+                                           {{if .IsSupervisor}}checked{{end}}
+                                           hx-post="/api/profile/toggle-supervisor"
+                                           hx-target="#supervisorFields"
+                                           hx-swap="innerHTML"
+                                           onchange="toggleSupervisorWarning(this)">
+                                    <label class="form-check-label" for="supervisorToggle">
+                                        <strong>Quero ser supervisor</strong>
+                                    </label>
+                                </div>
+                                
+                                <!-- Alerta informativo -->
+                                <div id="supervisorWarning" class="alert alert-info mt-2" style="display: none;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Atenção:</strong> Ao ativar o modo supervisor, você não poderá ser supervisionado. 
+                                    Esta escolha define seu papel principal no sistema.
+                                </div>
                             </div>
                         </div>
 
