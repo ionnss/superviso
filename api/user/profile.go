@@ -3,7 +3,10 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 	"superviso/api/auth"
 	"text/template"
@@ -12,14 +15,20 @@ import (
 func UpdateProfile(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(auth.UserIDKey).(int)
+		var updateSuccess bool = false
 
 		// Atualiza informações básicas
 		_, err := db.Exec(`
 			UPDATE users 
-			SET first_name = $1, last_name = $2
-			WHERE id = $3`,
+			SET first_name = $1, 
+				last_name = $2,
+				crp = $3,
+				theory_approach = $4
+			WHERE id = $5`,
 			r.FormValue("first_name"),
 			r.FormValue("last_name"),
+			r.FormValue("crp"),
+			r.FormValue("theory_approach"),
 			userID,
 		)
 
@@ -28,6 +37,8 @@ func UpdateProfile(db *sql.DB) http.HandlerFunc {
 			w.Write([]byte(`<div class="alert alert-danger">Erro ao atualizar perfil</div>`))
 			return
 		}
+
+		updateSuccess = true // Marca que houve atualização básica com sucesso
 
 		// Verifica se o modo supervisor está ativo
 		if r.FormValue("is_supervisor") == "on" {
@@ -76,6 +87,8 @@ func UpdateProfile(db *sql.DB) http.HandlerFunc {
 				w.Write([]byte(`<div class="alert alert-danger">Erro ao atualizar perfil de supervisor</div>`))
 				return
 			}
+
+			updateSuccess = true // Marca que houve atualização do supervisor com sucesso
 		} else {
 			// Se não está ativo, remove o perfil de supervisor se existir
 			_, err = db.Exec(`DELETE FROM supervisor_profiles WHERE user_id = $1`, userID)
@@ -86,7 +99,10 @@ func UpdateProfile(db *sql.DB) http.HandlerFunc {
 			}
 		}
 
-		w.Write([]byte(`<div class="alert alert-success">Perfil atualizado com sucesso!</div>`))
+		// Se qualquer atualização foi bem sucedida, mostra mensagem de sucesso
+		if updateSuccess {
+			w.Write([]byte(`<div class="alert alert-success">Perfil atualizado com sucesso!</div>`))
+		}
 	}
 }
 
@@ -101,23 +117,25 @@ func GetProfile(db *sql.DB) http.HandlerFunc {
 		userID := r.Context().Value(auth.UserIDKey).(int)
 
 		var user struct {
-			FirstName     string
-			LastName      string
-			Email         string
-			IsSupervisor  bool
-			HasRole       bool
-			SessionPrice  float64
-			AvailableDays string
-			StartTime     string
-			EndTime       string
+			FirstName      string
+			LastName       string
+			Email          string
+			CRP            string
+			TheoryApproach string
+			IsSupervisor   bool
+			HasRole        bool
+			SessionPrice   float64
+			AvailableDays  string
+			StartTime      string
+			EndTime        string
 		}
 
 		// Busca dados básicos
 		err := db.QueryRow(`
-			SELECT first_name, last_name, email 
+			SELECT first_name, last_name, email, crp, theory_approach 
 			FROM users WHERE id = $1`,
 			userID,
-		).Scan(&user.FirstName, &user.LastName, &user.Email)
+		).Scan(&user.FirstName, &user.LastName, &user.Email, &user.CRP, &user.TheoryApproach)
 
 		if err != nil {
 			http.Error(w, "Erro ao buscar dados do usuário", http.StatusInternalServerError)
@@ -231,5 +249,66 @@ func CheckUserRole(db *sql.DB) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]bool{"hasRole": hasRole})
+	}
+}
+
+func UploadProfileImage(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(auth.UserIDKey).(int)
+
+		// Parse do formulário multipart
+		err := r.ParseMultipartForm(10 << 20) // 10MB max
+		if err != nil {
+			w.Write([]byte(`<div class="alert alert-danger">Erro ao processar imagem</div>`))
+			return
+		}
+
+		file, handler, err := r.FormFile("profile_image")
+		if err != nil {
+			w.Write([]byte(`<div class="alert alert-danger">Erro ao receber arquivo</div>`))
+			return
+		}
+		defer file.Close()
+
+		// Validar tipo do arquivo
+		if !strings.HasPrefix(handler.Header.Get("Content-Type"), "image/") {
+			w.Write([]byte(`<div class="alert alert-danger">Arquivo deve ser uma imagem</div>`))
+			return
+		}
+
+		// Criar diretório se não existir
+		uploadDir := "uploads/profile_images"
+		os.MkdirAll(uploadDir, 0755)
+
+		// Gerar nome único para o arquivo
+		filename := fmt.Sprintf("%d_%s", userID, handler.Filename)
+		filepath := fmt.Sprintf("%s/%s", uploadDir, filename)
+
+		// Salvar arquivo
+		dst, err := os.Create(filepath)
+		if err != nil {
+			w.Write([]byte(`<div class="alert alert-danger">Erro ao salvar imagem</div>`))
+			return
+		}
+		defer dst.Close()
+
+		if _, err := io.Copy(dst, file); err != nil {
+			w.Write([]byte(`<div class="alert alert-danger">Erro ao copiar arquivo</div>`))
+			return
+		}
+
+		// Atualizar caminho no banco
+		_, err = db.Exec(`
+			UPDATE users 
+			SET profile_image = $1 
+			WHERE id = $2`,
+			"/"+filepath, userID)
+
+		if err != nil {
+			w.Write([]byte(`<div class="alert alert-danger">Erro ao atualizar perfil</div>`))
+			return
+		}
+
+		w.Write([]byte(`<div class="alert alert-success">Foto atualizada com sucesso!</div>`))
 	}
 }

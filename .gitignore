@@ -1,3 +1,7 @@
 + # Backups
 + backups/
 + backups/* 
+
+# Environment variables
++ .env
++ .env.*

@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
     theory_approach VARCHAR(100) NOT NULL,
     failed_login_attempts INT DEFAULT 0,
     last_failed_login TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_image VARCHAR(255)
 );

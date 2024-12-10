@@ -1,7 +1,7 @@
 /* Estilos personalizados para o Superviso */
 
 body {
-    background: linear-gradient(135deg, #ff6f61, #1c1c1c, #1c1c1c); /* Substitua pelas cores desejadas */
+    background: linear-gradient(135deg, #f2a50a, #ff6f61, #1c1c1c); /* Substitua pelas cores desejadas */
     background-attachment: fixed; /* Paralaxe */
     background-size: cover; /* Cobre toda a tela */
     color: #ffffff; /* Ajusta a cor do texto se necessário */
@@ -9,10 +9,19 @@ body {
 
 /* Navbar com efeito translúcido */
 .navbar {
-    background-color: rgba(28, 28, 28, 0.8) !important; /* Usando o #1c1c1c com transparência */
+    background-color: rgba(28, 28, 28, 0.8) !important;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    margin: 1rem 2rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Container da navbar */
+.navbar > .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
 }
 
 .navbar-light .navbar-nav .nav-link {
@@ -20,6 +29,15 @@ body {
 }
 
 .navbar-light .navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Ajuste da cor do brand (Superviso) */
+.navbar-light .navbar-brand {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.navbar-light .navbar-brand:hover {
     color: #ffffff !important;
 }
 
@@ -134,4 +152,311 @@ footer {
 
 .supervisor-hidden {
     display: none;
+}
+
+/* Ajuste do espaçamento do conteúdo principal */
+#dynamic-content {
+    margin-top: 6rem !important; /* Aumentado para compensar a navbar flutuante */
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .navbar {
+        margin: 0.5rem 1rem;
+    }
+    
+    #dynamic-content {
+        margin-top: 5rem !important;
+    }
+}
+
+/* Tema escuro para Dashboard */
+.card {
+    background-color: rgba(28, 28, 28, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.card-header {
+    background-color: rgba(40, 40, 40, 0.8) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-light {
+    background-color: rgba(28, 28, 28, 0.8) !important;
+}
+
+/* Breadcrumb escuro */
+.breadcrumb {
+    background-color: transparent !important;
+}
+
+.breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: #ffffff !important;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Inputs e forms em tema escuro */
+.form-control {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white !important;
+}
+
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Ajustes para texto em cards */
+.card-title, .card-text {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Ajustes para ícones e badges */
+.badge {
+    background-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* Ajustes para tabelas */
+.table {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.table td, .table th {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ajustes para modais */
+.modal-content {
+    background-color: rgba(28, 28, 28, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ajustes para dropdowns */
+.dropdown-menu {
+    background-color: rgba(28, 28, 28, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* Ajustes para labels e textos em forms */
+.form-label {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ajuste para textos em cards */
+.card-body {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ajuste para listas em cards */
+.card-body ul li {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ajuste para títulos de cards */
+.card-header h4 {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ajuste para textos em alertas */
+.alert {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ajuste para todos os textos dentro de cards */
+.card * {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Alerta de atenção (vermelho) */
+#supervisorWarning.alert-info {
+    background-color: rgb(220, 53, 69) !important;  /* Vermelho sólido */
+    border-color: rgb(220, 53, 69) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Alerta informativo (azul) */
+.bg-light.rounded {
+    background-color: rgb(13, 110, 253) !important;  /* Azul sólido */
+    border: 1px solid rgb(13, 110, 253) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ícones nos alertas */
+.alert i {
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-right: 0.5rem;
+}
+
+/* Alertas de sucesso */
+.alert-success {
+    background-color: rgb(25, 135, 84) !important;  /* Verde sólido */
+    border-color: rgb(25, 135, 84) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Alertas de erro */
+.alert-danger {
+    background-color: rgb(220, 53, 69) !important;  /* Vermelho sólido */
+    border-color: rgb(220, 53, 69) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Efeito de fade out para mensagens de sucesso */
+.alert {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.alert.fade-out {
+    opacity: 0;
+}
+
+/* Breadcrumb escuro com efeito translúcido */
+.bg-light.rounded.shadow-sm {
+    background-color: rgba(28, 28, 28, 0.8) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ajuste do cifrão nos inputs */
+.input-group-text {
+    background-color: rgba(28, 28, 28, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ícones de horário */
+input[name="start_time"]::-webkit-calendar-picker-indicator {
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); /* Verde */
+}
+
+input[name="end_time"]::-webkit-calendar-picker-indicator {
+    filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%); /* Vermelho */
+}
+
+/* Para Firefox e outros navegadores */
+input[type="time"].start-time {
+    color-scheme: dark;
+}
+
+input[type="time"].end-time {
+    color-scheme: dark;
+}
+
+/* Card de registro */
+.register-card {
+    background-color: rgba(28, 28, 28, 0.8) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+/* Uniformização dos inputs */
+.form-control {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white !important;
+}
+
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Card de aviso no dashboard */
+#roleWarning .card {
+    background-color: rgb(44, 48, 52) !important; /* Fundo escuro sólido */
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+#roleWarning .card-body {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+#roleWarning .card-title {
+    color: rgba(255, 255, 255, 1) !important;
+    font-weight: 600;
+}
+
+#roleWarning ul {
+    margin-left: 1.5rem;
+}
+
+#roleWarning ul li {
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-bottom: 0.5rem;
+}
+
+#roleWarning .fa-info-circle {
+    color: rgb(255, 152, 0) !important; /* Ícone em laranja sólido */
+}
+
+/* Ajuste do ícone do menu hambúrguer */
+.navbar-light .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1) !important;
+}
+
+.profile-image {
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.profile-image:hover {
+    border-color: rgba(255, 255, 255, 0.4);
 }

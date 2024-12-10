@@ -11,5 +11,6 @@ type User struct {
 	PasswordHash   string    `json:"-"`
 	CRP            string    `json:"crp"`
 	TheoryApproach string    `json:"theory_approach"`
+	ProfileImage   string    `json:"profile_image"`
 	CreatedAt      time.Time `json:"created_at"`
 }
