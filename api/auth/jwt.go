@@ -13,6 +13,15 @@ import (
 
 var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
+// Package auth fornece funcionalidades de autenticação e autorização.
+//
+// Implementa:
+//   - Geração e validação de tokens JWT
+//   - Middleware de autenticação
+//   - Controle de contexto para usuário autenticado
+
+// Claims define a estrutura do payload do JWT.
+// Inclui ID e email do usuário, além dos claims padrão do JWT.
 type Claims struct {
 	UserID int    `json:"user_id"`
 	Email  string `json:"email"`
@@ -26,7 +35,15 @@ const (
 	EmailKey  ContextKey = "email"
 )
 
-// GenerateToken cria um novo token JWT
+// GenerateToken cria um novo token JWT para um usuário.
+//
+// Parâmetros:
+//   - userID: ID do usuário
+//   - email: Email do usuário
+//
+// Retorna:
+//   - string: token JWT assinado
+//   - error: erro se houver falha na geração
 func GenerateToken(userID int, email string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{

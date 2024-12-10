@@ -10,6 +10,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Package user implementa o gerenciamento de usuários do Superviso.
+//
+// Fornece funcionalidades para:
+//   - Registro e autenticação de usuários
+//   - Gerenciamento de perfis (supervisor/supervisionado)
+//   - Atualização de informações pessoais
+//   - Controle de sessão
+
+// Register registra um novo usuário no sistema.
+//
+// Recebe os dados do usuário via formulário HTTP e cria um novo registro no banco.
+// Os campos obrigatórios são: first_name, last_name, email, cpf, crp e theory_approach.
+//
+// Retorna:
+//   - Status 201: usuário criado com sucesso
+//   - Status 400: dados inválidos
+//   - Status 500: erro interno do servidor
 func Register(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
@@ -68,6 +85,15 @@ func Register(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// Login autentica um usuário e gera um token JWT.
+//
+// Valida as credenciais (email/senha) e, se corretas, gera um token JWT
+// que será usado para autenticar requisições subsequentes.
+//
+// Retorna:
+//   - Status 200: login bem sucedido, com token JWT
+//   - Status 401: credenciais inválidas
+//   - Status 500: erro interno do servidor
 func Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User

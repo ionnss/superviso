@@ -10,6 +10,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Superviso é uma plataforma de conexão entre supervisores e supervisionados em Psicologia.
+//
+// Principais características:
+//   - Sistema de autenticação seguro
+//   - Gerenciamento de perfis de supervisores
+//   - Agendamento de supervisões
+//   - Backup automático de dados
+//   - Interface responsiva com HTMX
+
 func main() {
 	// Conecta ao banco de dados
 	conn, err := db.Connect()

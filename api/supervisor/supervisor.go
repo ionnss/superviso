@@ -14,6 +14,12 @@ import (
 	"superviso/models"
 )
 
+// Package supervisor gerencia as funcionalidades específicas de supervisores.
+//
+// Inclui funcionalidades para:
+//   - Listagem de supervisores disponíveis
+//   - Filtros por abordagem e valor
+//   - Gerenciamento de horários e disponibilidade
 func GetSupervisors(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Parâmetros de filtro

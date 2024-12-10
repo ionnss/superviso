@@ -2,6 +2,15 @@ package models
 
 import "time"
 
+// Package models define as estruturas de dados principais do sistema.
+//
+// Contém:
+//   - Modelos de usuário
+//   - Modelos de supervisor
+//   - Estruturas de agendamento
+
+// Supervisor representa um profissional que oferece supervisão.
+// Contém informações básicas do usuário e dados específicos de supervisor.
 type Supervisor struct {
 	UserID         int       `json:"user_id"`
 	FirstName      string    `json:"first_name"`

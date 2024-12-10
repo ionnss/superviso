@@ -12,7 +12,25 @@ import (
 
 var DB *sql.DB
 
-// Connect inicializa a conexão com o banco de dados e a retorna
+// Package db gerencia a conexão e operações com o banco de dados PostgreSQL.
+//
+// Fornece:
+//   - Conexão com o banco de dados
+//   - Execução de migrações
+//   - Gerenciamento de transações
+
+// Connect inicializa e retorna uma conexão com o banco de dados.
+//
+// Utiliza variáveis de ambiente para configuração:
+//   - DB_HOST: host do banco
+//   - DB_PORT: porta
+//   - DB_USER: usuário
+//   - DB_PASSWORD: senha
+//   - DB_NAME: nome do banco
+//
+// Retorna:
+//   - *sql.DB: conexão com o banco
+//   - error: erro se a conexão falhar
 func Connect() (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
