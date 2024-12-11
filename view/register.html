@@ -10,10 +10,8 @@
                     <div id="message-container"></div>
                     
                     <form class="row justify-content-center gx-3 gy-2" 
-                        hx-post="/users/register"
                         hx-target="#message-container"
                         hx-swap="innerHTML"
-                        hx-indicator=".button-spinner"
                         hx-on::after-request="handleFormResponse(event)"
                         novalidate>
                         
@@ -91,10 +89,11 @@
                         <div class="col-12 text-center mt-4">
                             <button type="submit" 
                                     class="btn btn-primary btn-lg rounded-pill"
-                                    hx-disabled-elt="this"
-                                    hx-indicator=".button-spinner">
+                                    hx-post="/users/register"
+                                    hx-indicator="#register-spinner"
+                                    hx-disabled-elt="this">
                                 <span class="htmx-indicator-hidden">Cadastrar</span>
-                                <span class="button-spinner htmx-indicator">
+                                <span id="register-spinner" class="htmx-indicator">
                                     <span class="spinner-border spinner-border-sm me-2"></span>
                                     Cadastrando...
                                 </span>

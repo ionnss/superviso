@@ -9,10 +9,9 @@
             
             <div id="system-message"></div>
             
-            <form hx-post="/users/login" 
+            <form 
                   hx-target="#message-container"
                   hx-swap="innerHTML"
-                  hx-indicator=".button-spinner"
                   hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/dashboard', 1500)">
                 
                 <div class="mb-3">
@@ -28,10 +27,11 @@
                 <div class="d-grid gap-2">
                     <button type="submit" 
                             class="btn btn-primary btn-lg rounded-pill"
-                            hx-disabled-elt="this"
-                            hx-indicator=".button-spinner">
+                            hx-post="/users/login"
+                            hx-indicator="#login-spinner"
+                            hx-disabled-elt="this">
                         <span class="htmx-indicator-hidden">Entrar</span>
-                        <span class="button-spinner htmx-indicator">
+                        <span id="login-spinner" class="htmx-indicator">
                             <span class="spinner-border spinner-border-sm me-2"></span>
                             Entrando...
                         </span>
