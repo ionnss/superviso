@@ -164,10 +164,19 @@ func Register(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		if err := SendVerificationEmail(db, user.ID, user.Email); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao enviar email de verificação. Por favor, tente novamente.
+			</div>`))
+			return
+		}
+
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte(`<div class="alert alert-success">
 			<i class="fas fa-check-circle me-2"></i>
-			Cadastro realizado com sucesso! Você será redirecionado...
+			Cadastro realizado com sucesso! Verifique seu email para ativar sua conta.
 		</div>`))
 	}
 }
@@ -184,13 +193,14 @@ func Register(db *sql.DB) http.HandlerFunc {
 func Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
+		var emailVerified bool
 
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
-		// Busca usuário pelo email
-		query := `SELECT id, email, password_hash FROM users WHERE email = $1`
-		err := db.QueryRow(query, email).Scan(&user.ID, &user.Email, &user.PasswordHash)
+		// Busca usuário e status de verificação
+		query := `SELECT id, email, password_hash, email_verified FROM users WHERE email = $1`
+		err := db.QueryRow(query, email).Scan(&user.ID, &user.Email, &user.PasswordHash, &emailVerified)
 
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -199,6 +209,16 @@ func Login(db *sql.DB) http.HandlerFunc {
 		} else if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`<div class="alert alert-danger">Erro ao buscar usuário</div>`))
+			return
+		}
+
+		// Verificar se email foi confirmado
+		if !emailVerified {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`<div class="alert alert-warning">
+				Por favor, confirme seu email antes de fazer login. 
+				<a href="#" onclick="resendVerification('` + email + `')">Reenviar email de confirmação</a>
+			</div>`))
 			return
 		}
 

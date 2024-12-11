@@ -67,4 +67,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/api/profile/check-role", auth.AuthMiddleware(user.CheckUserRole(db))).Methods("GET")
 	r.HandleFunc("/api/supervisors", auth.AuthMiddleware(supervisor.GetSupervisors(db))).Methods("GET")
 
+	r.HandleFunc("/verify-email", user.VerifyEmail(db)).Methods("GET")
+	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
+
 }

@@ -12,5 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     theory_approach VARCHAR(100) NOT NULL,
     failed_login_attempts INT DEFAULT 0,
     last_failed_login TIMESTAMP,
+    email_verified BOOLEAN DEFAULT FALSE,
+    verification_token VARCHAR(100),
+    verification_token_expires TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

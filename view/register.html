@@ -13,8 +13,18 @@
                         hx-post="/users/register"
                         hx-target="#message-container"
                         hx-swap="innerHTML"
+                        hx-indicator="#loading-indicator"
                         hx-on::after-request="handleFormResponse(event)"
                         novalidate>
+                        
+                        <div id="loading-indicator" class="htmx-indicator text-center mb-3">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="spinner-border text-primary me-2" role="status">
+                                    <span class="visually-hidden">Cadastrando...</span>
+                                </div>
+                                <span>Processando seu cadastro...</span>
+                            </div>
+                        </div>
                         
                         <div class="col-md-6">
                             <label for="firstName" class="form-label">Nome</label>
@@ -88,8 +98,11 @@
                         </div>
                         
                         <div class="col-12 text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
-                                Cadastrar
+                            <button type="submit" 
+                                    class="btn btn-primary btn-lg px-5 rounded-pill"
+                                    hx-disabled-elt="this">
+                                <span class="htmx-indicator-hidden">Cadastrar</span>
+                                <span class="htmx-indicator">Cadastrando...</span>
                             </button>
                         </div>
                     </form>
