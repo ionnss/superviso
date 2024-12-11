@@ -16,7 +16,7 @@
                     <strong>Horário de Atendimento:</strong> das {{formatTime .StartTime}} às {{formatTime .EndTime}}
                 </p>
                 <button class="btn btn-primary"
-                        hx-get="/appointments/new?supervisor_id={{.UserID}}"
+                        hx-get="/appointments/schedule?supervisor_id={{.UserID}}"
                         hx-target="#main-content">
                     Agendar Supervisão
                 </button>
