@@ -89,6 +89,8 @@ func VerifyEmail(db *sql.DB) http.HandlerFunc {
 func ResendVerification(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
+		fmt.Printf("Tentando reenviar email para: %s\n", email)
+
 		if email == "" {
 			http.Error(w, "Email não fornecido", http.StatusBadRequest)
 			return

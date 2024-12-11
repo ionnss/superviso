@@ -461,20 +461,3 @@ input[type="time"].end-time {
     border-color: rgba(255, 255, 255, 0.4);
 }
 
-/* Estilos para indicadores de loading HTMX */
-.htmx-indicator {
-    display: none;
-}
-
-.htmx-request .htmx-indicator {
-    display: block !important;
-}
-
-.htmx-request .htmx-indicator-hidden {
-    display: none;
-}
-
-.htmx-request.btn {
-    opacity: 0.7;
-    cursor: not-allowed;
-}

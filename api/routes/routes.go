@@ -40,6 +40,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/users/login", user.Login(db)).Methods("POST")
 	r.HandleFunc("/users/logout", user.Logout).Methods("POST")
 	r.HandleFunc("/api/docs", docs.GetDocument).Methods("GET")
+	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
 
 	// Rotas Páginas protegidas
 	r.HandleFunc("/api/test-auth", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {

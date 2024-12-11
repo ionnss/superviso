@@ -216,8 +216,12 @@ func Login(db *sql.DB) http.HandlerFunc {
 		if !emailVerified {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte(`<div class="alert alert-warning">
-				Por favor, confirme seu email antes de fazer login. 
-				<a href="#" onclick="resendVerification('` + email + `')">Reenviar email de confirmação</a>
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Por favor, confirme seu email antes de fazer login.<br>
+				<button class="btn btn-link p-0 mt-2" onclick="resendVerification('` + email + `')">
+					<i class="fas fa-envelope me-1"></i>
+					Reenviar email de confirmação
+				</button>
 			</div>`))
 			return
 		}

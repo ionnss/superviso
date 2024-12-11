@@ -12,17 +12,8 @@
             <form hx-post="/users/login" 
                   hx-target="#message-container"
                   hx-swap="innerHTML"
-                  hx-indicator="#loading-indicator"
+                  hx-indicator=".button-spinner"
                   hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/dashboard', 1500)">
-                
-                <div id="loading-indicator" class="htmx-indicator text-center mb-3">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <div class="spinner-border text-primary me-2" role="status">
-                            <span class="visually-hidden">Entrando...</span>
-                        </div>
-                        <span>Verificando suas credenciais...</span>
-                    </div>
-                </div>
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail</label>
@@ -37,9 +28,10 @@
                 <div class="d-grid gap-2">
                     <button type="submit" 
                             class="btn btn-primary btn-lg rounded-pill"
-                            hx-disabled-elt="this">
+                            hx-disabled-elt="this"
+                            hx-indicator=".button-spinner">
                         <span class="htmx-indicator-hidden">Entrar</span>
-                        <span class="htmx-indicator">
+                        <span class="button-spinner htmx-indicator">
                             <span class="spinner-border spinner-border-sm me-2"></span>
                             Entrando...
                         </span>
@@ -87,4 +79,39 @@ if (msg) {
             break;
     }
 }
+
+function resendVerification(email) {
+    const messageContainer = document.getElementById('message-container');
+    messageContainer.innerHTML = `
+        <div class="alert alert-info d-flex align-items-center">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <span>Reenviando email de verificação para ${email}...</span>
+        </div>
+    `;
+    
+    htmx.ajax('POST', '/resend-verification', {
+        target: '#message-container',
+        swap: 'innerHTML',
+        values: { email: email }
+    });
+}
 </script>
+
+<style>
+    .htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: block !important;
+}
+
+.htmx-request .htmx-indicator-hidden {
+    display: none;
+}
+
+.htmx-request.btn {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+</style>
