@@ -13,7 +13,7 @@
                     </div>
                     <p class="card-text">
                         <i class="far fa-clock me-2"></i>
-                        {{.StartTime}} - {{.EndTime}}
+                        {{formatTimeForDisplay .StartTime}} - {{formatTimeForDisplay .EndTime}}
                     </p>
                     <button class="btn btn-primary w-100"
                             hx-post="/api/appointments/book"

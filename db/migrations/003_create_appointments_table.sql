@@ -25,7 +25,21 @@ CREATE TABLE IF NOT EXISTS appointments (
 );
 
 -- Índices para melhor performance
-CREATE INDEX idx_slots_supervisor ON available_slots(supervisor_id);
-CREATE INDEX idx_slots_date ON available_slots(slot_date);
-CREATE INDEX idx_appointments_supervisor ON appointments(supervisor_id);
-CREATE INDEX idx_appointments_supervisee ON appointments(supervisee_id); 
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_slots_supervisor') THEN
+        CREATE INDEX idx_slots_supervisor ON available_slots(supervisor_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_slots_date') THEN
+        CREATE INDEX idx_slots_date ON available_slots(slot_date);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_appointments_supervisor') THEN
+        CREATE INDEX idx_appointments_supervisor ON appointments(supervisor_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_appointments_supervisee') THEN
+        CREATE INDEX idx_appointments_supervisee ON appointments(supervisee_id);
+    END IF;
+END $$; 

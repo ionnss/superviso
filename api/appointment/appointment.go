@@ -141,7 +141,8 @@ func GetAvailableSlots(db *sql.DB) http.HandlerFunc {
 
 		// Funções para o template
 		funcMap := template.FuncMap{
-			"formatDate": formatDate,
+			"formatDate":           formatDate,
+			"formatTimeForDisplay": formatTimeForDisplay,
 		}
 
 		// Renderizar partial com os slots
@@ -265,8 +266,8 @@ func generateSlots(supervisorID int, startTime, endTime string, availableDays []
 			slot := models.AvailableSlot{
 				SupervisorID: supervisorID,
 				SlotDate:     date,
-				StartTime:    startTime,
-				EndTime:      endTime,
+				StartTime:    formatTimeForDB(startTime),
+				EndTime:      formatTimeForDB(endTime),
 				Status:       "available",
 			}
 			slots = append(slots, slot)
@@ -282,4 +283,21 @@ func nextWeekday(start time.Time, weekday time.Weekday) time.Time {
 		date = date.AddDate(0, 0, 1)
 	}
 	return date
+}
+
+// formatTimeForDB converte o horário para o formato aceito pelo PostgreSQL
+func formatTimeForDB(timeStr string) string {
+	// Assumindo que timeStr está no formato "15:04:05"
+	return timeStr
+}
+
+// formatTimeForDisplay formata o horário para exibição
+func formatTimeForDisplay(timeStr string) string {
+	// Parse do horário
+	t, err := time.Parse("15:04:05", timeStr)
+	if err != nil {
+		return timeStr
+	}
+	// Retorna no formato "15:04"
+	return t.Format("15:04")
 }
