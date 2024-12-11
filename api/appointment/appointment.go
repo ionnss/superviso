@@ -80,7 +80,9 @@ func GetAvailableSlots(db *sql.DB) http.HandlerFunc {
 		// Buscar horários do supervisor
 		var startTime, endTime string
 		err = db.QueryRow(`
-			SELECT start_time, end_time
+			SELECT 
+				start_time::time::text,
+				end_time::time::text
 			FROM supervisor_profiles
 			WHERE user_id = $1`,
 			supID).Scan(&startTime, &endTime)
@@ -97,7 +99,7 @@ func GetAvailableSlots(db *sql.DB) http.HandlerFunc {
 			_, err = db.Exec(`
 				INSERT INTO available_slots 
 				(supervisor_id, slot_date, start_time, end_time, status)
-				VALUES ($1, $2, $3, $4, $5)
+				VALUES ($1, $2, $3::time, $4::time, $5)
 				ON CONFLICT (supervisor_id, slot_date, start_time) DO NOTHING`,
 				slot.SupervisorID, slot.SlotDate, slot.StartTime, slot.EndTime, slot.Status)
 			if err != nil {
@@ -287,17 +289,15 @@ func nextWeekday(start time.Time, weekday time.Weekday) time.Time {
 
 // formatTimeForDB converte o horário para o formato aceito pelo PostgreSQL
 func formatTimeForDB(timeStr string) string {
-	// Assumindo que timeStr está no formato "15:04:05"
-	return timeStr
+	return timeStr // O horário já vem no formato correto do banco
 }
 
 // formatTimeForDisplay formata o horário para exibição
 func formatTimeForDisplay(timeStr string) string {
-	// Parse do horário
+	// Parse do horário no formato HH:MM:SS
 	t, err := time.Parse("15:04:05", timeStr)
 	if err != nil {
 		return timeStr
 	}
-	// Retorna no formato "15:04"
 	return t.Format("15:04")
 }
