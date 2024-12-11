@@ -3,11 +3,11 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/dashboard#supervisores">Supervisores</a></li>
+            <li class="breadcrumb-item"><a href="/supervisors" hx-get="/supervisors" hx-target="#main-content">Supervisores</a></li>
             <li class="breadcrumb-item active">Agendar Supervisão</li>
         </ol>
     </nav>
-    <a href="/dashboard#supervisores" class="btn btn-outline-primary">
+    <a href="/supervisors" hx-get="/supervisors" hx-target="#main-content" class="btn btn-outline-primary">
         <i class="fas fa-arrow-left"></i> Voltar aos Supervisores
     </a>
 </div>
