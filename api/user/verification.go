@@ -82,7 +82,7 @@ func VerifyEmail(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Redirecionar para página de login com mensagem de sucesso
-		http.Redirect(w, r, "/login?msg=email_verified", http.StatusSeeOther)
+		http.Redirect(w, r, "/?verified=true", http.StatusSeeOther)
 	}
 }
 
