@@ -75,28 +75,45 @@
     </div>
 </div>
 
+<style>
+    .btn-confirm-hover {
+        transition: all 0.3s ease !important;
+    }
+
+    .btn-confirm-hover:hover {
+        background-color: #198754 !important;
+        border-color: #198754 !important;
+    }
+</style>
+
 <!-- Modal de Confirmação -->
 <div class="modal" id="confirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="background-color: #212529 !important; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: none;">
             <div class="modal-header">
                 <h5 class="modal-title">Confirmar Agendamento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Você está agendando uma supervisão para:</p>
                 <ul class="list-unstyled">
-                    <li><i class="far fa-calendar-alt me-2"></i><span id="modalDate"></span></li>
+                    <li>
+                        <i class="far fa-calendar-alt me-2"></i>
+                        <span id="modalDate"></span>
+                        <span class="text-muted ms-2">(<span id="modalWeekday"></span>)</span>
+                    </li>
                     <li><i class="far fa-clock me-2"></i><span id="modalTime"></span></li>
                 </ul>
-                <div class="alert alert-info">
+                <div class="alert alert-info" style="background-color: rgb(13, 110, 253); color: white; border: none;">
                     <i class="fas fa-info-circle me-2"></i>
                     Após a confirmação, o supervisor será notificado e poderá aceitar ou recusar o agendamento.
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="confirmBooking"
+                <button type="button" 
+                        class="btn btn-primary btn-confirm-hover" 
+                        id="confirmBooking"
                         hx-post="/api/appointments/book"
                         hx-target="#message-container"
                         hx-indicator="#modalSpinner">
@@ -110,3 +127,20 @@
         </div>
     </div>
 </div> 
+
+<script>
+document.addEventListener('show.bs.modal', function (event) {
+    if (event.target.id === 'confirmModal') {
+        const button = event.relatedTarget;
+        const slotId = button.getAttribute('data-slot-id');
+        const slotDate = button.getAttribute('data-slot-date');
+        const slotWeekday = button.getAttribute('data-slot-weekday');
+        const slotTime = button.getAttribute('data-slot-time');
+        
+        document.getElementById('modalDate').textContent = slotDate;
+        document.getElementById('modalWeekday').textContent = slotWeekday;
+        document.getElementById('modalTime').textContent = slotTime;
+        document.getElementById('confirmBooking').setAttribute('hx-vals', `{"slot_id": ${slotId}}`);
+    }
+});
+</script> 

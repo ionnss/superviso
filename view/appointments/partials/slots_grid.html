@@ -20,6 +20,7 @@
                             data-bs-target="#confirmModal"
                             data-slot-id="{{.ID}}"
                             data-slot-date="{{formatDate .SlotDate}}"
+                            data-slot-weekday="{{formatWeekdayFromDate .SlotDate}}"
                             data-slot-time="{{formatTimeForDisplay .StartTime}} - {{formatTimeForDisplay .EndTime}}">
                         Agendar
                     </button>

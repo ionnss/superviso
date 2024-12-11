@@ -53,6 +53,18 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 		// Funções para o template
 		funcMap := template.FuncMap{
 			"formatWeekday": formatWeekday,
+			"formatWeekdayFromDate": func(t time.Time) string {
+				weekdays := map[int]string{
+					0: "Domingo",
+					1: "Segunda-feira",
+					2: "Terça-feira",
+					3: "Quarta-feira",
+					4: "Quinta-feira",
+					5: "Sexta-feira",
+					6: "Sábado",
+				}
+				return weekdays[int(t.Weekday())]
+			},
 		}
 
 		// Renderizar template
@@ -145,6 +157,18 @@ func GetAvailableSlots(db *sql.DB) http.HandlerFunc {
 		funcMap := template.FuncMap{
 			"formatDate":           formatDate,
 			"formatTimeForDisplay": formatTimeForDisplay,
+			"formatWeekdayFromDate": func(t time.Time) string {
+				weekdays := map[int]string{
+					0: "Domingo",
+					1: "Segunda-feira",
+					2: "Terça-feira",
+					3: "Quarta-feira",
+					4: "Quinta-feira",
+					5: "Sexta-feira",
+					6: "Sábado",
+				}
+				return weekdays[int(t.Weekday())]
+			},
 		}
 
 		// Renderizar partial com os slots
@@ -170,12 +194,17 @@ func parseAvailableDays(days string) []string {
 // BookAppointment processa o agendamento de uma supervisão
 func BookAppointment(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Iniciando processo de agendamento...")
+
 		// Obter ID do usuário do contexto
 		userID := r.Context().Value(auth.UserIDKey).(int)
+		log.Printf("UserID do contexto: %d", userID)
 
 		// Obter ID do slot
 		slotID, err := strconv.Atoi(r.FormValue("slot_id"))
+		log.Printf("SlotID recebido: %d", slotID)
 		if err != nil {
+			log.Printf("Erro ao converter slot_id: %v", err)
 			http.Error(w, "ID do slot inválido", http.StatusBadRequest)
 			return
 		}
