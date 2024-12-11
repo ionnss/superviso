@@ -95,21 +95,23 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Container para mensagens de resposta -->
-                <div id="booking-message"></div>
+                <!-- Container para mensagens de resposta - movido para cima -->
+                <div id="booking-message" class="mb-3"></div>
 
-                <p>Você está agendando uma supervisão para:</p>
-                <ul class="list-unstyled">
-                    <li>
-                        <i class="far fa-calendar-alt me-2"></i>
-                        <span id="modalDate"></span>
-                        <span class="text-muted ms-2">(<span id="modalWeekday"></span>)</span>
-                    </li>
-                    <li><i class="far fa-clock me-2"></i><span id="modalTime"></span></li>
-                </ul>
-                <div class="alert alert-info" style="background-color: rgb(13, 110, 253); color: white; border: none;">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Após a confirmação, o supervisor será notificado e poderá aceitar ou recusar o agendamento.
+                <div id="booking-content">
+                    <p>Você está agendando uma supervisão para:</p>
+                    <ul class="list-unstyled">
+                        <li>
+                            <i class="far fa-calendar-alt me-2"></i>
+                            <span id="modalDate"></span>
+                            <span class="text-muted ms-2">(<span id="modalWeekday"></span>)</span>
+                        </li>
+                        <li><i class="far fa-clock me-2"></i><span id="modalTime"></span></li>
+                    </ul>
+                    <div class="alert alert-info" style="background-color: rgb(13, 110, 253); color: white; border: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Após a confirmação, o supervisor será notificado e poderá aceitar ou recusar o agendamento.
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -119,6 +121,7 @@
                         id="confirmBooking"
                         hx-post="/api/appointments/book"
                         hx-target="#booking-message"
+                        hx-swap="innerHTML show:top"
                         hx-indicator="#modalSpinner">
                     <span class="htmx-indicator-hidden">Confirmar Agendamento</span>
                     <span id="modalSpinner" class="htmx-indicator">
@@ -151,31 +154,27 @@ document.addEventListener('show.bs.modal', function (event) {
 
 document.addEventListener('htmx:afterRequest', function(evt) {
     if (evt.detail.successful && evt.detail.elt.id === 'confirmBooking') {
-        // Esconder o formulário e mostrar apenas a mensagem
-        document.querySelector('.modal-body p').style.display = 'none';
-        document.querySelector('.modal-body ul').style.display = 'none';
-        document.querySelector('.modal-body .alert-info').style.display = 'none';
+        // Se não houver erro (status 409 - Conflict)
+        if (!evt.detail.xhr || evt.detail.xhr.status !== 409) {
+            document.querySelector('#booking-content').style.display = 'none';
+            document.querySelector('.modal-footer').style.display = 'none';
         
-        // Esconder os botões
-        document.querySelector('.modal-footer').style.display = 'none';
-        
-        // Fechar o modal após 2 segundos
-        setTimeout(() => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-            modal.hide();
-            
-            // Atualizar a lista de slots
-            htmx.trigger('.slots-grid', 'load');
-            
-            // Restaurar o modal para próximo uso
+            // Fechar o modal após 2 segundos apenas em caso de sucesso
             setTimeout(() => {
-                document.querySelector('.modal-body p').style.display = 'block';
-                document.querySelector('.modal-body ul').style.display = 'block';
-                document.querySelector('.modal-body .alert-info').style.display = 'block';
-                document.querySelector('.modal-footer').style.display = 'block';
-                document.getElementById('booking-message').innerHTML = '';
-            }, 500);
-        }, 2000);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                modal.hide();
+            
+                // Atualizar a lista de slots
+                htmx.trigger('.slots-grid', 'load');
+            
+                // Restaurar o modal para próximo uso
+                setTimeout(() => {
+                    document.querySelector('#booking-content').style.display = 'block';
+                    document.querySelector('.modal-footer').style.display = 'block';
+                    document.getElementById('booking-message').innerHTML = '';
+                }, 500);
+            }, 2000);
+        }
     }
 });
 </script> 
