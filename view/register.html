@@ -13,7 +13,7 @@
                         hx-post="/users/register"
                         hx-target="#message-container"
                         hx-swap="innerHTML"
-                        hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/?msg=register_success', 1500)"
+                        hx-on::after-request="handleFormResponse(event)"
                         novalidate>
                         
                         <div class="col-md-6">
@@ -100,15 +100,29 @@
 </div>
 
 <script>
+function handleFormResponse(event) {
+    const messageContainer = document.getElementById('message-container');
+    
+    // Se a resposta foi bem sucedida (status 201)
+    if (event.detail.successful) {
+        setTimeout(() => window.location.href='/?msg=register_success', 1500);
+    } 
+    // Se houve erro (status 409 Conflict ou outros)
+    else {
+        messageContainer.innerHTML = event.detail.xhr.response;
+        messageContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Limpar mensagens quando começar nova requisição
 document.addEventListener('htmx:beforeRequest', function(evt) {
-    // Limpar mensagens anteriores
     document.getElementById('message-container').innerHTML = '';
 });
 
-document.addEventListener('htmx:afterRequest', function(evt) {
-    if (evt.detail.failed) {
-        // Se a requisição falhou, mostrar a mensagem de erro no container
-        document.getElementById('message-container').innerHTML = evt.detail.xhr.response;
-    }
+// Garantir que erros sejam mostrados
+document.addEventListener('htmx:responseError', function(evt) {
+    const messageContainer = document.getElementById('message-container');
+    messageContainer.innerHTML = evt.detail.xhr.response;
+    messageContainer.scrollIntoView({ behavior: 'smooth' });
 });
 </script>

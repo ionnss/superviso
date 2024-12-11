@@ -77,57 +77,51 @@ func Register(db *sql.DB) http.HandlerFunc {
 		var exists bool
 		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", user.Email).Scan(&exists)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">
+			http.Error(w, `<div class="alert alert-danger">
 				<i class="fas fa-exclamation-circle me-2"></i>
 				Erro ao verificar email. Por favor, tente novamente.
-			</div>`))
+			</div>`, http.StatusInternalServerError)
 			return
 		}
 		if exists {
-			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte(`<div class="alert alert-danger">
+			http.Error(w, `<div class="alert alert-danger">
 				<i class="fas fa-exclamation-circle me-2"></i>
 				Este email já está cadastrado. Por favor, use outro email.
-			</div>`))
+			</div>`, http.StatusConflict)
 			return
 		}
 
 		// Verifica se CPF já existe
 		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE cpf = $1)", user.CPF).Scan(&exists)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">
+			http.Error(w, `<div class="alert alert-danger">
 				<i class="fas fa-exclamation-circle me-2"></i>
 				Erro ao verificar CPF. Por favor, tente novamente.
-			</div>`))
+			</div>`, http.StatusInternalServerError)
 			return
 		}
 		if exists {
-			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte(`<div class="alert alert-danger">
+			http.Error(w, `<div class="alert alert-danger">
 				<i class="fas fa-exclamation-circle me-2"></i>
 				Este CPF já está cadastrado.
-			</div>`))
+			</div>`, http.StatusConflict)
 			return
 		}
 
 		// Verifica se CRP já existe
 		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE crp = $1)", user.CRP).Scan(&exists)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">
+			http.Error(w, `<div class="alert alert-danger">
 				<i class="fas fa-exclamation-circle me-2"></i>
 				Erro ao verificar CRP. Por favor, tente novamente.
-			</div>`))
+			</div>`, http.StatusInternalServerError)
 			return
 		}
 		if exists {
-			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte(`<div class="alert alert-danger">
+			http.Error(w, `<div class="alert alert-danger">
 				<i class="fas fa-exclamation-circle me-2"></i>
 				Este CRP já está cadastrado.
-			</div>`))
+			</div>`, http.StatusConflict)
 			return
 		}
 
