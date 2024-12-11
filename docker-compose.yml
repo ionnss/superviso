@@ -24,6 +24,11 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - superviso_network
 
@@ -32,10 +37,9 @@ services:
     volumes:
       - ./backups:/backups
       - ./scripts:/scripts:ro
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
       - TZ=America/Sao_Paulo
     entrypoint: [""]
     command: |
@@ -48,7 +52,7 @@ services:
     depends_on:
       - db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h db -U $$POSTGRES_USER"]
+      test: ["CMD-SHELL", "pg_isready -h db -U $$POSTGRES_USER -d superviso"]
       interval: 10s
       timeout: 5s
       retries: 5

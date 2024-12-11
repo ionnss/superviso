@@ -13,5 +13,4 @@ CREATE TABLE IF NOT EXISTS users (
     failed_login_attempts INT DEFAULT 0,
     last_failed_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    profile_image VARCHAR(255)
 );

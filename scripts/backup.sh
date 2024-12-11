@@ -3,6 +3,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="/backups"
 POSTGRES_HOST="db"
 POSTGRES_DB="${POSTGRES_DB}"
+
 POSTGRES_USER="${POSTGRES_USER}"
 export PGPASSWORD="${POSTGRES_PASSWORD}"  # Exporta a senha para pg_dump
 

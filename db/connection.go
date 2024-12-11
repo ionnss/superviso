@@ -58,8 +58,8 @@ func Connect() (*sql.DB, error) {
 // ExecuteMigrations executa os scripts de migração no banco
 func ExecuteMigrations(conn *sql.DB) {
 	files := []string{
-		"db/migrations/create_users_table.sql",
-		"db/migrations/create_supervisor_profiles_table.sql",
+		"db/migrations/001_create_users_table.sql",
+		"db/migrations/002_create_supervisor_profiles_table.sql",
 	}
 
 	for _, file := range files {
