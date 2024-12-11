@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"superviso/api/auth"
 	"superviso/models"
@@ -35,8 +36,33 @@ func Register(db *sql.DB) http.HandlerFunc {
 		err := r.ParseForm()
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`<div class="alert alert-danger">Erro ao processar formulário</div>`))
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao processar formulário. Por favor, tente novamente.
+			</div>`))
 			return
+		}
+
+		// Validação de campos obrigatórios
+		requiredFields := map[string]string{
+			"first_name":      "Nome",
+			"last_name":       "Sobrenome",
+			"email":           "E-mail",
+			"password":        "Senha",
+			"cpf":             "CPF",
+			"crp":             "CRP",
+			"theory_approach": "Abordagem Teórica",
+		}
+
+		for field, label := range requiredFields {
+			if r.FormValue(field) == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf(`<div class="alert alert-danger">
+					<i class="fas fa-exclamation-circle me-2"></i>
+					O campo %s é obrigatório
+				</div>`, label)))
+				return
+			}
 		}
 
 		// Preenche struct do usuário
@@ -47,11 +73,72 @@ func Register(db *sql.DB) http.HandlerFunc {
 		user.CRP = r.FormValue("crp")
 		user.TheoryApproach = r.FormValue("theory_approach")
 
+		// Verifica se email já existe
+		var exists bool
+		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", user.Email).Scan(&exists)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao verificar email. Por favor, tente novamente.
+			</div>`))
+			return
+		}
+		if exists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Este email já está cadastrado. Por favor, use outro email.
+			</div>`))
+			return
+		}
+
+		// Verifica se CPF já existe
+		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE cpf = $1)", user.CPF).Scan(&exists)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao verificar CPF. Por favor, tente novamente.
+			</div>`))
+			return
+		}
+		if exists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Este CPF já está cadastrado.
+			</div>`))
+			return
+		}
+
+		// Verifica se CRP já existe
+		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE crp = $1)", user.CRP).Scan(&exists)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao verificar CRP. Por favor, tente novamente.
+			</div>`))
+			return
+		}
+		if exists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Este CRP já está cadastrado.
+			</div>`))
+			return
+		}
+
 		// Hash da senha
 		passwordHash, err := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">Erro ao processar senha</div>`))
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao processar senha. Por favor, tente novamente.
+			</div>`))
 			return
 		}
 		user.PasswordHash = string(passwordHash)
@@ -76,12 +163,18 @@ func Register(db *sql.DB) http.HandlerFunc {
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">Erro ao cadastrar usuário</div>`))
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Erro ao cadastrar usuário. Por favor, tente novamente.
+			</div>`))
 			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`<div class="alert alert-success">Cadastro realizado com sucesso! Você será redirecionado...</div>`))
+		w.Write([]byte(`<div class="alert alert-success">
+			<i class="fas fa-check-circle me-2"></i>
+			Cadastro realizado com sucesso! Você será redirecionado...
+		</div>`))
 	}
 }
 
