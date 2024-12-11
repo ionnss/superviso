@@ -13,35 +13,78 @@
                         hx-post="/users/register"
                         hx-target="#message-container"
                         hx-swap="innerHTML"
-                        hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/?msg=register_success', 1500)">
+                        hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/?msg=register_success', 1500)"
+                        novalidate>
                         
                         <div class="col-md-6">
                             <label for="firstName" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="firstName" name="first_name" required>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="firstName" 
+                                   name="first_name" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-6">
                             <label for="lastName" class="form-label">Sobrenome</label>
-                            <input type="text" class="form-control" id="lastName" name="last_name" required>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="lastName" 
+                                   name="last_name" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-6">
                             <label for="email" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-6">
                             <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-6">
                             <label for="cpf" class="form-label">CPF</label>
-                            <input type="text" class="form-control" id="cpf" name="cpf" required>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="cpf" 
+                                   name="cpf" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-6">
                             <label for="crp" class="form-label">CRP</label>
-                            <input type="text" class="form-control" id="crp" name="crp" required>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="crp" 
+                                   name="crp" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-12">
                             <label for="theoryApproach" class="form-label">Abordagem Teórica</label>
-                            <input type="text" class="form-control" id="theoryApproach" name="theory_approach" required>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="theoryApproach" 
+                                   name="theory_approach" 
+                                   required
+                                   oninvalid="this.setCustomValidity('')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                         
                         <div class="col-12 text-center mt-4">
@@ -55,3 +98,17 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('htmx:beforeRequest', function(evt) {
+    // Limpar mensagens anteriores
+    document.getElementById('message-container').innerHTML = '';
+});
+
+document.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.failed) {
+        // Se a requisição falhou, mostrar a mensagem de erro no container
+        document.getElementById('message-container').innerHTML = evt.detail.xhr.response;
+    }
+});
+</script>
