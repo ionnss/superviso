@@ -20,13 +20,8 @@
                             data-bs-target="#confirmModal"
                             data-slot-id="{{.ID}}"
                             data-slot-date="{{formatDate .SlotDate}}"
-                            data-slot-time="{{formatTimeForDisplay .StartTime}} - {{formatTimeForDisplay .EndTime}}"
-                            hx-indicator="#spinner-{{.ID}}">
-                        <span class="htmx-indicator-hidden">Agendar</span>
-                        <span id="spinner-{{.ID}}" class="htmx-indicator">
-                            <span class="spinner-border spinner-border-sm me-2"></span>
-                            Agendando...
-                        </span>
+                            data-slot-time="{{formatTimeForDisplay .StartTime}} - {{formatTimeForDisplay .EndTime}}">
+                        Agendar
                     </button>
                 </div>
             </div>
@@ -42,42 +37,6 @@
     {{end}}
 </div>
 
-<!-- Modal de Confirmação -->
-<div class="modal fade" id="confirmModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar Agendamento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Você está agendando uma supervisão para:</p>
-                <ul class="list-unstyled">
-                    <li><i class="far fa-calendar-alt me-2"></i><span id="modalDate"></span></li>
-                    <li><i class="far fa-clock me-2"></i><span id="modalTime"></span></li>
-                </ul>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Após a confirmação, o supervisor será notificado e poderá aceitar ou recusar o agendamento.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="confirmBooking"
-                        hx-post="/api/appointments/book"
-                        hx-target="#message-container"
-                        hx-indicator="#modalSpinner">
-                    <span class="htmx-indicator-hidden">Confirmar Agendamento</span>
-                    <span id="modalSpinner" class="htmx-indicator">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        Agendando...
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 document.addEventListener('show.bs.modal', function (event) {
     if (event.target.id === 'confirmModal') {
@@ -89,21 +48,6 @@ document.addEventListener('show.bs.modal', function (event) {
         document.getElementById('modalDate').textContent = slotDate;
         document.getElementById('modalTime').textContent = slotTime;
         document.getElementById('confirmBooking').setAttribute('hx-vals', `{"slot_id": ${slotId}}`);
-    }
-});
-
-// Fechar modal após agendamento bem sucedido
-document.addEventListener('htmx:afterRequest', function(evt) {
-    if (evt.detail.successful && evt.target.id === 'confirmBooking') {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-        modal.hide();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('confirmModal');
-    if (modal) {
-        document.body.appendChild(modal);
     }
 });
 </script> 

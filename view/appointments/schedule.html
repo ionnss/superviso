@@ -73,4 +73,40 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você está agendando uma supervisão para:</p>
+                <ul class="list-unstyled">
+                    <li><i class="far fa-calendar-alt me-2"></i><span id="modalDate"></span></li>
+                    <li><i class="far fa-clock me-2"></i><span id="modalTime"></span></li>
+                </ul>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Após a confirmação, o supervisor será notificado e poderá aceitar ou recusar o agendamento.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmBooking"
+                        hx-post="/api/appointments/book"
+                        hx-target="#message-container"
+                        hx-indicator="#modalSpinner">
+                    <span class="htmx-indicator-hidden">Confirmar Agendamento</span>
+                    <span id="modalSpinner" class="htmx-indicator">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Agendando...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div> 
