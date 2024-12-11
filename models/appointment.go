@@ -5,7 +5,7 @@ import (
 )
 
 type AvailableSlot struct {
-	ID           int       `json:"id"`
+	SlotID       int       `json:"slot_id"`
 	SupervisorID int       `json:"supervisor_id"`
 	SlotDate     time.Time `json:"slot_date"`
 	StartTime    string    `json:"start_time"`

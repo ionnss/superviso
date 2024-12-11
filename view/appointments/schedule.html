@@ -143,7 +143,9 @@ document.addEventListener('show.bs.modal', function (event) {
         document.getElementById('modalDate').textContent = slotDate;
         document.getElementById('modalWeekday').textContent = slotWeekday;
         document.getElementById('modalTime').textContent = slotTime;
-        document.getElementById('confirmBooking').setAttribute('hx-vals', `{"slot_id": ${slotId}}`);
+        document.getElementById('confirmBooking').setAttribute('hx-vals', JSON.stringify({
+            slot_id: slotId
+        }));
     }
 });
 

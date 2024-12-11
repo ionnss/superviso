@@ -107,22 +107,26 @@ func GetAvailableSlots(db *sql.DB) http.HandlerFunc {
 		allSlots := generateSlots(supID, startTime, endTime, []string{day})
 
 		// Primeiro, inserir os slots no banco se não existirem
-		for _, slot := range allSlots {
-			_, err = db.Exec(`
+		for i := range allSlots {
+			var slotID int
+			err = db.QueryRow(`
 				INSERT INTO available_slots 
 				(supervisor_id, slot_date, start_time, end_time, status)
 				VALUES ($1, $2, $3::time, $4::time, $5)
-				ON CONFLICT (supervisor_id, slot_date, start_time) DO NOTHING`,
-				slot.SupervisorID, slot.SlotDate, slot.StartTime, slot.EndTime, slot.Status)
+				ON CONFLICT (supervisor_id, slot_date, start_time) 
+				DO UPDATE SET status = EXCLUDED.status
+				RETURNING id`,
+				allSlots[i].SupervisorID, allSlots[i].SlotDate, allSlots[i].StartTime, allSlots[i].EndTime, allSlots[i].Status).Scan(&slotID)
 			if err != nil {
 				log.Printf("Erro ao inserir slot: %v", err)
 				continue
 			}
+			allSlots[i].SlotID = slotID
 		}
 
 		// Filtrar slots já agendados
 		rows, err := db.Query(`
-			SELECT slot_date::date
+			SELECT id, slot_date::date
 			FROM available_slots
 			WHERE supervisor_id = $1
 			AND status = 'booked'`,
@@ -195,17 +199,20 @@ func parseAvailableDays(days string) []string {
 func BookAppointment(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Iniciando processo de agendamento...")
+		log.Printf("Form values: %+v", r.Form)
+		log.Printf("Raw body: %s", r.Body)
 
 		// Obter ID do usuário do contexto
 		userID := r.Context().Value(auth.UserIDKey).(int)
 		log.Printf("UserID do contexto: %d", userID)
 
 		// Obter ID do slot
+		r.ParseForm()
 		slotID, err := strconv.Atoi(r.FormValue("slot_id"))
 		log.Printf("SlotID recebido: %d", slotID)
 		if err != nil {
 			log.Printf("Erro ao converter slot_id: %v", err)
-			http.Error(w, "ID do slot inválido", http.StatusBadRequest)
+			http.Error(w, "ID do slot inv��lido", http.StatusBadRequest)
 			return
 		}
 
@@ -334,6 +341,7 @@ func generateSlots(supervisorID int, startTime, endTime string, availableDays []
 
 			// Criar slot
 			slot := models.AvailableSlot{
+				SlotID:       0,
 				SupervisorID: supervisorID,
 				SlotDate:     date,
 				StartTime:    formatTimeForDB(startTime),
