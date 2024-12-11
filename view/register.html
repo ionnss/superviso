@@ -46,14 +46,31 @@
                                    oninput="this.setCustomValidity('')">
                         </div>
                         <div class="col-md-6">
+                            <label for="confirmEmail" class="form-label">Confirmar E-mail</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="confirmEmail" 
+                                   name="confirm_email" 
+                                   required
+                                   oninput="validateEmail(this)">
+                        </div>
+                        <div class="col-md-6">
                             <label for="password" class="form-label">Senha</label>
                             <input type="password" 
                                    class="form-control" 
                                    id="password" 
                                    name="password" 
                                    required
-                                   oninvalid="this.setCustomValidity('')"
-                                   oninput="this.setCustomValidity('')">
+                                   oninput="validatePassword(this)">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="confirmPassword" 
+                                   name="confirm_password" 
+                                   required
+                                   oninput="validatePassword(this)">
                         </div>
                         <div class="col-md-6">
                             <label for="cpf" class="form-label">CPF</label>
@@ -131,6 +148,61 @@ document.addEventListener('htmx:responseError', function(evt) {
     const messageContainer = document.getElementById('message-container');
     messageContainer.innerHTML = evt.detail.xhr.response;
     messageContainer.scrollIntoView({ behavior: 'smooth' });
+});
+
+function validateEmail(input) {
+    const email = document.getElementById('email');
+    if (input.value !== email.value) {
+        input.setCustomValidity('Os emails não coincidem');
+    } else {
+        input.setCustomValidity('');
+    }
+}
+
+function validatePassword(input) {
+    const password = document.getElementById('password');
+    const confirm = document.getElementById('confirmPassword');
+    
+    if (password.value.length < 6) {
+        password.setCustomValidity('A senha deve ter pelo menos 6 caracteres');
+    } else {
+        password.setCustomValidity('');
+    }
+    
+    if (confirm.value && password.value !== confirm.value) {
+        confirm.setCustomValidity('As senhas não coincidem');
+    } else {
+        confirm.setCustomValidity('');
+    }
+}
+
+// Adicionar validação antes do envio
+document.querySelector('form').addEventListener('submit', function(e) {
+    const email = document.getElementById('email');
+    const confirmEmail = document.getElementById('confirmEmail');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    
+    if (email.value !== confirmEmail.value) {
+        e.preventDefault();
+        document.getElementById('message-container').innerHTML = 
+            '<div class="alert alert-danger">Os emails não coincidem</div>';
+        return false;
+    }
+    
+    if (password.value !== confirmPassword.value) {
+        e.preventDefault();
+        document.getElementById('message-container').innerHTML = 
+            '<div class="alert alert-danger">As senhas não coincidem</div>';
+        return false;
+    }
+    
+    if (password.value.length < 6) {
+        e.preventDefault();
+        document.getElementById('message-container').innerHTML = 
+            '<div class="alert alert-danger">A senha deve ter pelo menos 6 caracteres</div>';
+        return false;
+    }
 });
 </script>
 

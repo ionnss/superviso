@@ -43,6 +43,36 @@ func Register(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Validar confirmação de email
+		if r.FormValue("email") != r.FormValue("confirm_email") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				Os emails não coincidem
+			</div>`))
+			return
+		}
+
+		// Validar confirmação de senha
+		if r.FormValue("password") != r.FormValue("confirm_password") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				As senhas não coincidem
+			</div>`))
+			return
+		}
+
+		// Validar tamanho mínimo da senha
+		if len(r.FormValue("password")) < 6 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`<div class="alert alert-danger">
+				<i class="fas fa-exclamation-circle me-2"></i>
+				A senha deve ter pelo menos 6 caracteres
+			</div>`))
+			return
+		}
+
 		// Validação de campos obrigatórios
 		requiredFields := map[string]string{
 			"first_name":      "Nome",
