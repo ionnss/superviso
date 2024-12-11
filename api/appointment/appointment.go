@@ -180,6 +180,34 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Verificar se o usuário já tem um agendamento pendente com este supervisor
+		var existingAppointment bool
+		err = db.QueryRow(`
+			SELECT EXISTS(
+				SELECT 1 FROM appointments a
+				JOIN available_slots s ON a.slot_id = s.id
+				WHERE a.supervisee_id = $1 
+				AND s.supervisor_id = (SELECT supervisor_id FROM available_slots WHERE id = $2)
+				AND a.status = 'pending'
+			)`, userID, slotID).Scan(&existingAppointment)
+
+		if err != nil {
+			http.Error(w, "Erro ao verificar agendamentos existentes", http.StatusInternalServerError)
+			return
+		}
+
+		if existingAppointment {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(`
+				<div class="alert alert-warning">
+					<i class="fas fa-exclamation-circle me-2"></i>
+					Você já possui um agendamento pendente com este supervisor.
+					Aguarde a confirmação ou cancele o agendamento anterior.
+				</div>
+			`))
+			return
+		}
+
 		// Iniciar transação
 		tx, err := db.Begin()
 		if err != nil {
@@ -196,8 +224,19 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 			WHERE id = $1 AND status = 'available'
 			FOR UPDATE`,
 			slotID).Scan(&supervisorID)
+
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte(`
+				<div class="alert alert-warning">
+					<i class="fas fa-exclamation-circle me-2"></i>
+					Este horário não está mais disponível.
+				</div>
+			`))
+			return
+		}
 		if err != nil {
-			http.Error(w, "Horário não disponível", http.StatusBadRequest)
+			http.Error(w, "Erro ao verificar disponibilidade", http.StatusInternalServerError)
 			return
 		}
 
