@@ -43,7 +43,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/api/docs", docs.GetDocument).Methods("GET")
 	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
 
-	// Rotas P��ginas protegidas
+	// Rotas Páginas protegidas
 	r.HandleFunc("/api/test-auth", auth.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(auth.UserIDKey).(int)
 		email := r.Context().Value(auth.EmailKey).(string)
@@ -72,7 +72,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/verify-email", user.VerifyEmail(db)).Methods("GET")
 	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
 
-	r.HandleFunc("/appointments/new", auth.AuthMiddleware(appointment.GetNewAppointmentForm(db))).Methods("GET")
+	r.HandleFunc("/appointments/schedule", auth.AuthMiddleware(appointment.GetNewAppointmentForm(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/slots", auth.AuthMiddleware(appointment.GetAvailableSlots(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db))).Methods("POST")
 

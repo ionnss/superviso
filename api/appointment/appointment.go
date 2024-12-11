@@ -56,9 +56,9 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Renderizar template
-		tmpl := template.Must(template.New("new.html").
+		tmpl := template.Must(template.New("schedule.html").
 			Funcs(funcMap).
-			ParseFiles("view/appointments/new.html"))
+			ParseFiles("view/appointments/schedule.html"))
 
 		tmpl.Execute(w, data)
 	}
