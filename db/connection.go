@@ -57,12 +57,13 @@ func Connect() (*sql.DB, error) {
 
 // ExecuteMigrations executa os scripts de migração no banco
 func ExecuteMigrations(conn *sql.DB) {
-	files := []string{
+	migrationFiles := []string{
 		"db/migrations/001_create_users_table.sql",
 		"db/migrations/002_create_supervisor_profiles_table.sql",
+		"db/migrations/003_create_appointments_table.sql",
 	}
 
-	for _, file := range files {
+	for _, file := range migrationFiles {
 		content, err := os.ReadFile(file)
 		if err != nil {
 			log.Fatalf("Erro ao ler o arquivo de migração %s: %v", file, err)
