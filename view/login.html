@@ -6,7 +6,8 @@
             <div id="system-message"></div>
             <div id="message-container"></div>
             
-            <form hx-post="/users/login"
+            <form class="form-container" 
+                  hx-post="/users/login"
                   hx-target="#message-container"
                   hx-swap="innerHTML"
                   hx-indicator="#login-spinner"
@@ -33,9 +34,9 @@
                            required>
                 </div>
 
-                <div class="text-center mb-3">
+                <div class="text-center form-submit-button">
                     <button type="submit" 
-                            class="btn btn-primary btn-lg rounded-pill px-5"
+                            class="btn btn-primary btn-lg rounded-pill px-5 bm-4"
                             hx-disabled-elt="this">
                         <span class="htmx-indicator-hidden">Entrar</span>
                         <span id="login-spinner" class="htmx-indicator d-flex align-items-center justify-content-center gap-2">
@@ -45,7 +46,7 @@
                     </button>
                 </div>
 
-                <div class="text-center">
+                <div class="text-center mt-4">
                     <p class="mb-0">Ainda não tem uma conta? 
                         <a href="/register" 
                            hx-get="/register" 

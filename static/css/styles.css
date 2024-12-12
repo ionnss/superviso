@@ -461,3 +461,54 @@ input[type="time"].end-time {
     border-color: rgba(255, 255, 255, 0.4);
 }
 
+/* Estilos globais */
+
+/* Alertas personalizados */
+.alert {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#message-container .alert.alert-warning {
+    background-color: #efad0b !important;
+    border-color: #f7ba07 !important;
+    color: var(--bs-warning-text-emphasis) !important;
+}
+
+#message-container .alert.alert-warning .btn-link {
+    color: var(--bs-warning-text-emphasis) !important;
+    text-decoration-color: var(--bs-warning-text-emphasis) !important;
+}
+
+/* Ajustes de formulário */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-submit-button {
+    margin: 1rem 0;
+}
+
+/* Ajustes de botão */
+.btn .htmx-indicator,
+.btn .htmx-indicator-hidden {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.btn {
+    position: relative;
+    min-height: 48px;
+    min-width: 120px;
+}
+
+/* Ajustes de espaçamento */
+.container.py-5.mt-4 {
+    margin-bottom: 0 !important;
+}
+
+.container.py-5.mb-4 {
+    display: none;
+}
+

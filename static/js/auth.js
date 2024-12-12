@@ -22,10 +22,10 @@ function handleLoginResponse(event) {
             const trigger = JSON.parse(triggerHeader);
             if (trigger.showVerification) {
                 messageContainer.innerHTML = `
-                    <div class="alert alert-warning" style="background-color: #fcf0bd; color: #664d03; border-color: #f7dd7e;">
+                    <div class="alert alert-warning">
                         <i class="fas fa-exclamation-circle me-2"></i>
                         Por favor, confirme seu email antes de fazer login.<br>
-                        <button class="btn btn-link p-0 mt-2" style="color: #664d03; text-decoration-color: #664d03;" onclick="resendVerification('${trigger.showVerification.email}')">
+                        <button class="btn btn-link p-0 mt-2" onclick="resendVerification('${trigger.showVerification.email}')">
                             <i class="fas fa-envelope me-1"></i>
                             Reenviar email de confirmação
                         </button>
