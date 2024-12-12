@@ -228,47 +228,41 @@ func Login(db *sql.DB) http.HandlerFunc {
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
-		// Busca usuário e status de verificação
-		query := `SELECT id, email, password_hash, email_verified FROM users WHERE email = $1`
-		err := db.QueryRow(query, email).Scan(&user.ID, &user.Email, &user.PasswordHash, &emailVerified)
+		// Busca usuário pelo email
+		err := db.QueryRow(`
+			SELECT id, email, password_hash, email_verified 
+			FROM users 
+			WHERE email = $1`,
+			email,
+		).Scan(&user.ID, &user.Email, &user.PasswordHash, &emailVerified)
 
-		if err == sql.ErrNoRows {
+		// Se usuário não existe ou senha incorreta, retorna o mesmo erro
+		if err == sql.ErrNoRows || bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) != nil {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(`<div class="alert alert-danger">Usuário não encontrado</div>`))
 			return
-		} else if err != nil {
+		}
+
+		// Se houve outro erro do banco de dados
+		if err != nil {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">Erro ao buscar usuário</div>`))
 			return
 		}
 
 		// Verificar se email foi confirmado
 		if !emailVerified {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Header().Set("HX-Trigger", `{"showVerification": {"email": "`+email+`"}}`)
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(`<div class="alert alert-warning">
-				<i class="fas fa-exclamation-circle me-2"></i>
-				Por favor, confirme seu email antes de fazer login.<br>
-				<button class="btn btn-link p-0 mt-2" onclick="resendVerification('` + email + `')">
-					<i class="fas fa-envelope me-1"></i>
-					Reenviar email de confirmação
-				</button>
-			</div>`))
-			return
-		}
-
-		// Verifica senha
-		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(`<div class="alert alert-danger">Senha incorreta</div>`))
 			return
 		}
 
 		// Gera o token
 		token, err := auth.GenerateToken(user.ID, user.Email)
 		if err != nil {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`<div class="alert alert-danger">Erro ao gerar token</div>`))
 			return
 		}
 
@@ -278,13 +272,13 @@ func Login(db *sql.DB) http.HandlerFunc {
 			Value:    token,
 			Path:     "/",
 			HttpOnly: true,
-			Secure:   true, // Em produção
+			Secure:   true,
 			SameSite: http.SameSiteStrictMode,
 			MaxAge:   24 * 60 * 60, // 24 horas
 		})
 
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`<div class="alert alert-success">Login realizado com sucesso! Redirecionando...</div>`))
 	}
 }
 

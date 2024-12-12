@@ -18,6 +18,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	// Arquivos estáticos para web
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("view/assets/"))))
 	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("view/css/"))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// Páginas
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

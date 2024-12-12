@@ -1,49 +1,56 @@
-<div class="container py-5 mb-4"></div>
-
 <div class="container py-5 mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center mb-4">Login</h2>
             
+            <div id="system-message"></div>
             <div id="message-container"></div>
             
-            <div id="system-message"></div>
-            
-            <form 
+            <form hx-post="/users/login"
                   hx-target="#message-container"
                   hx-swap="innerHTML"
-                  hx-on::after-request="if(event.detail.successful) setTimeout(() => window.location.href='/dashboard', 1500)">
+                  hx-indicator="#login-spinner"
+                  hx-on::after-request="handleLoginResponse(event)"
+                  hx-on::responseError="handleLoginResponse(event)">
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" 
+                           class="form-control" 
+                           id="email" 
+                           name="email" 
+                           autocomplete="email"
+                           required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="password" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           autocomplete="current-password"
+                           required>
                 </div>
 
-                <div class="d-grid gap-2">
+                <div class="text-center mb-3">
                     <button type="submit" 
-                            class="btn btn-primary btn-lg rounded-pill"
-                            hx-post="/users/login"
-                            hx-indicator="#login-spinner"
+                            class="btn btn-primary btn-lg rounded-pill px-5"
                             hx-disabled-elt="this">
                         <span class="htmx-indicator-hidden">Entrar</span>
-                        <span id="login-spinner" class="htmx-indicator">
-                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span id="login-spinner" class="htmx-indicator d-flex align-items-center justify-content-center gap-2">
+                            <span class="spinner-border spinner-border-sm"></span>
                             Entrando...
                         </span>
                     </button>
                 </div>
 
-                <div class="text-center mt-3">
-                    <p>Ainda não tem uma conta? 
+                <div class="text-center">
+                    <p class="mb-0">Ainda não tem uma conta? 
                         <a href="/register" 
                            hx-get="/register" 
-                           hx-target="#dynamic-content" 
-                           hx-swap="innerHTML">
+                           hx-target="#dynamic-content"
+                           hx-push-url="true">
                             Registre-se
                         </a>
                     </p>
@@ -53,65 +60,10 @@
     </div>
 </div>
 
-<script>
-// Verifica se há mensagem na URL
-const urlParams = new URLSearchParams(window.location.search);
-const msg = urlParams.get('msg');
+<!-- Scripts -->
+<script src="/static/js/auth.js"></script>
+<script src="/static/js/verification.js"></script>
+<script src="/static/js/messages.js"></script>
 
-if (msg) {
-    const messageContainer = document.getElementById('system-message');
-    switch(msg) {
-        case 'register_success':
-            messageContainer.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Cadastro realizado com sucesso! Por favor, faça login.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            break;
-        case 'logout_success':
-            messageContainer.innerHTML = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Logout realizado com sucesso!
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            break;
-    }
-}
-
-function resendVerification(email) {
-    const messageContainer = document.getElementById('message-container');
-    messageContainer.innerHTML = `
-        <div class="alert alert-info d-flex align-items-center">
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            <span>Reenviando email de verificação para ${email}...</span>
-        </div>
-    `;
-    
-    htmx.ajax('POST', '/resend-verification', {
-        target: '#message-container',
-        swap: 'innerHTML',
-        values: { email: email }
-    });
-}
-</script>
-
-<style>
-    .htmx-indicator {
-    display: none;
-}
-
-.htmx-request .htmx-indicator {
-    display: block !important;
-}
-
-.htmx-request .htmx-indicator-hidden {
-    display: none;
-}
-
-.htmx-request.btn {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-</style>
+<!-- Estilos -->
+<link rel="stylesheet" href="/static/css/htmx.css">

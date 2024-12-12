@@ -1,0 +1,17 @@
+/* Estilos para indicadores HTMX */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline !important;
+}
+
+.htmx-request .htmx-indicator-hidden {
+    display: none;
+}
+
+.htmx-request.btn {
+    opacity: 0.7;
+    cursor: not-allowed;
+} 

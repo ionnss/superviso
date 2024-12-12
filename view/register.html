@@ -10,8 +10,10 @@
                     <div id="message-container"></div>
                     
                     <form class="row justify-content-center gx-3 gy-2" 
+                        hx-post="/users/register"
                         hx-target="#message-container"
                         hx-swap="innerHTML"
+                        hx-indicator="#register-spinner"
                         hx-on::after-request="handleFormResponse(event)"
                         novalidate>
                         
@@ -106,12 +108,10 @@
                         <div class="col-12 text-center mt-4">
                             <button type="submit" 
                                     class="btn btn-primary btn-lg rounded-pill"
-                                    hx-post="/users/register"
-                                    hx-indicator="#register-spinner"
                                     hx-disabled-elt="this">
                                 <span class="htmx-indicator-hidden">Cadastrar</span>
-                                <span id="register-spinner" class="htmx-indicator">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                <span id="register-spinner" class="htmx-indicator d-flex align-items-center justify-content-center gap-2">
+                                    <span class="spinner-border spinner-border-sm"></span>
                                     Cadastrando...
                                 </span>
                             </button>
@@ -206,13 +206,16 @@ document.querySelector('form').addEventListener('submit', function(e) {
 });
 </script>
 
+<!-- Estilos -->
+<link rel="stylesheet" href="/static/css/htmx.css">
+
 <style>
-    .htmx-indicator {
+.htmx-indicator {
     display: none;
 }
 
 .htmx-request .htmx-indicator {
-    display: block !important;
+    display: inline !important;
 }
 
 .htmx-request .htmx-indicator-hidden {
