@@ -112,6 +112,6 @@ func ResendVerification(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		w.Write([]byte(`<div class="alert alert-success">Email de verificação reenviado!</div>`))
+		w.Write([]byte(`<div class="alert alert-success">Email de verificação reenviado! Verifique sua caixa de entrada e spam.</div>`))
 	}
 }
