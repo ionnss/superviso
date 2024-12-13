@@ -25,7 +25,7 @@ function handleLoginResponse(event) {
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-circle me-2"></i>
                         Por favor, confirme seu email antes de fazer login.<br>
-                        <button class="btn btn-link p-0 mt-2" onclick="resendVerification('${trigger.showVerification.email}')">
+                        <button class="btn btn-link p-0 mt-2" onclick="resendVerification('${trigger.showVerification.email}')" style="border-left:20px; border-right:20px;">
                             <i class="fas fa-envelope me-1"></i>
                             Reenviar email de confirmação
                         </button>

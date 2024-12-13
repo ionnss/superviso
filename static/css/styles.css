@@ -486,21 +486,26 @@ input[type="time"].end-time {
 }
 
 .form-submit-button {
+    display: flex;
+    justify-content: center;
+    width: 100%;
     margin: 1rem 0;
 }
 
 /* Ajustes de botão */
 .btn .htmx-indicator,
 .btn .htmx-indicator-hidden {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    transform: none;
 }
 
 .btn {
     position: relative;
     min-height: 48px;
     min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Ajustes de espaçamento */
@@ -510,5 +515,165 @@ input[type="time"].end-time {
 
 .container.py-5.mb-4 {
     display: none;
+}
+
+/* Ajuste específico para o botão de login na navbar */
+.navbar-nav .nav-link.btn.btn-primary {
+    padding: 0.25rem 0.75rem !important;
+    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    height: auto;
+}
+
+/* Ajuste do item da navbar que contém o botão */
+.navbar-nav .nav-item:last-child {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ajuste do botão de entrar na página de login */
+.form-submit-button .btn {
+    position: relative;
+    min-height: 48px;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Container para o conteúdo do botão */
+.form-submit-button .btn .button-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Estilos para os estados do botão */
+.form-submit-button .btn .htmx-indicator-hidden,
+.form-submit-button .btn .htmx-indicator {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+/* Ajuste específico para o spinner durante o loading */
+.form-submit-button .btn .htmx-indicator {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.htmx-request .form-submit-button .btn .htmx-indicator {
+    display: inline-flex;
+}
+
+/* Ajuste da mensagem de reenvio de email */
+#message-container .alert-info {
+    background-color: #0d47a1 !important;
+    border-color: #1565c0 !important;
+    color: #ffffff !important;
+    border-radius: 20px !important;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Ajuste do spinner na mensagem */
+#message-container .alert-info .spinner-border {
+    border-color: #ffffff;
+    border-right-color: transparent;
+}
+
+/* Ajuste do texto na mensagem */
+#message-container .alert-info .d-flex {
+    color: #ffffff !important;
+    justify-content: center;
+}
+
+/* Ajuste do container da mensagem */
+#message-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Estilo específico para o botão de login na navbar */
+.navbar .nav-link.login-button {
+    background-color: #007bff;
+    color: #ffffff !important;
+    border-radius: 25px;
+    padding: 0.5rem 1.8rem !important;
+    margin: 0 !important;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 1rem;
+    min-width: 100px;
+    text-align: center;
+}
+
+.navbar .nav-link.login-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar .nav-link.login-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Container do botão na navbar */
+.navbar-nav .nav-item:last-child {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem !important;
+}
+
+/* Ajuste dos botões de submit (login e cadastro) */
+.form-submit-button .btn {
+    position: relative;
+    min-height: 48px;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-submit-button .btn .button-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-submit-button .btn .htmx-indicator-hidden,
+.form-submit-button .btn .htmx-indicator {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.form-submit-button .btn .htmx-indicator {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.htmx-request .form-submit-button .btn .htmx-indicator {
+    display: inline-flex;
 }
 
