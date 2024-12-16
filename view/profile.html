@@ -23,32 +23,30 @@
                           hx-target="#message-container"
                           hx-swap="innerHTML">
                         
-                        <!-- <div id="message-container"></div> -->
-
                         <!-- Informações Básicas -->
                         <div class="mb-3">
                             <label class="form-label">Nome</label>
-                            <input type="text" class="form-control" name="first_name" value="{{.FirstName}}" required>
+                            <input type="text" class="form-control" name="first_name" value="{{.User.FirstName}}" required>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Sobrenome</label>
-                            <input type="text" class="form-control" name="last_name" value="{{.LastName}}" required>
+                            <input type="text" class="form-control" name="last_name" value="{{.User.LastName}}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">CRP</label>
-                            <input type="text" class="form-control" name="crp" value="{{.CRP}}" required>
+                            <input type="text" class="form-control" name="crp" value="{{.User.CRP}}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Abordagem Teórica</label>
-                            <input type="text" class="form-control" name="theory_approach" value="{{.TheoryApproach}}" required>
+                            <input type="text" class="form-control" name="theory_approach" value="{{.User.TheoryApproach}}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="{{.Email}}" readonly>
+                            <input type="email" class="form-control" value="{{.User.Email}}" readonly>
                         </div>
 
                         <!-- Toggle Supervisor -->
@@ -61,15 +59,14 @@
                                            {{if .IsSupervisor}}checked{{end}}
                                            hx-post="/api/profile/toggle-supervisor"
                                            hx-target="#supervisorFields"
-                                           hx-swap="innerHTML"
-                                           onchange="toggleSupervisorWarning(this)">
+                                           hx-swap="innerHTML">
                                     <label class="form-check-label" for="supervisorToggle">
                                         <strong>Quero ser supervisor</strong>
                                     </label>
                                 </div>
                                 
                                 <!-- Alerta informativo -->
-                                <div id="supervisorWarning" class="alert alert-info mt-2" style="display: none;">
+                                <div id="supervisorWarning" class="alert alert-info mt-2">
                                     <i class="fas fa-info-circle me-2"></i>
                                     <strong>Atenção:</strong> Ao ativar o modo supervisor, você não poderá ser supervisionado. 
                                     Esta escolha define seu papel principal no sistema.
@@ -78,8 +75,10 @@
                         </div>
 
                         <!-- Campos de Supervisor -->
-                        <div id="supervisorFields" class="{{if .IsSupervisor}}supervisor-visible{{else}}supervisor-hidden{{end}}">
-                            <!-- Será preenchido via HTMX quando o toggle for ativado -->
+                        <div id="supervisorFields">
+                            {{if .IsSupervisor}}
+                                {{template "partials/supervisor_fields.html" .}}
+                            {{end}}
                         </div>
 
                         <div id="message-container"></div>

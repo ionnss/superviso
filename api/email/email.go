@@ -26,6 +26,11 @@ func getConfig() EmailConfig {
 
 func SendVerificationEmail(to, token string) error {
 	config := getConfig()
+
+	// Log das configurações (remova senhas em produção)
+	fmt.Printf("Configuração de Email:\nFrom: %s\nHost: %s\nPort: %s\n",
+		config.From, config.Host, config.Port)
+
 	auth := smtp.PlainAuth("", config.From, config.Password, config.Host)
 
 	templateData := struct {
@@ -34,14 +39,18 @@ func SendVerificationEmail(to, token string) error {
 		VerificationLink: fmt.Sprintf("http://localhost:8080/verify-email?token=%s", token),
 	}
 
-	// Ler o template
+	// Log do template
+	fmt.Printf("Tentando carregar template em: %s\n", "view/email_templates/verification.html")
+
 	tmpl, err := template.ParseFiles("view/email_templates/verification.html")
 	if err != nil {
+		fmt.Printf("Erro ao carregar template: %v\n", err)
 		return fmt.Errorf("erro ao carregar template: %v", err)
 	}
 
 	var body bytes.Buffer
 	if err := tmpl.Execute(&body, templateData); err != nil {
+		fmt.Printf("Erro ao executar template: %v\n", err)
 		return fmt.Errorf("erro ao executar template: %v", err)
 	}
 
@@ -50,9 +59,13 @@ func SendVerificationEmail(to, token string) error {
 	msg := []byte(subject + mime + body.String())
 
 	addr := fmt.Sprintf("%s:%s", config.Host, config.Port)
+	fmt.Printf("Tentando enviar email para %s via %s\n", to, addr)
+
 	if err := smtp.SendMail(addr, auth, config.From, []string{to}, msg); err != nil {
+		fmt.Printf("Erro ao enviar email: %v\n", err)
 		return fmt.Errorf("erro ao enviar email: %v", err)
 	}
 
+	fmt.Printf("Email enviado com sucesso para %s\n", to)
 	return nil
 }
