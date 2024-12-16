@@ -23,3 +23,19 @@ type Supervisor struct {
 	EndTime        string    `json:"end_time"`
 	CreatedAt      time.Time `json:"created_at"`
 }
+
+type SupervisorWeeklyHours struct {
+	ID           int
+	SupervisorID int
+	Weekday      int
+	StartTime    string
+	EndTime      string
+}
+
+type SupervisorAvailabilityPeriod struct {
+	ID           int
+	SupervisorID int
+	StartDate    time.Time
+	EndDate      time.Time
+	CreatedAt    time.Time
+}
