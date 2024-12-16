@@ -36,14 +36,14 @@
                         
                         <!-- Tabs para dias da semana -->
                         <ul class="nav nav-pills mb-3" id="slotsTabs" role="tablist">
-                            {{range $index, $hour := .WeeklyHours}}
+                            {{range $index, $day := .AvailableDays}}
                             <li class="nav-item me-2" role="presentation">
                                 <button class="nav-link {{if eq $index 0}}active{{end}}"
                                         data-bs-toggle="pill"
-                                        data-bs-target="#day-{{.Weekday}}"
+                                        data-bs-target="#day-{{$day}}"
                                         type="button"
                                         role="tab">
-                                    {{formatWeekday .Weekday}}
+                                    {{formatWeekday $day}}
                                 </button>
                             </li>
                             {{end}}
@@ -51,12 +51,12 @@
 
                         <!-- Conteúdo das tabs -->
                         <div class="tab-content" id="slotsContent">
-                            {{range $index, $hour := .WeeklyHours}}
+                            {{range $index, $day := .AvailableDays}}
                             <div class="tab-pane fade {{if eq $index 0}}show active{{end}}"
-                                 id="day-{{.Weekday}}"
+                                 id="day-{{$day}}"
                                  role="tabpanel">
                                 <div class="slots-grid"
-                                     hx-get="/api/appointments/slots?supervisor_id={{$.Supervisor.UserID}}&weekday={{.Weekday}}"
+                                     hx-get="/api/appointments/slots?supervisor_id={{$.Supervisor.UserID}}&day={{$day}}"
                                      hx-trigger="load"
                                      hx-indicator=".slots-loading">
                                     <div class="slots-loading text-center py-4">

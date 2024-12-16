@@ -61,7 +61,6 @@ func ExecuteMigrations(conn *sql.DB) {
 		"db/migrations/001_create_users_table.sql",
 		"db/migrations/002_create_supervisor_profiles_table.sql",
 		"db/migrations/003_create_appointments_table.sql",
-		"db/migrations/004_create_supervisor_weekl_hours_table.sql",
 	}
 
 	for _, file := range migrationFiles {

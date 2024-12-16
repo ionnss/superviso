@@ -8,13 +8,13 @@ Documento detalhando as alterações necessárias para implementar o novo sistem
 
 ## 1. Alterações no Banco de Dados
 
- ### Modificar: db/migrations 002_create_supervisor_profiles_table.sql ✅ 
+### Modificar: db/migrations/002_create_supervisor_profiles_table.sql
 - Remover colunas:
   - available_days
   - start_time
   - end_time
 
-### Criar: db/migrations/004_create_supervisor_schedules.sql ✅
+### Criar: db/migrations/004_create_supervisor_schedules.sql
 ```sql
 CREATE TABLE supervisor_weekly_hours (
     id SERIAL PRIMARY KEY,
@@ -35,9 +35,9 @@ CREATE TABLE supervisor_availability_periods (
 );
 ```
 
-## 2. Alterações nos Modelos ✅
+## 2. Alterações nos Modelos
 
-### Modificar: models/supervisor.go ✅
+### Modificar: models/supervisor.go
 ```go
 type SupervisorWeeklyHours struct {
     ID           int

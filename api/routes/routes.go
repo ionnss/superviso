@@ -77,14 +77,4 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/api/appointments/slots", auth.AuthMiddleware(appointment.GetAvailableSlots(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db))).Methods("POST")
 
-	// Rotas de disponibilidade do supervisor
-	r.HandleFunc("/api/supervisor/weekly-hours", auth.AuthMiddleware(supervisor.GetWeeklyHours(db))).Methods("GET")
-	r.HandleFunc("/api/supervisor/weekly-hours", auth.AuthMiddleware(supervisor.UpdateWeeklyHours(db))).Methods("POST")
-	r.HandleFunc("/api/supervisor/availability-periods", auth.AuthMiddleware(supervisor.GetAvailabilityPeriods(db))).Methods("GET")
-	r.HandleFunc("/api/supervisor/availability-periods", auth.AuthMiddleware(supervisor.CreateAvailabilityPeriod(db))).Methods("POST")
-	r.HandleFunc("/api/supervisor/availability-periods/{id}", auth.AuthMiddleware(supervisor.DeleteAvailabilityPeriod(db))).Methods("DELETE")
-
-	r.HandleFunc("/api/supervisor/update-profile",
-		auth.AuthMiddleware(supervisor.UpdateSupervisorProfile(db))).Methods("POST")
-
 }
