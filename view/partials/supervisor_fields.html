@@ -10,62 +10,24 @@
     </div>
 
     <div class="mb-4">
-        <label class="form-label fw-bold">Dias Disponíveis</label>
-        <div class="row row-cols-2 row-cols-md-4 g-3">
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="1" {{if and . (contains .AvailableDays "1")}}checked{{end}}>
-                    <label class="form-check-label">Segunda</label>
-                </div>
+        <h5>Horários por Dia da Semana</h5>
+        {{range $day := .WeekDays}}
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">{{formatWeekday $day}}</label>
             </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="2" {{if and . (contains .AvailableDays "2")}}checked{{end}}>
-                    <label class="form-check-label">Terça</label>
-                </div>
+            <div class="col-md-4">
+                <input type="time" class="form-control" 
+                       name="start_time_{{$day}}" 
+                       value="{{index $.WeeklyHours $day "start_time"}}">
             </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="3" {{if and . (contains .AvailableDays "3")}}checked{{end}}>
-                    <label class="form-check-label">Quarta</label>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="4" {{if and . (contains .AvailableDays "4")}}checked{{end}}>
-                    <label class="form-check-label">Quinta</label>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="5" {{if and . (contains .AvailableDays "5")}}checked{{end}}>
-                    <label class="form-check-label">Sexta</label>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="6" {{if and . (contains .AvailableDays "6")}}checked{{end}}>
-                    <label class="form-check-label">Sábado</label>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="available_days" value="7" {{if and . (contains .AvailableDays "7")}}checked{{end}}>
-                    <label class="form-check-label">Domingo</label>
-                </div>
+            <div class="col-md-4">
+                <input type="time" class="form-control" 
+                       name="end_time_{{$day}}" 
+                       value="{{index $.WeeklyHours $day "end_time"}}">
             </div>
         </div>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Horário Início</label>
-            <input type="time" class="form-control" name="start_time" value="{{.StartTime}}">
-        </div>
-        <div class="col-md-6">
-            <label class="form-label fw-bold">Horário Fim</label>
-            <input type="time" class="form-control" name="end_time" value="{{.EndTime}}">
-        </div>
+        {{end}}
     </div>
 
     <div class="mt-4 p-3 bg-light rounded">

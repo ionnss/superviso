@@ -15,3 +15,8 @@ CREATE TABLE supervisor_availability_periods (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (supervisor_id, start_date, end_date)
 );
+
+-- Criar índices para melhor performance
+CREATE INDEX idx_weekly_hours_supervisor ON supervisor_weekly_hours(supervisor_id);
+CREATE INDEX idx_availability_periods_supervisor ON supervisor_availability_periods(supervisor_id);
+CREATE INDEX idx_availability_periods_dates ON supervisor_availability_periods(start_date, end_date);

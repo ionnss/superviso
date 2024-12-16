@@ -2,11 +2,11 @@ package appointment
 
 import (
 	"database/sql"
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"superviso/api/auth"
 	"superviso/models"
 	"time"
@@ -25,7 +25,7 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 		// Buscar dados do supervisor
 		var supervisor models.Supervisor
 		err := db.QueryRow(`
-			SELECT u.id, u.first_name, u.last_name, u.crp, sp.available_days
+			SELECT u.id, u.first_name, u.last_name, u.crp
 			FROM users u
 			JOIN supervisor_profiles sp ON u.id = sp.user_id
 			WHERE u.id = $1`,
@@ -34,20 +34,45 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 			&supervisor.FirstName,
 			&supervisor.LastName,
 			&supervisor.CRP,
-			&supervisor.AvailableDays,
 		)
 		if err != nil {
 			http.Error(w, "Erro ao buscar supervisor", http.StatusInternalServerError)
 			return
 		}
 
+		// Buscar horários semanais do supervisor
+		rows, err := db.Query(`
+			SELECT weekday, start_time, end_time 
+			FROM supervisor_weekly_hours 
+			WHERE supervisor_id = $1 
+			ORDER BY weekday`,
+			supervisorID)
+		if err != nil {
+			http.Error(w, "Erro ao buscar horários", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		var weeklyHours []models.SupervisorWeeklyHours
+		for rows.Next() {
+			var h models.SupervisorWeeklyHours
+			err := rows.Scan(&h.Weekday, &h.StartTime, &h.EndTime)
+			if err != nil {
+				http.Error(w, "Erro ao ler horários", http.StatusInternalServerError)
+				return
+			}
+			weeklyHours = append(weeklyHours, h)
+		}
+
 		// Preparar dados para o template
 		data := struct {
-			Supervisor    models.Supervisor
-			AvailableDays []string
+			Supervisor  models.Supervisor
+			WeeklyHours []models.SupervisorWeeklyHours
+			WeekDays    []int
 		}{
-			Supervisor:    supervisor,
-			AvailableDays: parseAvailableDays(supervisor.AvailableDays),
+			Supervisor:  supervisor,
+			WeeklyHours: weeklyHours,
+			WeekDays:    []int{1, 2, 3, 4, 5, 6, 7},
 		}
 
 		// Funções para o template
@@ -80,119 +105,73 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 func GetAvailableSlots(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		supervisorID := r.URL.Query().Get("supervisor_id")
-		day := r.URL.Query().Get("day")
+		weekday := r.URL.Query().Get("weekday")
 
-		// Converter supervisorID para int
+		// Buscar horário do supervisor para este dia
+		var startTime, endTime string
+		err := db.QueryRow(`
+			SELECT start_time, end_time 
+			FROM supervisor_weekly_hours 
+			WHERE supervisor_id = $1 AND weekday = $2`,
+			supervisorID, weekday).Scan(&startTime, &endTime)
+		if err == sql.ErrNoRows {
+			// Retornar array vazio se não houver horário configurado
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode([]models.AvailableSlot{})
+			return
+		}
+		if err != nil {
+			http.Error(w, "Erro ao buscar horários", http.StatusInternalServerError)
+			return
+		}
+
+		// Verificar períodos de disponibilidade
+		var isAvailable bool
+		err = db.QueryRow(`
+			SELECT EXISTS(
+				SELECT 1 FROM supervisor_availability_periods
+				WHERE supervisor_id = $1 
+				AND CURRENT_DATE BETWEEN start_date AND end_date
+			)`, supervisorID).Scan(&isAvailable)
+		if err != nil {
+			http.Error(w, "Erro ao verificar disponibilidade", http.StatusInternalServerError)
+			return
+		}
+
+		if !isAvailable {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode([]models.AvailableSlot{})
+			return
+		}
+
+		// Gerar slots para as próximas 4 semanas
 		supID, err := strconv.Atoi(supervisorID)
 		if err != nil {
 			http.Error(w, "ID do supervisor inválido", http.StatusBadRequest)
 			return
 		}
-
-		// Buscar horários do supervisor
-		var startTime, endTime string
-		err = db.QueryRow(`
-			SELECT 
-				start_time::time::text,
-				end_time::time::text
-			FROM supervisor_profiles
-			WHERE user_id = $1`,
-			supID).Scan(&startTime, &endTime)
-		if err != nil {
-			http.Error(w, "Erro ao buscar horários do supervisor", http.StatusInternalServerError)
-			return
-		}
-
-		// Gerar slots para o dia específico
-		allSlots := generateSlots(supID, startTime, endTime, []string{day})
-
-		// Primeiro, inserir os slots no banco se não existirem
-		for i := range allSlots {
-			var slotID int
-			err = db.QueryRow(`
-				INSERT INTO available_slots 
-				(supervisor_id, slot_date, start_time, end_time, status)
-				VALUES ($1, $2, $3::time, $4::time, $5)
-				ON CONFLICT (supervisor_id, slot_date, start_time) 
-				DO UPDATE SET status = EXCLUDED.status
-				RETURNING id`,
-				allSlots[i].SupervisorID, allSlots[i].SlotDate, allSlots[i].StartTime, allSlots[i].EndTime, allSlots[i].Status).Scan(&slotID)
-			if err != nil {
-				log.Printf("Erro ao inserir slot: %v", err)
-				continue
-			}
-			allSlots[i].SlotID = slotID
-		}
+		slots := generateSlots(supID, weekday, startTime, endTime)
 
 		// Filtrar slots já agendados
-		rows, err := db.Query(`
-			SELECT id, slot_date::date
-			FROM available_slots
-			WHERE supervisor_id = $1
-			AND status = 'booked'`,
-			supID)
-		if err != nil {
-			http.Error(w, "Erro ao verificar slots agendados", http.StatusInternalServerError)
-			return
-		}
-		defer rows.Close()
+		availableSlots := filterAvailableSlots(db, slots)
 
-		// Criar mapa de datas ocupadas
-		bookedDates := make(map[string]bool)
-		for rows.Next() {
-			var date time.Time
-			err := rows.Scan(&date)
-			if err != nil {
-				continue
-			}
-			bookedDates[date.Format("2006-01-02")] = true
-		}
-
-		// Filtrar slots disponíveis
-		var availableSlots []models.AvailableSlot
-		for _, slot := range allSlots {
-			dateStr := slot.SlotDate.Format("2006-01-02")
-			if !bookedDates[dateStr] {
-				availableSlots = append(availableSlots, slot)
-			}
-		}
-
-		// Funções para o template
-		funcMap := template.FuncMap{
-			"formatDate":           formatDate,
-			"formatTimeForDisplay": formatTimeForDisplay,
-			"formatWeekdayFromDate": func(t time.Time) string {
-				weekdays := map[int]string{
-					0: "Domingo",
-					1: "Segunda-feira",
-					2: "Terça-feira",
-					3: "Quarta-feira",
-					4: "Quinta-feira",
-					5: "Sexta-feira",
-					6: "Sábado",
-				}
-				return weekdays[int(t.Weekday())]
-			},
-		}
-
-		// Renderizar partial com os slots
-		tmpl := template.Must(template.New("slots_grid.html").
-			Funcs(funcMap).
-			ParseFiles("view/appointments/partials/slots_grid.html"))
-		tmpl.Execute(w, availableSlots)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(availableSlots)
 	}
 }
 
 // Funções auxiliares
-func formatDate(t time.Time) string {
-	return t.Format("02/01/2006")
-}
-
-func parseAvailableDays(days string) []string {
-	if days == "" {
-		return []string{}
+func formatWeekday(day int) string {
+	weekdays := map[int]string{
+		1: "Segunda",
+		2: "Terça",
+		3: "Quarta",
+		4: "Quinta",
+		5: "Sexta",
+		6: "Sábado",
+		7: "Domingo",
 	}
-	return strings.Split(days, ",")
+	return weekdays[day]
 }
 
 // BookAppointment processa o agendamento de uma supervisão
@@ -212,7 +191,7 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 		log.Printf("SlotID recebido: %d", slotID)
 		if err != nil {
 			log.Printf("Erro ao converter slot_id: %v", err)
-			http.Error(w, "ID do slot inv��lido", http.StatusBadRequest)
+			http.Error(w, "ID do slot inválido", http.StatusBadRequest)
 			return
 		}
 
@@ -313,67 +292,70 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func formatWeekday(day string) string {
-	weekdays := map[string]string{
-		"1": "Segunda",
-		"2": "Terça",
-		"3": "Quarta",
-		"4": "Quinta",
-		"5": "Sexta",
-		"6": "Sábado",
-		"7": "Domingo",
-	}
-	return weekdays[day]
-}
-
 // GenerateSlots gera slots de horário para as próximas 4 semanas
-func generateSlots(supervisorID int, startTime, endTime string, availableDays []string) []models.AvailableSlot {
+func generateSlots(supervisorID int, weekday string, startTime, endTime string) []models.AvailableSlot {
 	var slots []models.AvailableSlot
 	now := time.Now()
 
 	// Gerar slots para as próximas 4 semanas
 	for week := 0; week < 4; week++ {
-		for _, dayStr := range availableDays {
-			day, _ := strconv.Atoi(dayStr)
+		date := nextWeekday(now.AddDate(0, 0, week*7), weekday)
 
-			// Encontrar próxima data para este dia da semana
-			date := nextWeekday(now.AddDate(0, 0, week*7), time.Weekday(day))
-
-			// Criar slot
-			slot := models.AvailableSlot{
-				SlotID:       0,
-				SupervisorID: supervisorID,
-				SlotDate:     date,
-				StartTime:    formatTimeForDB(startTime),
-				EndTime:      formatTimeForDB(endTime),
-				Status:       "available",
-			}
-			slots = append(slots, slot)
+		slot := models.AvailableSlot{
+			SupervisorID: supervisorID,
+			SlotDate:     date,
+			StartTime:    startTime,
+			EndTime:      endTime,
+			Status:       "available",
 		}
+		slots = append(slots, slot)
 	}
 	return slots
 }
 
 // nextWeekday retorna a próxima data para um dia específico da semana
-func nextWeekday(start time.Time, weekday time.Weekday) time.Time {
+func nextWeekday(start time.Time, weekday string) time.Time {
+	// Converter string para int
+	day, err := strconv.Atoi(weekday)
+	if err != nil {
+		return start
+	}
+
+	// Ajustar para o formato time.Weekday (0-6, onde 0 é Domingo)
+	// Nossa aplicação usa 1-7, onde 1 é Segunda
+	if day == 7 {
+		day = 0
+	}
+
 	date := start
-	for date.Weekday() != weekday {
+	for date.Weekday() != time.Weekday(day) {
 		date = date.AddDate(0, 0, 1)
 	}
 	return date
 }
 
-// formatTimeForDB converte o horário para o formato aceito pelo PostgreSQL
-func formatTimeForDB(timeStr string) string {
-	return timeStr // O horário já vem no formato correto do banco
-}
+// filterAvailableSlots filtra os slots que já estão agendados
+func filterAvailableSlots(db *sql.DB, slots []models.AvailableSlot) []models.AvailableSlot {
+	var availableSlots []models.AvailableSlot
+	for _, slot := range slots {
+		var exists bool
+		err := db.QueryRow(`
+			SELECT EXISTS(
+				SELECT 1 FROM available_slots 
+				WHERE supervisor_id = $1 
+				AND slot_date = $2 
+				AND start_time = $3
+				AND status = 'booked'
+			)`,
+			slot.SupervisorID, slot.SlotDate, slot.StartTime).Scan(&exists)
 
-// formatTimeForDisplay formata o horário para exibição
-func formatTimeForDisplay(timeStr string) string {
-	// Parse do horário no formato HH:MM:SS
-	t, err := time.Parse("15:04:05", timeStr)
-	if err != nil {
-		return timeStr
+		if err != nil {
+			log.Printf("Erro ao verificar slot %v: %v", slot, err)
+			continue
+		}
+		if !exists {
+			availableSlots = append(availableSlots, slot)
+		}
 	}
-	return t.Format("15:04")
+	return availableSlots
 }

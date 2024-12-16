@@ -34,9 +34,6 @@ func GetSupervisors(db *sql.DB) http.HandlerFunc {
 				u.crp,
 				u.theory_approach,
 				sp.session_price,
-				sp.available_days,
-				sp.start_time,
-				sp.end_time,
 				sp.created_at
 			FROM users u
 			INNER JOIN supervisor_profiles sp ON u.id = sp.user_id
@@ -77,8 +74,7 @@ func GetSupervisors(db *sql.DB) http.HandlerFunc {
 			var s models.Supervisor
 			err := rows.Scan(
 				&s.UserID, &s.FirstName, &s.LastName, &s.CRP,
-				&s.TheoryApproach, &s.SessionPrice, &s.AvailableDays,
-				&s.StartTime, &s.EndTime, &s.CreatedAt,
+				&s.TheoryApproach, &s.SessionPrice, &s.CreatedAt,
 			)
 			if err != nil {
 				http.Error(w, "Erro ao ler dados", http.StatusInternalServerError)
