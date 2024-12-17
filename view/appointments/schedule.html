@@ -1,180 +1,82 @@
-<!-- Breadcrumb e Botão Voltar -->
-<div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded shadow-sm">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/supervisors" hx-get="/supervisors" hx-target="#main-content">Supervisores</a></li>
-            <li class="breadcrumb-item active">Agendar Supervisão</li>
-        </ol>
-    </nav>
-    <a href="/supervisors" hx-get="/supervisors" hx-target="#main-content" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left"></i> Voltar aos Supervisores
-    </a>
-</div>
-
 <div class="container py-5">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Agendar Supervisão</h4>
+    <!-- Breadcrumb e Botão Voltar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded shadow-sm">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/supervisors">Supervisores</a></li>
+                <li class="breadcrumb-item active">Agendar Supervisão</li>
+            </ol>
+        </nav>
+        <a href="/supervisors" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar aos Supervisores
+        </a>
+    </div>
+
+    <!-- Dados do Supervisor -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Supervisor Selecionado</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>{{.Supervisor.FirstName}} {{.Supervisor.LastName}}</h5>
+                    <p class="mb-3">
+                        <strong>CRP:</strong> {{.Supervisor.CRP}}<br>
+                        <strong>Abordagem:</strong> {{.Supervisor.TheoryApproach}}<br>
+                        <strong>Valor da Sessão:</strong> R$ {{printf "%.2f" .Supervisor.SessionPrice}}
+                    </p>
                 </div>
-                <div class="card-body">
-                    <!-- Informações do Supervisor -->
-                    <div class="supervisor-info mb-4 p-3 bg-light rounded">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h5 class="mb-1">{{.Supervisor.FirstName}} {{.Supervisor.LastName}}</h5>
-                                <p class="text-muted mb-0">CRP: {{.Supervisor.CRP}}</p>
-                            </div>
+                <div class="col-md-6">
+                    <h6 class="mb-3">Horários Disponíveis:</h6>
+                    <div class="small">
+                        {{range $day, $hours := .Supervisor.WeeklyHours}}
+                        <div class="mb-2">
+                            <strong>{{formatWeekday $day}}:</strong>
+                            {{formatTime $hours.StartTime}} às {{formatTime $hours.EndTime}}
                         </div>
+                        {{end}}
                     </div>
-
-                    <!-- Seleção de Horários -->
-                    <div class="available-slots">
-                        <h5 class="mb-3">Horários Disponíveis</h5>
-                        
-                        <!-- Tabs para dias da semana -->
-                        <ul class="nav nav-pills mb-3" id="slotsTabs" role="tablist">
-                            {{range $index, $day := .AvailableDays}}
-                            <li class="nav-item me-2" role="presentation">
-                                <button class="nav-link {{if eq $index 0}}active{{end}}"
-                                        data-bs-toggle="pill"
-                                        data-bs-target="#day-{{$day}}"
-                                        type="button"
-                                        role="tab">
-                                    {{formatWeekday $day}}
-                                </button>
-                            </li>
-                            {{end}}
-                        </ul>
-
-                        <!-- Conteúdo das tabs -->
-                        <div class="tab-content" id="slotsContent">
-                            {{range $index, $day := .AvailableDays}}
-                            <div class="tab-pane fade {{if eq $index 0}}show active{{end}}"
-                                 id="day-{{$day}}"
-                                 role="tabpanel">
-                                <div class="slots-grid"
-                                     hx-get="/api/appointments/slots?supervisor_id={{$.Supervisor.UserID}}&day={{$day}}"
-                                     hx-trigger="load"
-                                     hx-indicator=".slots-loading">
-                                    <div class="slots-loading text-center py-4">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="visually-hidden">Carregando...</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Disponível de {{formatDate .Supervisor.StartDate}} até {{formatDate .Supervisor.EndDate}}
+                        </small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-    .btn-confirm-hover {
-        transition: all 0.3s ease !important;
-    }
-
-    .btn-confirm-hover:hover {
-        background-color: #198754 !important;
-        border-color: #198754 !important;
-    }
-</style>
-
-<!-- Modal de Confirmação -->
-<div class="modal" id="confirmModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background-color: #212529 !important; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: none;">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar Agendamento</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Container para mensagens de resposta - movido para cima -->
-                <div id="booking-message" class="mb-3"></div>
-
-                <div id="booking-content">
-                    <p>Você está agendando uma supervisão para:</p>
-                    <ul class="list-unstyled">
-                        <li>
-                            <i class="far fa-calendar-alt me-2"></i>
-                            <span id="modalDate"></span>
-                            <span class="text-muted ms-2">(<span id="modalWeekday"></span>)</span>
-                        </li>
-                        <li><i class="far fa-clock me-2"></i><span id="modalTime"></span></li>
-                    </ul>
-                    <div class="alert alert-info" style="background-color: rgb(13, 110, 253); color: white; border: none;">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Após a confirmação, o supervisor será notificado e poderá aceitar ou recusar o agendamento.
+    <!-- Seleção de Horário -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Selecione o Horário</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Data da Supervisão</label>
+                        <input type="date" class="form-control" 
+                               min="{{now}}" max="{{formatDate .Supervisor.EndDate}}"
+                               hx-get="/api/appointments/slots"
+                               hx-target="#available-slots"
+                               hx-include="[name='supervisor_id']"
+                               name="date" required>
+                        <input type="hidden" name="supervisor_id" value="{{.Supervisor.ID}}">
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" 
-                        class="btn btn-primary btn-confirm-hover" 
-                        id="confirmBooking"
-                        hx-post="/api/appointments/book"
-                        hx-target="#booking-message"
-                        hx-swap="innerHTML show:top"
-                        hx-indicator="#modalSpinner">
-                    <span class="htmx-indicator-hidden">Confirmar Agendamento</span>
-                    <span id="modalSpinner" class="htmx-indicator">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        Agendando...
-                    </span>
-                </button>
+                <div class="col-md-8">
+                    <div id="available-slots" class="mt-md-4">
+                        <div class="text-muted text-center">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Selecione uma data para ver os horários disponíveis
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div> 
-
-<script>
-document.addEventListener('show.bs.modal', function (event) {
-    if (event.target.id === 'confirmModal') {
-        const button = event.relatedTarget;
-        const slotId = button.getAttribute('data-slot-id');
-        const slotDate = button.getAttribute('data-slot-date');
-        const slotWeekday = button.getAttribute('data-slot-weekday');
-        const slotTime = button.getAttribute('data-slot-time');
-        
-        document.getElementById('modalDate').textContent = slotDate;
-        document.getElementById('modalWeekday').textContent = slotWeekday;
-        document.getElementById('modalTime').textContent = slotTime;
-        document.getElementById('confirmBooking').setAttribute('hx-vals', JSON.stringify({
-            slot_id: slotId
-        }));
-    }
-});
-
-document.addEventListener('htmx:afterRequest', function(evt) {
-    if (evt.detail.successful && evt.detail.elt.id === 'confirmBooking') {
-        // Se não houver erro (status 409 - Conflict)
-        if (!evt.detail.xhr || evt.detail.xhr.status !== 409) {
-            document.querySelector('#booking-content').style.display = 'none';
-            document.querySelector('.modal-footer').style.display = 'none';
-        
-            // Fechar o modal após 2 segundos apenas em caso de sucesso
-            setTimeout(() => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-                modal.hide();
-            
-                // Atualizar a lista de slots
-                htmx.trigger('.slots-grid', 'load');
-            
-                // Restaurar o modal para próximo uso
-                setTimeout(() => {
-                    document.querySelector('#booking-content').style.display = 'block';
-                    document.querySelector('.modal-footer').style.display = 'block';
-                    document.getElementById('booking-message').innerHTML = '';
-                }, 500);
-            }, 2000);
-        }
-    }
-});
-</script> 

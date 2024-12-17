@@ -77,4 +77,12 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/api/appointments/slots", auth.AuthMiddleware(appointment.GetAvailableSlots(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db))).Methods("POST")
 
+	r.HandleFunc("/api/supervisor/toggle-day-hours",
+		auth.AuthMiddleware(supervisor.ToggleDayHours(db))).Methods("POST")
+	r.HandleFunc("/api/supervisor/update-availability",
+		auth.AuthMiddleware(supervisor.UpdateAvailability(db))).Methods("POST")
+
+	r.HandleFunc("/api/supervisor/availability",
+		auth.AuthMiddleware(supervisor.GetSupervisorAvailability(db))).Methods("GET")
+
 }

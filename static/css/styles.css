@@ -365,14 +365,6 @@ footer {
     color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Ícones de horário */
-input[name="start_time"]::-webkit-calendar-picker-indicator {
-    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); /* Verde */
-}
-
-input[name="end_time"]::-webkit-calendar-picker-indicator {
-    filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%); /* Vermelho */
-}
 
 /* Para Firefox e outros navegadores */
 input[type="time"].start-time {
@@ -675,5 +667,23 @@ input[type="time"].end-time {
 
 .htmx-request .form-submit-button .btn .htmx-indicator {
     display: inline-flex;
+}
+
+/* Cores dos ícones de calendário */
+.calendar-success::-webkit-calendar-picker-indicator {
+    filter: invert(73%) sepia(62%) saturate(385%) hue-rotate(86deg) brightness(89%) contrast(87%) !important;
+}
+
+.calendar-danger::-webkit-calendar-picker-indicator {
+    filter: invert(83%) sepia(31%) saturate(436%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
+}
+
+/* Cores dos ícones de relógio */
+.time-success::-webkit-calendar-picker-indicator {
+    filter: invert(73%) sepia(62%) saturate(385%) hue-rotate(86deg) brightness(89%) contrast(87%) !important;
+}
+
+.time-danger::-webkit-calendar-picker-indicator {
+    filter: invert(83%) sepia(31%) saturate(436%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
 }
 

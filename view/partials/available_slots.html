@@ -1,0 +1,36 @@
+{{if .Slots}}
+<div class="available-slots">
+    <h6 class="mb-3">
+        <i class="far fa-clock me-2"></i>
+        Horários Disponíveis para {{formatDate .Date}}
+        <small class="text-muted">({{formatWeekday .Date}})</small>
+    </h6>
+    
+    <div class="row row-cols-2 row-cols-md-3 g-3">
+        {{range .Slots}}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-3">{{formatTime .StartTime}}</h5>
+                    <button class="btn btn-primary w-100"
+                            hx-post="/api/appointments/book"
+                            hx-vals='{"slot_id": {{.SlotID}}}'
+                            hx-target="#booking-message"
+                            hx-swap="innerHTML">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Agendar
+                    </button>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{else}}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    Não há horários disponíveis para esta data.
+</div>
+{{end}}
+
+<div id="booking-message" class="mt-3"></div> 

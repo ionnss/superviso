@@ -5,13 +5,12 @@ import (
 )
 
 type AvailableSlot struct {
-	SlotID       int       `json:"slot_id"`
+	SlotID       int       `json:"id"`
 	SupervisorID int       `json:"supervisor_id"`
 	SlotDate     time.Time `json:"slot_date"`
 	StartTime    string    `json:"start_time"`
 	EndTime      string    `json:"end_time"`
 	Status       string    `json:"status"`
-	CreatedAt    time.Time `json:"created_at"`
 }
 
 type Appointment struct {

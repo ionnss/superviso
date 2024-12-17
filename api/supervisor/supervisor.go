@@ -4,14 +4,11 @@ package supervisor
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
-	"html/template"
 	"net/http"
-	"strconv"
-	"strings"
-	"time"
-
 	"superviso/models"
+	"superviso/utils"
+	"text/template"
+	"time"
 )
 
 // Package supervisor gerencia as funcionalidades específicas de supervisores.
@@ -20,108 +17,106 @@ import (
 //   - Listagem de supervisores disponíveis
 //   - Filtros por abordagem e valor
 //   - Gerenciamento de horários e disponibilidade
+
+var funcMap = template.FuncMap{
+	"formatWeekday": utils.FormatWeekday,
+	"formatDate":    utils.FormatDate,
+	"formatTime": func(t string) string {
+		if t == "" {
+			return ""
+		}
+		// Remover os segundos se existirem
+		if len(t) > 5 {
+			t = t[:5]
+		}
+		return t
+	},
+}
+
+// GetSupervisors retorna a lista de supervisores disponíveis
 func GetSupervisors(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Parâmetros de filtro
-		approach := r.URL.Query().Get("approach")
-		maxPrice := r.URL.Query().Get("max_price")
-
-		query := `
-			SELECT 
-				u.id,
-				u.first_name,
-				u.last_name,
-				u.crp,
-				u.theory_approach,
-				sp.session_price,
-				sp.available_days,
-				sp.start_time,
-				sp.end_time,
-				sp.created_at
-			FROM users u
-			INNER JOIN supervisor_profiles sp ON u.id = sp.user_id
-			WHERE 1=1
-		`
-		var params []interface{}
-		paramCount := 1
-
-		if approach != "" {
-			query += fmt.Sprintf(" AND u.theory_approach ILIKE $%d", paramCount)
-			params = append(params, "%"+approach+"%")
-			paramCount++
-		}
-
-		if maxPrice != "" {
-			query += fmt.Sprintf(" AND sp.session_price <= $%d", paramCount)
-			price, err := strconv.ParseFloat(maxPrice, 64)
-			if err != nil {
-				http.Error(w, "Valor máximo inválido", http.StatusBadRequest)
-				return
-			}
-			params = append(params, price)
-			paramCount++
-		}
-
-		query += " ORDER BY sp.created_at DESC"
-
-		// Executa a query e obtém os resultados
-		rows, err := db.Query(query, params...)
+		// Buscar supervisores com seus horários
+		rows, err := db.Query(`
+				SELECT DISTINCT 
+					u.id,
+					u.first_name,
+					u.last_name,
+					u.crp,
+					u.theory_approach,
+					sp.session_price,
+					sap.start_date,
+					sap.end_date
+				FROM users u
+				JOIN supervisor_profiles sp ON u.id = sp.user_id
+				JOIN supervisor_availability_periods sap ON sp.user_id = sap.supervisor_id
+				WHERE sap.end_date >= CURRENT_DATE
+				ORDER BY u.first_name, u.last_name`)
 		if err != nil {
 			http.Error(w, "Erro ao buscar supervisores", http.StatusInternalServerError)
 			return
 		}
 		defer rows.Close()
 
-		var supervisors []models.Supervisor
+		var supervisors []struct {
+			models.Supervisor
+			StartDate   time.Time                 `json:"start_date"`
+			EndDate     time.Time                 `json:"end_date"`
+			WeeklyHours map[int]models.WeeklyHour `json:"weekly_hours"`
+		}
+
 		for rows.Next() {
-			var s models.Supervisor
+			var s struct {
+				models.Supervisor
+				StartDate   time.Time
+				EndDate     time.Time
+				WeeklyHours map[int]models.WeeklyHour
+			}
+			s.WeeklyHours = make(map[int]models.WeeklyHour)
+
 			err := rows.Scan(
-				&s.UserID, &s.FirstName, &s.LastName, &s.CRP,
-				&s.TheoryApproach, &s.SessionPrice, &s.AvailableDays,
-				&s.StartTime, &s.EndTime, &s.CreatedAt,
-			)
+				&s.UserID, &s.FirstName, &s.LastName,
+				&s.CRP, &s.TheoryApproach, &s.SessionPrice,
+				&s.StartDate, &s.EndDate)
 			if err != nil {
 				http.Error(w, "Erro ao ler dados", http.StatusInternalServerError)
 				return
 			}
-			supervisors = append(supervisors, s)
-		}
 
-		// Se a requisição for HTMX, retorna HTML
-		if r.Header.Get("HX-Request") == "true" {
-			funcMap := template.FuncMap{
-				"formatTime": func(t string) string {
-					timeObj, err := time.Parse(time.RFC3339, t)
-					if err != nil {
-						// Tentar outro formato caso o primeiro falhe
-						timeObj, err = time.Parse("2006-01-02T15:04:05Z", t)
-						if err != nil {
-							return t
-						}
-					}
-					return timeObj.Format("15:04")
-				},
-				"formatDays": func(days string) string {
-					dayMap := map[string]string{
-						"1": "Segunda",
-						"2": "Terça",
-						"3": "Quarta",
-						"4": "Quinta",
-						"5": "Sexta",
-						"6": "Sábado",
-						"7": "Domingo",
-					}
+			// Buscar horários do supervisor
+			hourRows, err := db.Query(`
+				SELECT 
+					weekday,
+					TO_CHAR(start_time, 'HH24:MI') as start_time,
+					TO_CHAR(end_time, 'HH24:MI') as end_time
+				FROM supervisor_weekly_hours 
+				WHERE supervisor_id = $1 
+				ORDER BY weekday`, s.UserID)
+			if err != nil {
+				http.Error(w, "Erro ao buscar horários", http.StatusInternalServerError)
+				return
+			}
+			defer hourRows.Close()
 
-					var result []string
-					for _, day := range strings.Split(days, ",") {
-						if name, ok := dayMap[day]; ok {
-							result = append(result, name)
-						}
-					}
-					return strings.Join(result, ", ")
-				},
+			for hourRows.Next() {
+				var h models.WeeklyHour
+				if err := hourRows.Scan(&h.Weekday, &h.StartTime, &h.EndTime); err != nil {
+					http.Error(w, "Erro ao ler horários", http.StatusInternalServerError)
+					return
+				}
+				s.WeeklyHours[h.Weekday] = h
 			}
 
+			supervisors = append(supervisors, struct {
+				models.Supervisor
+				StartDate   time.Time                 "json:\"start_date\""
+				EndDate     time.Time                 "json:\"end_date\""
+				WeeklyHours map[int]models.WeeklyHour "json:\"weekly_hours\""
+			}(s))
+		}
+
+		// Se for requisição HTMX, retorna HTML
+		if r.Header.Get("HX-Request") == "true" {
 			tmpl := template.Must(template.New("supervisor_list.html").
 				Funcs(funcMap).
 				ParseFiles("view/partials/supervisor_list.html"))
@@ -129,7 +124,7 @@ func GetSupervisors(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Se não for HTMX, retorna JSON
+		// Senão retorna JSON
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(supervisors)
 	}
