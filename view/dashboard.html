@@ -32,7 +32,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" 
-                           href="#perfil" 
+                           href="/profile" 
                            hx-get="/profile" 
                            hx-target="#main-content"
                            onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
@@ -43,13 +43,14 @@
                         <a class="nav-link" 
                            href="/supervisors"
                            hx-get="/supervisors"
-                           hx-target="#main-content">
+                           hx-target="#main-content"
+                           onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
                             <i class="fas fa-search"></i> Buscar Supervisores
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" 
-                           href="#agendamentos" 
+                           href="/appointments" 
                            hx-get="/appointments" 
                            hx-target="#main-content"
                            onclick="bootstrap.Collapse.getInstance(document.getElementById('navbarResponsive')).hide()">
@@ -97,7 +98,10 @@
             <!-- Dashboard Overview -->
             <div class="row">
                 <!-- Card Informativo sobre Papel do Usuário -->
-                <div id="roleWarning" class="col-12 mb-4">
+                <div id="roleWarning" class="col-12 mb-4"
+                     hx-get="/api/user/account-age"
+                     hx-trigger="load"
+                     hx-swap="outerHTML">
                     <div class="card border-primary">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
@@ -204,43 +208,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-    document.addEventListener('click', function(e) {
-        const navbar = document.getElementById('navbarResponsive');
-        const toggler = document.querySelector('.navbar-toggler');
-        
-        if (navbar.classList.contains('show') && 
-            !navbar.contains(e.target) && 
-            !toggler.contains(e.target)) {
-            bootstrap.Collapse.getInstance(navbar).hide();
-        }
-    });
-    </script>
-
-    <script>
-    // Função para verificar o papel do usuário via API
-    function checkUserRole() {
-        fetch('/api/profile/check-role')
-            .then(response => response.json())
-            .then(data => {
-                const roleWarning = document.getElementById('roleWarning');
-                if (roleWarning) {
-                    roleWarning.style.display = data.hasRole ? 'none' : 'block';
-                }
-            });
-    }
-
-    // Verificar quando a página carrega
-    document.addEventListener('DOMContentLoaded', checkUserRole);
-
-    // Verificar quando o perfil é atualizado (evento HTMX)
-    document.addEventListener('htmx:afterRequest', function(evt) {
-        if (evt.detail.pathInfo.requestPath === '/api/profile/update') {
-            checkUserRole();
-        }
-    });
-    </script>
 
     <!-- Scripts -->
     <script src="/static/js/dashboard.js"></script>

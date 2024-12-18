@@ -13,11 +13,6 @@ import (
 	"superviso/models"
 )
 
-// Variável global para os templates
-var templates = template.Must(template.New("").
-	Funcs(tmpl.TemplateFuncs).
-	ParseGlob("view/*.html"))
-
 type AppointmentResponse struct {
 	ID             int       `json:"id"`
 	SupervisorName string    `json:"supervisor_name"`
@@ -47,23 +42,25 @@ func AppointmentsHandler(db *sql.DB) http.HandlerFunc {
 			appointments, err = getSuperviseeAppointments(db, userID)
 		}
 
-		log.Printf("Usuário %d é supervisor? %v", userID, isSupervisor)
-		log.Printf("Número de agendamentos encontrados: %d", len(appointments))
-		log.Printf("Appointments: %+v", appointments)
-
 		if err != nil {
 			http.Error(w, "Erro ao buscar agendamentos", http.StatusInternalServerError)
 			return
 		}
 
-		data := map[string]interface{}{
+		// Criar template com as funções necessárias
+		tmpl := template.Must(template.New("appointments.html").
+			Funcs(tmpl.TemplateFuncs).
+			ParseFiles("view/appointments.html"))
+
+		// Executar template com os dados
+		err = tmpl.Execute(w, map[string]interface{}{
 			"Appointments": appointments,
 			"IsSupervisor": isSupervisor,
-		}
+		})
 
-		err = templates.ExecuteTemplate(w, "appointments.html", data)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Erro ao renderizar template: %v", err)
+			http.Error(w, "Erro ao renderizar página", http.StatusInternalServerError)
 			return
 		}
 	}
