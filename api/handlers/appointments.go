@@ -35,16 +35,15 @@ func AppointmentsHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		var appointments []AppointmentResponse
+		var pendingAppointments, confirmedAppointments, historicAppointments []AppointmentResponse
 		if isSupervisor {
-			appointments, err = getPendingSupervisorAppointments(db, userID)
+			pendingAppointments, err = getSupervisorAppointmentsByStatus(db, userID, "pending")
+			confirmedAppointments, err = getSupervisorAppointmentsByStatus(db, userID, "confirmed")
+			historicAppointments, err = getSupervisorAppointmentsByStatus(db, userID, "rejected")
 		} else {
-			appointments, err = getSuperviseeAppointments(db, userID)
-		}
-
-		if err != nil {
-			http.Error(w, "Erro ao buscar agendamentos", http.StatusInternalServerError)
-			return
+			pendingAppointments, err = getSuperviseeAppointmentsByStatus(db, userID, "pending")
+			confirmedAppointments, err = getSuperviseeAppointmentsByStatus(db, userID, "confirmed")
+			historicAppointments, err = getSuperviseeAppointmentsByStatus(db, userID, "rejected")
 		}
 
 		// Criar template com as funções necessárias
@@ -54,8 +53,10 @@ func AppointmentsHandler(db *sql.DB) http.HandlerFunc {
 
 		// Executar template com os dados
 		err = tmpl.Execute(w, map[string]interface{}{
-			"Appointments": appointments,
-			"IsSupervisor": isSupervisor,
+			"PendingAppointments":   pendingAppointments,
+			"ConfirmedAppointments": confirmedAppointments,
+			"HistoricAppointments":  historicAppointments,
+			"IsSupervisor":          isSupervisor,
 		})
 
 		if err != nil {
@@ -66,7 +67,7 @@ func AppointmentsHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func getPendingSupervisorAppointments(db *sql.DB, userID int) ([]AppointmentResponse, error) {
+func getSupervisorAppointmentsByStatus(db *sql.DB, userID int, status string) ([]AppointmentResponse, error) {
 	query := `
 		SELECT 
 			a.id,
@@ -81,10 +82,10 @@ func getPendingSupervisorAppointments(db *sql.DB, userID int) ([]AppointmentResp
 		JOIN users u1 ON a.supervisee_id = u1.id
 		JOIN users u2 ON a.supervisor_id = u2.id
 		JOIN available_slots s ON a.slot_id = s.id
-		WHERE a.supervisor_id = $1 AND a.status = 'pending'
+		WHERE a.supervisor_id = $1 AND a.status = $2
 		ORDER BY s.slot_date, s.start_time`
 
-	rows, err := db.Query(query, userID)
+	rows, err := db.Query(query, userID, status)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func getPendingSupervisorAppointments(db *sql.DB, userID int) ([]AppointmentResp
 	return appointments, nil
 }
 
-func getSuperviseeAppointments(db *sql.DB, userID int) ([]AppointmentResponse, error) {
+func getSuperviseeAppointmentsByStatus(db *sql.DB, userID int, status string) ([]AppointmentResponse, error) {
 	query := `
 		SELECT 
 			a.id,
@@ -127,10 +128,10 @@ func getSuperviseeAppointments(db *sql.DB, userID int) ([]AppointmentResponse, e
 		JOIN users u1 ON a.supervisee_id = u1.id
 		JOIN users u2 ON a.supervisor_id = u2.id
 		JOIN available_slots s ON a.slot_id = s.id
-		WHERE a.supervisee_id = $1
+		WHERE a.supervisee_id = $1 AND a.status = $2
 		ORDER BY s.slot_date, s.start_time`
 
-	rows, err := db.Query(query, userID)
+	rows, err := db.Query(query, userID, status)
 	if err != nil {
 		return nil, err
 	}

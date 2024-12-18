@@ -2,62 +2,88 @@
     <h2 class="mb-4">{{if .IsSupervisor}}Solicitações de Supervisão{{else}}Meus Agendamentos{{end}}</h2>
     
     <div class="nav-tabs-wrapper mb-4">
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link active" href="#pendentes">Pendentes</a>
+        <ul class="nav nav-tabs" id="appointmentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">
+                    <i class="fas fa-clock me-2"></i>Pendentes
+                    {{if .PendingAppointments}}<span class="badge bg-primary ms-2">{{len .PendingAppointments}}</span>{{end}}
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#confirmados">Confirmados</a>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="confirmed-tab" data-bs-toggle="tab" href="#confirmed" role="tab">
+                    <i class="fas fa-check-circle me-2"></i>Confirmados
+                    {{if .ConfirmedAppointments}}<span class="badge bg-success ms-2">{{len .ConfirmedAppointments}}</span>{{end}}
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#historico">Histórico</a>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="historic-tab" data-bs-toggle="tab" href="#historic" role="tab">
+                    <i class="fas fa-history me-2"></i>Histórico
+                    {{if .HistoricAppointments}}<span class="badge bg-secondary ms-2">{{len .HistoricAppointments}}</span>{{end}}
+                </a>
             </li>
         </ul>
     </div>
 
-    <div class="appointments-container">
-        <!-- Debug info -->
-        <div style="display: none;">
-            {{printf "%+v" .Appointments}}
+    <div class="tab-content" id="appointmentTabsContent">
+        <!-- Aba Pendentes -->
+        <div class="tab-pane fade show active" id="pending" role="tabpanel">
+            {{template "appointment-list" .PendingAppointments}}
         </div>
-        {{if not .Appointments}}
-            <div class="alert alert-info">Nenhum agendamento encontrado.</div>
-        {{else}}
-            <div class="row">
-                {{range .Appointments}}
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card appointment-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Supervisor: {{.SupervisorName}}</h5>
-                            <div class="appointment-details">
-                                <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
-                                <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
-                                <p><i class="fas fa-user"></i> Supervisionando: {{.SuperviseeName}}</p>
-                                <span class="status-badge status-{{.Status}}">
-                                    {{if eq .Status "pending"}}Pendente{{end}}
-                                    {{if eq .Status "confirmed"}}Confirmado{{end}}
-                                    {{if eq .Status "rejected"}}Rejeitado{{end}}
-                                </span>
-                            </div>
-                            {{if and (eq .Status "pending") $.IsSupervisor}}
-                                <div class="appointment-actions mt-3">
-                                    <button class="btn btn-success btn-sm accept-btn" data-id="{{.ID}}">
-                                        <i class="fas fa-check"></i> Aceitar
-                                    </button>
-                                    <button class="btn btn-danger btn-sm reject-btn" data-id="{{.ID}}">
-                                        <i class="fas fa-times"></i> Rejeitar
-                                    </button>
-                                </div>
-                            {{end}}
-                        </div>
-                    </div>
-                </div>
-                {{end}}
-            </div>
-        {{end}}
+
+        <!-- Aba Confirmados -->
+        <div class="tab-pane fade" id="confirmed" role="tabpanel">
+            {{template "appointment-list" .ConfirmedAppointments}}
+        </div>
+
+        <!-- Aba Histórico -->
+        <div class="tab-pane fade" id="historic" role="tabpanel">
+            {{template "appointment-list" .HistoricAppointments}}
+        </div>
     </div>
 </div>
 
 <!-- Scripts -->
 <script src="/static/js/appointment.js"></script>
+
+<!-- Template para lista de agendamentos -->
+{{define "appointment-list"}}
+    {{if not .}}
+        <div class="alert alert-info">
+            <i class="fas fa-calendar-times"></i>
+            Nenhum agendamento encontrado.
+        </div>
+    {{else}}
+        <div class="row">
+            {{range .}}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card appointment-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Supervisor: {{.SupervisorName}}</h5>
+                        <div class="appointment-details">
+                            <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
+                            <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
+                            <p><i class="fas fa-user"></i> Supervisionando: {{.SuperviseeName}}</p>
+                            <span class="status-badge status-{{.Status}}">
+                                {{if eq .Status "pending"}}Pendente{{end}}
+                                {{if eq .Status "confirmed"}}Confirmado{{end}}
+                                {{if eq .Status "rejected"}}Rejeitado{{end}}
+                            </span>
+                        </div>
+                        {{if and (eq .Status "pending") $}}
+                            <div class="appointment-actions mt-3">
+                                <button class="btn btn-success btn-sm accept-btn" data-id="{{.ID}}">
+                                    <i class="fas fa-check"></i> Aceitar
+                                </button>
+                                <button class="btn btn-danger btn-sm reject-btn" data-id="{{.ID}}">
+                                    <i class="fas fa-times"></i> Rejeitar
+                                </button>
+                            </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    {{end}}
+{{end}}
  

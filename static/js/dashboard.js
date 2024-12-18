@@ -33,7 +33,13 @@ function checkUserRole() {
         .then(data => {
             const roleWarning = document.getElementById('roleWarning');
             if (roleWarning) {
-                roleWarning.style.display = data.hasRole ? 'none' : 'block';
+                // Verificar idade da conta
+                fetch('/api/profile/check-age')
+                    .then(response => response.json())
+                    .then(ageData => {
+                        roleWarning.style.display = 
+                            (data.hasRole || ageData.isOldEnough) ? 'none' : 'block';
+                    });
             }
         });
 }

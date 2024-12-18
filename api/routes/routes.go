@@ -71,32 +71,21 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/api/profile/update", auth.AuthMiddleware(user.UpdateProfile(db))).Methods("POST")
 	r.HandleFunc("/api/profile/toggle-supervisor", auth.AuthMiddleware(user.ToggleSupervisor(db))).Methods("POST")
 	r.HandleFunc("/api/profile/check-role", auth.AuthMiddleware(user.CheckUserRole(db))).Methods("GET")
+	r.HandleFunc("/api/profile/check-age", auth.AuthMiddleware(handlers.CheckAccountAge(db))).Methods("GET")
 	r.HandleFunc("/api/supervisors", auth.AuthMiddleware(supervisor.GetSupervisors(db))).Methods("GET")
-
 	r.HandleFunc("/verify-email", user.VerifyEmail(db)).Methods("GET")
 	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
-
 	r.HandleFunc("/schedule", auth.AuthMiddleware(handlers.GetScheduleHandler(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/slots", auth.AuthMiddleware(appointment.GetAvailableSlots(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db))).Methods("POST")
-
-	r.HandleFunc("/api/supervisor/toggle-day-hours",
-		auth.AuthMiddleware(supervisor.ToggleDayHours(db))).Methods("POST")
-	r.HandleFunc("/api/supervisor/update-availability",
-		auth.AuthMiddleware(supervisor.UpdateAvailability(db))).Methods("POST")
-
-	r.HandleFunc("/api/supervisor/availability",
-		auth.AuthMiddleware(supervisor.GetSupervisorAvailability(db))).Methods("GET")
-
+	r.HandleFunc("/api/supervisor/toggle-day-hours", auth.AuthMiddleware(supervisor.ToggleDayHours(db))).Methods("POST")
+	r.HandleFunc("/api/supervisor/update-availability", auth.AuthMiddleware(supervisor.UpdateAvailability(db))).Methods("POST")
+	r.HandleFunc("/api/supervisor/availability", auth.AuthMiddleware(supervisor.GetSupervisorAvailability(db))).Methods("GET")
 	r.HandleFunc("/appointments", auth.AuthMiddleware(handlers.AppointmentsHandler(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/accept", auth.AuthMiddleware(handlers.AcceptAppointmentHandler(db))).Methods("POST")
 	r.HandleFunc("/api/appointments/reject", auth.AuthMiddleware(handlers.RejectAppointmentHandler(db))).Methods("POST")
-
-	r.HandleFunc("/api/notifications/unread-count",
-		auth.AuthMiddleware(handlers.GetUnreadCountHandler(db))).Methods("GET")
-	r.HandleFunc("/api/notifications",
-		auth.AuthMiddleware(handlers.GetNotificationsHandler(db))).Methods("GET")
-	r.HandleFunc("/api/notifications/{id}/read",
-		auth.AuthMiddleware(handlers.MarkNotificationAsReadHandler(db))).Methods("POST")
+	r.HandleFunc("/api/notifications/unread-count", auth.AuthMiddleware(handlers.GetUnreadCountHandler(db))).Methods("GET")
+	r.HandleFunc("/api/notifications", auth.AuthMiddleware(handlers.GetNotificationsHandler(db))).Methods("GET")
+	r.HandleFunc("/api/notifications/{id}/read", auth.AuthMiddleware(handlers.MarkNotificationAsReadHandler(db))).Methods("POST")
 
 }

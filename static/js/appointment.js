@@ -33,4 +33,13 @@ document.addEventListener('click', function(e) {
             swap: 'innerHTML'
         });
     }
+});
+
+// Adicionar ao final do arquivo
+document.addEventListener('DOMContentLoaded', function() {
+    // Ativar as tabs do Bootstrap
+    var triggerTabList = [].slice.call(document.querySelectorAll('#appointmentTabs a'))
+    triggerTabList.forEach(function (triggerEl) {
+        new bootstrap.Tab(triggerEl)
+    })
 }); 
