@@ -76,7 +76,7 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/verify-email", user.VerifyEmail(db)).Methods("GET")
 	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
 
-	r.HandleFunc("/appointments/schedule", auth.AuthMiddleware(appointment.GetNewAppointmentForm(db))).Methods("GET")
+	r.HandleFunc("/schedule", auth.AuthMiddleware(handlers.GetScheduleHandler(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/slots", auth.AuthMiddleware(appointment.GetAvailableSlots(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db))).Methods("POST")
 

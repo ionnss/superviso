@@ -18,14 +18,19 @@ document.addEventListener('show.bs.modal', function (event) {
     }
 });
 
-// Adicionar listener para o botão de confirmação
-document.addEventListener('click', function(event) {
-    if (event.target.id === 'confirmBooking') {
-        const slotId = JSON.parse(event.target.getAttribute('hx-vals')).slot_id;
-        if (!slotId) {
-            console.error('Slot ID não encontrado');
-            event.preventDefault();
-            return;
-        }
+// Manipulação das ações de aceitar/rejeitar agendamento
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('accept-btn')) {
+        const id = e.target.dataset.id;
+        htmx.ajax('POST', `/api/appointments/accept?id=${id}`, {
+            target: '#main-content',
+            swap: 'innerHTML'
+        });
+    } else if (e.target.classList.contains('reject-btn')) {
+        const id = e.target.dataset.id;
+        htmx.ajax('POST', `/api/appointments/reject?id=${id}`, {
+            target: '#main-content',
+            swap: 'innerHTML'
+        });
     }
 }); 

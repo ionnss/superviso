@@ -33,9 +33,13 @@
                                 <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
                                 <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
                                 <p><i class="fas fa-user"></i> Supervisionando: {{.SuperviseeName}}</p>
-                                <span class="status-badge status-{{.Status}}">{{.Status}}</span>
+                                <span class="status-badge status-{{.Status}}">
+                                    {{if eq .Status "pending"}}Pendente{{end}}
+                                    {{if eq .Status "confirmed"}}Confirmado{{end}}
+                                    {{if eq .Status "rejected"}}Rejeitado{{end}}
+                                </span>
                             </div>
-                            {{if eq .Status "pending"}}
+                            {{if and (eq .Status "pending") $.IsSupervisor}}
                                 <div class="appointment-actions mt-3">
                                     <button class="btn btn-success btn-sm accept-btn" data-id="{{.ID}}">
                                         <i class="fas fa-check"></i> Aceitar
@@ -54,21 +58,6 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('accept-btn')) {
-        const id = e.target.dataset.id;
-        htmx.ajax('POST', `/appointments/accept?id=${id}`, {
-            target: '#main-content',
-            swap: 'innerHTML'
-        });
-    } else if (e.target.classList.contains('reject-btn')) {
-        const id = e.target.dataset.id;
-        htmx.ajax('POST', `/appointments/reject?id=${id}`, {
-            target: '#main-content',
-            swap: 'innerHTML'
-        });
-    }
-});
-</script>
+<!-- Scripts -->
+<script src="/static/js/appointment.js"></script>
  
