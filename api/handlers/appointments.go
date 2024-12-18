@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -426,5 +427,115 @@ func CreateAppointmentHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
+	}
+}
+
+func BookAppointment(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(auth.UserIDKey).(int)
+
+		// Decodificar dados do request
+		var data struct {
+			SlotID int `json:"slot_id"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+			http.Error(w, "Dados inválidos", http.StatusBadRequest)
+			return
+		}
+
+		// Buscar informações do slot e supervisor
+		var (
+			supervisorID int
+			slotDate     time.Time
+			startTime    time.Time
+			endTime      time.Time
+		)
+		err := db.QueryRow(`
+			SELECT supervisor_id, slot_date, start_time, end_time
+			FROM available_slots 
+			WHERE id = $1 AND status = 'available'`,
+			data.SlotID).Scan(&supervisorID, &slotDate, &startTime, &endTime)
+
+		if err != nil {
+			http.Error(w, "Slot não disponível", http.StatusBadRequest)
+			return
+		}
+
+		// Iniciar transação
+		tx, err := db.Begin()
+		if err != nil {
+			http.Error(w, "Erro interno", http.StatusInternalServerError)
+			return
+		}
+		defer tx.Rollback()
+
+		// Criar o agendamento
+		var appointmentID int
+		err = tx.QueryRow(`
+			INSERT INTO appointments (supervisor_id, supervisee_id, slot_id, status)
+			VALUES ($1, $2, $3, 'pending')
+			RETURNING id`,
+			supervisorID, userID, data.SlotID).Scan(&appointmentID)
+
+		if err != nil {
+			log.Printf("Erro ao criar agendamento: %v", err)
+			http.Error(w, "Erro ao criar agendamento", http.StatusInternalServerError)
+			return
+		}
+
+		// Atualizar status do slot
+		_, err = tx.Exec(`
+			UPDATE available_slots 
+			SET status = 'pending' 
+			WHERE id = $1`, data.SlotID)
+
+		if err != nil {
+			log.Printf("Erro ao atualizar slot: %v", err)
+			http.Error(w, "Erro ao atualizar disponibilidade", http.StatusInternalServerError)
+			return
+		}
+
+		// Buscar nome do supervisionando para a notificação
+		var superviseeName string
+		err = tx.QueryRow(`
+			SELECT CONCAT(first_name, ' ', last_name)
+			FROM users
+			WHERE id = $1`, userID).Scan(&superviseeName)
+		if err != nil {
+			log.Printf("Erro ao buscar nome do supervisionando: %v", err)
+			http.Error(w, "Erro ao criar notificação", http.StatusInternalServerError)
+			return
+		}
+
+		// Criar notificação para o supervisor
+		_, err = tx.Exec(`
+			INSERT INTO notifications (user_id, title, message, type)
+			VALUES ($1, 'Nova Solicitação de Supervisão', 
+				$2, 'appointment_request')`,
+			supervisorID,
+			fmt.Sprintf("Você recebeu uma nova solicitação de supervisão de %s para %s às %s",
+				superviseeName,
+				slotDate.Format("02/01/2006"),
+				startTime.Format("15:04")))
+
+		if err != nil {
+			log.Printf("Erro ao criar notificação: %v", err)
+			http.Error(w, "Erro ao criar notificação", http.StatusInternalServerError)
+			return
+		}
+
+		// Commit da transação
+		if err = tx.Commit(); err != nil {
+			log.Printf("Erro ao confirmar transação: %v", err)
+			http.Error(w, "Erro ao finalizar agendamento", http.StatusInternalServerError)
+			return
+		}
+
+		// Retornar sucesso
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message": "Agendamento criado com sucesso",
+			"id":      appointmentID,
+		})
 	}
 }
