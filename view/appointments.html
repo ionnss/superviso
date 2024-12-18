@@ -18,6 +18,10 @@
     </div>
 
     <div class="appointments-container">
+        <!-- Debug info -->
+        <div style="display: none;">
+            {{printf "%+v" .Appointments}}
+        </div>
         {{if not .Appointments}}
             <div class="alert alert-info">Nenhum agendamento encontrado.</div>
         {{else}}
@@ -26,11 +30,11 @@
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card appointment-card">
                         <div class="card-body">
-                            <h5 class="card-title">{{.SupervisorName}}</h5>
+                            <h5 class="card-title">Supervisor: {{.SupervisorName}}</h5>
                             <div class="appointment-details">
                                 <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
                                 <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
-                                <p><i class="fas fa-user"></i> {{.SuperviseeName}}</p>
+                                <p><i class="fas fa-user"></i> Supervisionando: {{.SuperviseeName}}</p>
                                 <span class="status-badge status-{{.Status}}">{{.Status}}</span>
                             </div>
                             {{if eq .Status "pending"}}

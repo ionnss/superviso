@@ -16,19 +16,12 @@ type Notification struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func CreateNotification(db *sql.DB, notification *Notification) error {
-	query := `
-		INSERT INTO notifications (user_id, type, title, message)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id, created_at, updated_at`
-
-	return db.QueryRow(
-		query,
-		notification.UserID,
-		notification.Type,
-		notification.Title,
-		notification.Message,
-	).Scan(&notification.ID, &notification.CreatedAt, &notification.UpdatedAt)
+func CreateNotification(db *sql.DB, n *Notification) error {
+	_, err := db.Exec(`
+		INSERT INTO notifications (user_id, type, title, message, read, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+		n.UserID, n.Type, n.Title, n.Message)
+	return err
 }
 
 func GetUnreadNotifications(db *sql.DB, userID int) ([]Notification, error) {

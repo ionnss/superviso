@@ -1,13 +1,15 @@
 .appointments-container {
     margin-top: 20px;
+    display: block;
 }
 
 .appointment-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    color: #000;
     transition: transform 0.2s;
+    margin-bottom: 15px;
 }
 
 .appointment-card:hover {

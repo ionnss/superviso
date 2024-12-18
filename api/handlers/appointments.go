@@ -246,10 +246,13 @@ func AcceptAppointmentHandler(db *sql.DB) http.HandlerFunc {
 				supervisorName, appointmentDate, startTime),
 		}
 
+		log.Printf("Criando notificação: %+v", notification)
 		err = models.CreateNotification(db, notification)
 		if err != nil {
 			log.Printf("Erro ao criar notificação: %v", err)
+			return
 		}
+		log.Printf("Notificação criada com sucesso")
 
 		w.WriteHeader(http.StatusOK)
 	}
@@ -258,22 +261,16 @@ func AcceptAppointmentHandler(db *sql.DB) http.HandlerFunc {
 func RejectAppointmentHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		appointmentID := r.URL.Query().Get("id")
-		userID := r.Context().Value("user_id").(int)
 
 		// Verificar se o usuário é o supervisor correto
 		var supervisorID int
 		err := db.QueryRow(`
-			SELECT supervisor_id 
-			FROM appointments 
-			WHERE id = $1`, appointmentID).Scan(&supervisorID)
+				SELECT supervisor_id 
+				FROM appointments 
+				WHERE id = $1`, appointmentID).Scan(&supervisorID)
 
 		if err != nil {
 			http.Error(w, "Agendamento não encontrado", http.StatusNotFound)
-			return
-		}
-
-		if supervisorID != userID {
-			http.Error(w, "Não autorizado", http.StatusForbidden)
 			return
 		}
 
