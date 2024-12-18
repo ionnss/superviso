@@ -79,6 +79,9 @@
                                 <button class="btn btn-success btn-sm accept-btn" 
                                         data-id="{{.ID}}"
                                         onclick="this.disabled = true"
+                                        hx-post="/api/appointments/accept"
+                                        hx-vals='{"id": "{{.ID}}"}'
+                                        hx-target="#main-content"
                                         hx-indicator="#spinner-{{.ID}}">
                                     <i class="fas fa-check"></i> 
                                     <span class="htmx-indicator-hidden">Aceitar</span>

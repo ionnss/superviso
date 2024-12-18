@@ -20,17 +20,7 @@ document.addEventListener('show.bs.modal', function (event) {
 
 // Manipulação das ações de aceitar/rejeitar agendamento
 document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('accept-btn')) {
-        const id = e.target.dataset.id;
-        htmx.ajax('POST', `/api/appointments/accept?id=${id}`, {
-            target: '#main-content',
-            swap: 'innerHTML',
-            afterRequest: function() {
-                // Ativar a aba de confirmados
-                document.querySelector('#confirmed-tab').click();
-            }
-        });
-    } else if (e.target.classList.contains('reject-btn')) {
+    if (e.target.classList.contains('reject-btn')) {
         const id = e.target.dataset.id;
         htmx.ajax('POST', `/api/appointments/reject?id=${id}`, {
             target: '#main-content',

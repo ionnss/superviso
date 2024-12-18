@@ -187,14 +187,25 @@ func getSuperviseeAppointmentsByStatus(db *sql.DB, userID int, status string) ([
 
 func AcceptAppointmentHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		appointmentID := r.URL.Query().Get("id")
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "Erro ao processar requisição", http.StatusBadRequest)
+			return
+		}
+		appointmentID := r.FormValue("id")
+
+		if appointmentID == "" {
+			http.Error(w, "ID do agendamento não fornecido", http.StatusBadRequest)
+			return
+		}
+
 		userID := r.Context().Value(auth.UserIDKey).(int)
 
 		var (
 			supervisorID int
 			superviseeID int
 		)
-		err := db.QueryRow(`
+		err = db.QueryRow(`
 			SELECT supervisor_id, supervisee_id
 			FROM appointments 
 			WHERE id = $1`, appointmentID).Scan(&supervisorID, &superviseeID)
@@ -297,7 +308,8 @@ func AcceptAppointmentHandler(db *sql.DB) http.HandlerFunc {
 			}
 		}()
 
-		w.WriteHeader(http.StatusOK)
+		// Retornar a lista atualizada de agendamentos
+		AppointmentsHandler(db).ServeHTTP(w, r)
 	}
 }
 
