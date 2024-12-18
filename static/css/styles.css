@@ -689,10 +689,12 @@ input[type="time"].end-time {
 
 /* Modal Styles */
 .modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.8) !important;
+    opacity: 1 !important;
+    background-color: rgba(0, 0, 0, 0.95) !important;
 }
 
 .modal-content {
     background-color: #212529 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 

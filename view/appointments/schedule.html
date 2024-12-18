@@ -30,7 +30,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-12">
                     <h5>{{.Supervisor.FirstName}} {{.Supervisor.LastName}}</h5>
                     <p class="mb-3">
                         <strong><i class="fas fa-id-card me-2"></i>CRP:</strong> {{.Supervisor.CRP}}<br>
@@ -38,25 +38,11 @@
                         <strong><i class="fas fa-dollar-sign me-2"></i>Valor da Sessão:</strong> R$ {{printf "%.2f" .Supervisor.SessionPrice}}
                     </p>
                 </div>
-                <div class="col-md-6">
-                    <h6 class="mb-3">
-                        <i class="fas fa-clock me-2"></i>
-                        Horários Disponíveis:
-                    </h6>
-                    <div class="small">
-                        {{range $day, $hours := .Supervisor.WeeklyHours}}
-                        <div class="mb-2">
-                            <strong>{{formatWeekday $day}}:</strong>
-                            {{formatTime $hours.StartTime}} às {{formatTime $hours.EndTime}}
-                        </div>
-                        {{end}}
-                    </div>
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            <i class="fas fa-calendar-alt me-2"></i>
-                            Disponível de {{formatDate .Supervisor.StartDate}} até {{formatDate .Supervisor.EndDate}}
-                        </small>
-                    </div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Disponível de {{formatDate .Supervisor.StartDate}} até {{formatDate .Supervisor.EndDate}}
+                    </small>
                 </div>
             </div>
         </div>

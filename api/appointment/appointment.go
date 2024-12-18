@@ -381,9 +381,9 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 		}
 
 		w.Write([]byte(`
-			<div class="alert alert-success">
+			<div class="alert alert-success bg-success text-light border-0">
 				<i class="fas fa-check-circle me-2"></i>
-				Agendamento realizado com sucesso! Aguardando confirmação do supervisor.
+				Agendamento realizado com sucesso! Aguardando aprovação do supervisor.
 			</div>
 		`))
 	}
