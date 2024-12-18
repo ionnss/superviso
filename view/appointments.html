@@ -1,0 +1,54 @@
+{{define "content"}}
+<link rel="stylesheet" href="/static/css/appointments.css">
+<div class="container mt-4">
+    <h2 class="mb-4">{{if .IsSupervisor}}Solicitações de Supervisão{{else}}Meus Agendamentos{{end}}</h2>
+    
+    <div class="nav-tabs-wrapper mb-4">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#pendentes">Pendentes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#confirmados">Confirmados</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#historico">Histórico</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="appointments-container">
+        {{if not .Appointments}}
+            <div class="alert alert-info">Nenhum agendamento encontrado.</div>
+        {{else}}
+            <div class="row">
+                {{range .Appointments}}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card appointment-card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{.SupervisorName}}</h5>
+                            <div class="appointment-details">
+                                <p><i class="fas fa-calendar"></i> {{.Date}}</p>
+                                <p><i class="fas fa-clock"></i> {{.StartTime}} - {{.EndTime}}</p>
+                                <p><i class="fas fa-user"></i> {{.SuperviseeName}}</p>
+                                <span class="status-badge status-{{.Status}}">{{.Status}}</span>
+                            </div>
+                            {{if eq .Status "pending"}}
+                                <div class="appointment-actions mt-3">
+                                    <button class="btn btn-success btn-sm accept-btn" data-id="{{.ID}}">
+                                        <i class="fas fa-check"></i> Aceitar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm reject-btn" data-id="{{.ID}}">
+                                        <i class="fas fa-times"></i> Rejeitar
+                                    </button>
+                                </div>
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        {{end}}
+    </div>
+</div>
+{{end}} 

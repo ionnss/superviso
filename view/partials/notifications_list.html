@@ -1,0 +1,16 @@
+{{range .Notifications}}
+    <a class="dropdown-item notification-item {{if not .Read}}unread{{end}}" 
+       href="#"
+       hx-post="/api/notifications/{{.ID}}/read"
+       hx-swap="outerHTML">
+        <div class="d-flex w-100 justify-content-between">
+            <h6 class="mb-1">{{.Title}}</h6>
+            <small class="text-muted">{{formatTimeAgo .CreatedAt}}</small>
+        </div>
+        <p class="mb-1">{{.Message}}</p>
+    </a>
+{{else}}
+    <div class="dropdown-item text-muted text-center">
+        Nenhuma notificação
+    </div>
+{{end}} 

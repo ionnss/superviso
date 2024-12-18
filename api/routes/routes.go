@@ -11,6 +11,8 @@ import (
 	"superviso/api/supervisor"
 	"superviso/api/user"
 
+	"superviso/api/handlers"
+
 	"github.com/gorilla/mux"
 )
 
@@ -85,5 +87,16 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 
 	r.HandleFunc("/api/supervisor/availability",
 		auth.AuthMiddleware(supervisor.GetSupervisorAvailability(db))).Methods("GET")
+
+	r.HandleFunc("/appointments", auth.AuthMiddleware(handlers.AppointmentsHandler(db))).Methods("GET")
+	r.HandleFunc("/api/appointments/accept", auth.AuthMiddleware(handlers.AcceptAppointmentHandler(db))).Methods("POST")
+	r.HandleFunc("/api/appointments/reject", auth.AuthMiddleware(handlers.RejectAppointmentHandler(db))).Methods("POST")
+
+	r.HandleFunc("/api/notifications/unread-count",
+		auth.AuthMiddleware(handlers.GetUnreadCountHandler(db))).Methods("GET")
+	r.HandleFunc("/api/notifications",
+		auth.AuthMiddleware(handlers.GetNotificationsHandler(db))).Methods("GET")
+	r.HandleFunc("/api/notifications/{id}/read",
+		auth.AuthMiddleware(handlers.MarkNotificationAsReadHandler(db))).Methods("POST")
 
 }

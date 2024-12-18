@@ -710,3 +710,50 @@ input[type="time"].end-time {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Estilo para o dropdown de notificações */
+.dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background-color: #f8f9fa;
+}
+
+.notification-item:hover {
+    background-color: #f1f3f5;
+    text-decoration: none;
+}
+
+.notification-item h6 {
+    color: #212529;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.notification-item p {
+    color: #6c757d;
+    font-size: 0.8125rem;
+    margin-bottom: 0;
+}
+
+.notification-item small {
+    font-size: 0.75rem;
+}
+
+/* Badge de notificação */
+.notification-badge {
+    font-size: 0.65rem;
+    padding: 0.25em 0.5em;
+    transform: translate(-50%, -50%);
+}
+

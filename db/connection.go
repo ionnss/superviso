@@ -62,6 +62,7 @@ func ExecuteMigrations(conn *sql.DB) {
 		"db/migrations/002_create_supervisor_profiles_table.sql",
 		"db/migrations/003_create_appointments_table.sql",
 		"db/migrations/004_create_supervisor_weekl_hours_table.sql",
+		"db/migrations/005_create_notifications_table.sql",
 	}
 
 	for _, file := range migrationFiles {
@@ -70,11 +71,34 @@ func ExecuteMigrations(conn *sql.DB) {
 			log.Fatalf("Erro ao ler o arquivo de migração %s: %v", file, err)
 		}
 
-		_, err = conn.Exec(string(content))
+		// Inicia uma transação
+		tx, err := conn.Begin()
 		if err != nil {
+			log.Fatalf("Erro ao iniciar transação para %s: %v", file, err)
+		}
+
+		_, err = tx.Exec(string(content))
+		if err != nil {
+			tx.Rollback()
 			log.Fatalf("Erro ao executar o script de migração %s: %v", file, err)
+		}
+
+		if err = tx.Commit(); err != nil {
+			log.Fatalf("Erro ao commitar migração %s: %v", file, err)
 		}
 
 		log.Printf("Migração executada com sucesso: %s", file)
 	}
+
+	// Verifica se a tabela notifications existe
+	var exists bool
+	err := conn.QueryRow(`
+		SELECT EXISTS (
+			SELECT FROM information_schema.tables 
+			WHERE table_name = 'notifications'
+		)`).Scan(&exists)
+	if err != nil {
+		log.Printf("Erro ao verificar tabela notifications: %v", err)
+	}
+	log.Printf("Tabela notifications existe? %v", exists)
 }

@@ -1,0 +1,76 @@
+.appointments-container {
+    margin-top: 20px;
+}
+
+.appointment-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transition: transform 0.2s;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+}
+
+.appointment-details {
+    margin: 15px 0;
+}
+
+.appointment-details p {
+    margin: 5px 0;
+    color: #e0e0e0;
+}
+
+.appointment-details i {
+    width: 20px;
+    margin-right: 10px;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.status-pending {
+    background: #ffd700;
+    color: #000;
+}
+
+.status-confirmed {
+    background: #28a745;
+    color: #fff;
+}
+
+.status-rejected {
+    background: #dc3545;
+    color: #fff;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-tabs .nav-link {
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+}
+
+.nav-tabs .nav-link.active {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn-sm {
+    padding: 5px 15px;
+} 
