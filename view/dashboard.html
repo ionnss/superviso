@@ -92,11 +92,11 @@
                                 <div>
                                     <h5 class="card-title mb-2">Defina seu papel no sistema!</h5>
                                     <p class="card-text mb-2">
-                                        Você ainda não definiu seu papel no sistema. Acesse seu perfil para escolher entre:
+                                        A sua função padrão é <strong>supervisionado</strong>. Caso queira ser supervisor, você deve ativar o modo <strong>supervisor</strong> no seu perfil.
                                     </p>
                                     <ul class="mb-3">
-                                        <li><strong>Supervisor:</strong> Profissional que oferece supervisão</li>
                                         <li><strong>Supervisionado:</strong> Profissional que busca supervisão</li>
+                                        <li><strong>Supervisor:</strong> Profissional que oferece supervisão</li>
                                     </ul>
                                     <p class="card-text mb-2"></p>
                                         Caso queira ser supervisionado, ignore esta mensagem.
@@ -107,6 +107,12 @@
                                        hx-target="#main-content">
                                         <i class="fas fa-user-cog me-2"></i>Configurar Perfil
                                     </a>
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-link text-muted" onclick="hideRoleWarning()">
+                                            <i class="fas fa-times-circle me-1"></i>
+                                            Não mostrar novamente
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -222,5 +228,8 @@
         }
     });
     </script>
+
+    <!-- Scripts -->
+    <script src="/static/js/dashboard.js"></script>
 </body>
 </html> 
