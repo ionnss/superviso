@@ -6,34 +6,50 @@ import (
 	"time"
 )
 
-// Criar um novo FuncMap para ser usado nos templates
 var TemplateFuncs = template.FuncMap{
-	"formatTimeAgo": formatTimeAgo,
-	"formatDate": func(t time.Time) string {
-		return t.Format("02/01/2006")
-	},
-	"formatTime": func(t time.Time) string {
-		return t.Format("15:04")
+	"formatDate":    formatDate,
+	"formatTime":    formatTime,
+	"formatWeekday": formatWeekday,
+	"dict": func(values ...interface{}) (map[string]interface{}, error) {
+		if len(values)%2 != 0 {
+			return nil, fmt.Errorf("invalid dict call")
+		}
+		dict := make(map[string]interface{}, len(values)/2)
+		for i := 0; i < len(values); i += 2 {
+			key, ok := values[i].(string)
+			if !ok {
+				return nil, fmt.Errorf("dict keys must be strings")
+			}
+			dict[key] = values[i+1]
+		}
+		return dict, nil
 	},
 }
 
-func formatTimeAgo(t time.Time) string {
-	now := time.Now()
-	diff := now.Sub(t)
+func formatDate(t time.Time) string {
+	return t.Format("02/01/2006")
+}
 
-	switch {
-	case diff < time.Minute:
-		return "agora"
-	case diff < time.Hour:
-		minutes := int(diff.Minutes())
-		return fmt.Sprintf("há %d min", minutes)
-	case diff < 24*time.Hour:
-		hours := int(diff.Hours())
-		return fmt.Sprintf("há %d h", hours)
-	case diff < 48*time.Hour:
-		return "ontem"
+func formatTime(t time.Time) string {
+	return t.Format("15:04")
+}
+
+func formatWeekday(t time.Time) string {
+	weekday := t.Weekday()
+	switch weekday {
+	case time.Monday:
+		return "Segunda-feira"
+	case time.Tuesday:
+		return "Terça-feira"
+	case time.Wednesday:
+		return "Quarta-feira"
+	case time.Thursday:
+		return "Quinta-feira"
+	case time.Friday:
+		return "Sexta-feira"
+	case time.Saturday:
+		return "Sábado"
 	default:
-		days := int(diff.Hours() / 24)
-		return fmt.Sprintf("há %d dias", days)
+		return "Domingo"
 	}
 }

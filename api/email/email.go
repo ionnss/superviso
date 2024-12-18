@@ -2,6 +2,7 @@ package email
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"net/smtp"
@@ -55,4 +56,38 @@ func SendVerificationEmail(to, token string) error {
 	}
 
 	return nil
+}
+
+func SendEmail(to, subject, body string) error {
+	config := getConfig()
+	auth := smtp.PlainAuth("", config.From, config.Password, config.Host)
+
+	// Ler a imagem do logo
+	logoPath := "static/assets/img/logo.png"
+	logo, err := os.ReadFile(logoPath)
+	if err != nil {
+		return fmt.Errorf("erro ao ler logo: %v", err)
+	}
+
+	// Criar email com múltiplas partes
+	boundary := "superviso-boundary"
+	mime := fmt.Sprintf(
+		"MIME-Version: 1.0\n"+
+			"Content-Type: multipart/related; boundary=%s\n\n"+
+			"--%s\n"+
+			"Content-Type: text/html; charset=\"UTF-8\"\n\n"+
+			"%s\n\n"+
+			"--%s\n"+
+			"Content-Type: image/png\n"+
+			"Content-ID: <logo>\n"+
+			"Content-Transfer-Encoding: base64\n\n"+
+			"%s\n"+
+			"--%s--",
+		boundary, boundary, body, boundary,
+		base64.StdEncoding.EncodeToString(logo), boundary,
+	)
+
+	msg := []byte(fmt.Sprintf("Subject: %s\n%s", subject, mime))
+	addr := fmt.Sprintf("%s:%s", config.Host, config.Port)
+	return smtp.SendMail(addr, auth, config.From, []string{to}, msg)
 }

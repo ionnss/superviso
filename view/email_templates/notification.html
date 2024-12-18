@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}} - Superviso</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background-color: #2c3e50; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+        <img src="cid:logo" alt="Superviso" style="max-width: 150px; height: auto; display: inline-block;">
+    </div>
+    
+    <div style="background-color: #fff; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2 style="color: #2c3e50; margin-bottom: 20px;">{{.Title}}</h2>
+        
+        <div style="margin: 20px 0;">
+            {{.Message}}
+        </div>
+
+        {{if .ActionURL}}
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{.ActionURL}}" 
+               style="background-color: #3498db; 
+                      color: white; 
+                      padding: 12px 25px; 
+                      text-decoration: none; 
+                      border-radius: 5px;
+                      display: inline-block;">
+                {{.ActionText}}
+            </a>
+        </div>
+        {{end}}
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <p style="color: #666; font-size: 12px; text-align: center;">
+            Este é um email automático do sistema Superviso. Por favor, não responda.
+        </p>
+    </div>
+</body>
+</html> 

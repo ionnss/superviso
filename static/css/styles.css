@@ -714,46 +714,56 @@ input[type="time"].end-time {
 .dropdown-menu {
     max-height: 400px;
     overflow-y: auto;
+    background-color: #2c3e50;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-.notification-item {
+.dropdown-menu::-webkit-scrollbar {
+    display: none;
+}
+
+.dropdown-item {
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid #eee;
 }
 
-.notification-item:last-child {
+.dropdown-item:last-child {
     border-bottom: none;
 }
 
-.notification-item.unread {
-    background-color: #f8f9fa;
+.dropdown-item.unread {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
-.notification-item:hover {
-    background-color: #f1f3f5;
+.dropdown-item:hover {
+    background-color: #34495e;
     text-decoration: none;
 }
 
-.notification-item h6 {
-    color: #212529;
+.dropdown-item h6 {
     font-size: 0.875rem;
     margin-bottom: 0.25rem;
 }
 
-.notification-item p {
-    color: #6c757d;
+.dropdown-item p {
     font-size: 0.8125rem;
     margin-bottom: 0;
-}
-
-.notification-item small {
-    font-size: 0.75rem;
+    opacity: 0.8;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
 /* Badge de notificação */
-.notification-badge {
-    font-size: 0.65rem;
-    padding: 0.25em 0.5em;
-    transform: translate(-50%, -50%);
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    font-size: 0.75rem;
+    min-width: 18px;
+    height: 18px;
+    padding: 2px 5px;
 }
 

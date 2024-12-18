@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"superviso/api/auth"
+	"superviso/api/email"
 	tmpl "superviso/api/template"
 	"superviso/models"
 )
@@ -39,12 +40,36 @@ func AppointmentsHandler(db *sql.DB) http.HandlerFunc {
 		var pendingAppointments, confirmedAppointments, historicAppointments []AppointmentResponse
 		if isSupervisor {
 			pendingAppointments, err = getSupervisorAppointmentsByStatus(db, userID, "pending")
+			if err != nil {
+				http.Error(w, "Erro ao buscar agendamentos pendentes", http.StatusInternalServerError)
+				return
+			}
 			confirmedAppointments, err = getSupervisorAppointmentsByStatus(db, userID, "confirmed")
+			if err != nil {
+				http.Error(w, "Erro ao buscar agendamentos confirmados", http.StatusInternalServerError)
+				return
+			}
 			historicAppointments, err = getSupervisorAppointmentsByStatus(db, userID, "rejected")
+			if err != nil {
+				http.Error(w, "Erro ao buscar histórico de agendamentos", http.StatusInternalServerError)
+				return
+			}
 		} else {
 			pendingAppointments, err = getSuperviseeAppointmentsByStatus(db, userID, "pending")
+			if err != nil {
+				http.Error(w, "Erro ao buscar agendamentos pendentes", http.StatusInternalServerError)
+				return
+			}
 			confirmedAppointments, err = getSuperviseeAppointmentsByStatus(db, userID, "confirmed")
+			if err != nil {
+				http.Error(w, "Erro ao buscar agendamentos confirmados", http.StatusInternalServerError)
+				return
+			}
 			historicAppointments, err = getSuperviseeAppointmentsByStatus(db, userID, "rejected")
+			if err != nil {
+				http.Error(w, "Erro ao buscar histórico de agendamentos", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		// Criar template com as funções necessárias
@@ -165,12 +190,14 @@ func AcceptAppointmentHandler(db *sql.DB) http.HandlerFunc {
 		appointmentID := r.URL.Query().Get("id")
 		userID := r.Context().Value(auth.UserIDKey).(int)
 
-		// Verificar se o usuário é o supervisor correto
-		var supervisorID int
+		var (
+			supervisorID int
+			superviseeID int
+		)
 		err := db.QueryRow(`
-			SELECT supervisor_id 
+			SELECT supervisor_id, supervisee_id
 			FROM appointments 
-			WHERE id = $1`, appointmentID).Scan(&supervisorID)
+			WHERE id = $1`, appointmentID).Scan(&supervisorID, &superviseeID)
 
 		if err != nil {
 			http.Error(w, "Agendamento não encontrado", http.StatusNotFound)
@@ -212,46 +239,63 @@ func AcceptAppointmentHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		err = tx.Commit()
-		if err != nil {
+		// Commit da transação
+		if err = tx.Commit(); err != nil {
 			http.Error(w, "Erro ao confirmar operação", http.StatusInternalServerError)
 			return
 		}
 
-		// Após commit da transação, criar notificação
-		// Buscar informações do agendamento
-		var superviseeID int
-		var supervisorName, appointmentDate, startTime string
+		// Buscar informações para notificação
+		var supervisorName, appointmentDate, startTime, superviseeEmail string
 		err = db.QueryRow(`
 			SELECT 
-				a.supervisee_id, 
 				CONCAT(u.first_name, ' ', u.last_name) as supervisor_name,
-				s.slot_date,
-				s.start_time
+				TO_CHAR(s.slot_date, 'DD/MM/YYYY') as formatted_date,
+				TO_CHAR(s.start_time, 'HH24:MI') as formatted_time,
+				(SELECT email FROM users WHERE id = $2) as supervisee_email
 			FROM appointments a
 			JOIN users u ON u.id = a.supervisor_id 
 			JOIN available_slots s ON s.id = a.slot_id
-			WHERE a.id = $1`, appointmentID).Scan(&superviseeID, &supervisorName, &appointmentDate, &startTime)
+			WHERE a.id = $1`, appointmentID, superviseeID).Scan(
+			&supervisorName, &appointmentDate, &startTime, &superviseeEmail)
+
 		if err != nil {
 			log.Printf("Erro ao buscar detalhes do agendamento: %v", err)
 			return
 		}
 
+		// Criar e enviar notificação
+		notificationMsg := fmt.Sprintf("Seu agendamento com %s para %s às %s foi confirmado.",
+			supervisorName, appointmentDate, startTime)
+
 		notification := &models.Notification{
-			UserID: superviseeID,
-			Type:   "appointment_accepted",
-			Title:  "Agendamento Confirmado",
-			Message: fmt.Sprintf("Seu agendamento com %s para %s às %s foi confirmado.",
-				supervisorName, appointmentDate, startTime),
+			UserID:  superviseeID,
+			Type:    "appointment_accepted",
+			Title:   "Agendamento Confirmado",
+			Message: notificationMsg,
 		}
 
-		log.Printf("Criando notificação: %+v", notification)
-		err = models.CreateNotification(db, notification)
-		if err != nil {
+		if err = models.CreateNotification(db, notification); err != nil {
 			log.Printf("Erro ao criar notificação: %v", err)
 			return
 		}
-		log.Printf("Notificação criada com sucesso")
+
+		// Enviar email de forma assíncrona
+		go func() {
+			err := email.SendEmail(
+				superviseeEmail,
+				"Agendamento Confirmado - Superviso",
+				fmt.Sprintf(`
+					<h2>Agendamento Confirmado</h2>
+					<p>Olá,</p>
+					<p>%s</p>
+					<p>Atenciosamente,<br>Equipe Superviso</p>
+				`, notificationMsg),
+			)
+			if err != nil {
+				log.Printf("Erro ao enviar email: %v", err)
+			}
+		}()
 
 		w.WriteHeader(http.StatusOK)
 	}
@@ -316,8 +360,8 @@ func RejectAppointmentHandler(db *sql.DB) http.HandlerFunc {
 			SELECT 
 				a.supervisee_id, 
 				CONCAT(u.first_name, ' ', u.last_name) as supervisor_name,
-				s.slot_date,
-				s.start_time
+				TO_CHAR(s.slot_date, 'DD/MM/YYYY') as formatted_date,
+				TO_CHAR(s.start_time, 'HH24:MI') as formatted_time
 			FROM appointments a
 			JOIN users u ON u.id = a.supervisor_id 
 			JOIN available_slots s ON s.id = a.slot_id
@@ -446,12 +490,16 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 		// Buscar informações do slot e supervisor
 		var (
 			supervisorID int
-			slotDate     time.Time
-			startTime    time.Time
-			endTime      time.Time
+			slotDate     string
+			startTime    string
+			endTime      string
 		)
 		err := db.QueryRow(`
-			SELECT supervisor_id, slot_date, start_time, end_time
+			SELECT 
+				supervisor_id, 
+				TO_CHAR(slot_date, 'DD/MM/YYYY') as formatted_date,
+				TO_CHAR(start_time, 'HH24:MI') as formatted_time,
+				TO_CHAR(end_time, 'HH24:MI') as formatted_end_time
 			FROM available_slots 
 			WHERE id = $1 AND status = 'available'`,
 			data.SlotID).Scan(&supervisorID, &slotDate, &startTime, &endTime)
@@ -497,10 +545,12 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 
 		// Buscar nome do supervisionando para a notificação
 		var superviseeName string
+		var supervisorEmail string
 		err = tx.QueryRow(`
-			SELECT CONCAT(first_name, ' ', last_name)
+			SELECT CONCAT(first_name, ' ', last_name), email
 			FROM users
-			WHERE id = $1`, userID).Scan(&superviseeName)
+			WHERE id = $1`, supervisorID).Scan(&superviseeName, &supervisorEmail)
+
 		if err != nil {
 			log.Printf("Erro ao buscar nome do supervisionando: %v", err)
 			http.Error(w, "Erro ao criar notificação", http.StatusInternalServerError)
@@ -508,28 +558,49 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Criar notificação para o supervisor
-		_, err = tx.Exec(`
-			INSERT INTO notifications (user_id, title, message, type)
-			VALUES ($1, 'Nova Solicitação de Supervisão', 
-				$2, 'appointment_request')`,
-			supervisorID,
-			fmt.Sprintf("Você recebeu uma nova solicitação de supervisão de %s para %s às %s",
-				superviseeName,
-				slotDate.Format("02/01/2006"),
-				startTime.Format("15:04")))
+		notificationMsg := fmt.Sprintf("Você recebeu uma nova solicitação de supervisão de %s para %s às %s",
+			superviseeName,
+			slotDate,
+			startTime)
 
+		// Criar notificação no sistema
+		notification := &models.Notification{
+			UserID:  supervisorID,
+			Type:    "appointment_request",
+			Title:   "Nova Solicitação de Supervisão",
+			Message: notificationMsg,
+		}
+
+		err = models.CreateNotification(db, notification)
 		if err != nil {
-			log.Printf("Erro ao criar notificação: %v", err)
+			log.Printf("Erro ao criar notificação no sistema: %v", err)
 			http.Error(w, "Erro ao criar notificação", http.StatusInternalServerError)
 			return
 		}
 
 		// Commit da transação
-		if err = tx.Commit(); err != nil {
-			log.Printf("Erro ao confirmar transação: %v", err)
-			http.Error(w, "Erro ao finalizar agendamento", http.StatusInternalServerError)
+		if err := tx.Commit(); err != nil {
+			http.Error(w, "Erro ao confirmar operação", http.StatusInternalServerError)
 			return
 		}
+
+		// Enviar email para o supervisor
+		go func() {
+			err := email.SendEmail(
+				supervisorEmail,
+				"Nova Solicitação de Supervisão - Superviso",
+				fmt.Sprintf(`
+					<h2>Nova Solicitação de Supervisão</h2>
+					<p>Olá,</p>
+					<p>%s</p>
+					<p>Acesse a plataforma para aceitar ou rejeitar esta solicitação.</p>
+					<p>Atenciosamente,<br>Equipe Superviso</p>
+				`, notificationMsg),
+			)
+			if err != nil {
+				log.Printf("Erro ao enviar email: %v", err)
+			}
+		}()
 
 		// Retornar sucesso
 		w.Header().Set("Content-Type", "application/json")

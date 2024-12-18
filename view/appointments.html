@@ -27,17 +27,17 @@
     <div class="tab-content" id="appointmentTabsContent">
         <!-- Aba Pendentes -->
         <div class="tab-pane fade show active" id="pending" role="tabpanel">
-            {{template "appointment-list" .PendingAppointments}}
+            {{template "appointment-list" dict "Appointments" .PendingAppointments "IsSupervisor" .IsSupervisor}}
         </div>
 
         <!-- Aba Confirmados -->
         <div class="tab-pane fade" id="confirmed" role="tabpanel">
-            {{template "appointment-list" .ConfirmedAppointments}}
+            {{template "appointment-list" dict "Appointments" .ConfirmedAppointments "IsSupervisor" .IsSupervisor}}
         </div>
 
         <!-- Aba Histórico -->
         <div class="tab-pane fade" id="historic" role="tabpanel">
-            {{template "appointment-list" .HistoricAppointments}}
+            {{template "appointment-list" dict "Appointments" .HistoricAppointments "IsSupervisor" .IsSupervisor}}
         </div>
     </div>
 </div>
@@ -47,32 +47,44 @@
 
 <!-- Template para lista de agendamentos -->
 {{define "appointment-list"}}
-    {{if not .}}
+    {{if not .Appointments}}
         <div class="alert alert-info">
             <i class="fas fa-calendar-times"></i>
             Nenhum agendamento encontrado.
         </div>
     {{else}}
         <div class="row">
-            {{range .}}
+            {{range .Appointments}}
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card appointment-card">
                     <div class="card-body">
-                        <h5 class="card-title">Supervisor: {{.SupervisorName}}</h5>
+                        <h5 class="card-title">
+                            {{if $.IsSupervisor}}
+                                Supervisionando: {{.SuperviseeName}}
+                            {{else}}
+                                Supervisor: {{.SupervisorName}}
+                            {{end}}
+                        </h5>
                         <div class="appointment-details">
                             <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
                             <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
-                            <p><i class="fas fa-user"></i> Supervisionando: {{.SuperviseeName}}</p>
                             <span class="status-badge status-{{.Status}}">
                                 {{if eq .Status "pending"}}Pendente{{end}}
                                 {{if eq .Status "confirmed"}}Confirmado{{end}}
                                 {{if eq .Status "rejected"}}Rejeitado{{end}}
                             </span>
                         </div>
-                        {{if and (eq .Status "pending") $}}
+                        {{if and (eq .Status "pending") $.IsSupervisor}}
                             <div class="appointment-actions mt-3">
-                                <button class="btn btn-success btn-sm accept-btn" data-id="{{.ID}}">
-                                    <i class="fas fa-check"></i> Aceitar
+                                <button class="btn btn-success btn-sm accept-btn" 
+                                        data-id="{{.ID}}"
+                                        onclick="this.disabled = true"
+                                        hx-indicator="#spinner-{{.ID}}">
+                                    <i class="fas fa-check"></i> 
+                                    <span class="htmx-indicator-hidden">Aceitar</span>
+                                    <span id="spinner-{{.ID}}" class="htmx-indicator">
+                                        <span class="spinner-border spinner-border-sm"></span>
+                                    </span>
                                 </button>
                                 <button class="btn btn-danger btn-sm reject-btn" data-id="{{.ID}}">
                                     <i class="fas fa-times"></i> Rejeitar
