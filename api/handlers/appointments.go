@@ -558,10 +558,13 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 		// Buscar nome do supervisionando para a notificação
 		var superviseeName string
 		var supervisorEmail string
+		var supervisorName string
 		err = tx.QueryRow(`
-			SELECT CONCAT(first_name, ' ', last_name), email
+			SELECT CONCAT(first_name, ' ', last_name) as name, 
+				   email,
+				   (SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = $2) as supervisor_name
 			FROM users
-			WHERE id = $1`, supervisorID).Scan(&superviseeName, &supervisorEmail)
+			WHERE id = $1`, userID, supervisorID).Scan(&superviseeName, &supervisorEmail, &supervisorName)
 
 		if err != nil {
 			log.Printf("Erro ao buscar nome do supervisionando: %v", err)
@@ -603,11 +606,12 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 				"Nova Solicitação de Supervisão - Superviso",
 				fmt.Sprintf(`
 					<h2>Nova Solicitação de Supervisão</h2>
-					<p>Olá,</p>
-					<p>%s</p>
-					<p>Acesse a plataforma para aceitar ou rejeitar esta solicitação.</p>
-					<p>Atenciosamente,<br>Equipe Superviso</p>
-				`, notificationMsg),
+					<p>Olá %s,</p>
+					<p>Você recebeu uma nova solicitação de supervisão.</p>
+					<p>Supervisionando: <strong>%s</strong></p>
+					<p>Data: %s</p>
+					<p>Horário: %s</p>
+				`, supervisorName, superviseeName, slotDate, startTime),
 			)
 			if err != nil {
 				log.Printf("Erro ao enviar email: %v", err)
