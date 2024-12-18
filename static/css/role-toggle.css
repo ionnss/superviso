@@ -1,0 +1,29 @@
+.flex-1 {
+    flex: 1;
+    padding: 0 1rem;
+}
+
+.form-check-input {
+    margin: 0;
+    position: relative;
+}
+
+.form-check-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 576px) {
+    .form-check.form-switch {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .form-check-input {
+        margin: 0.5rem 0;
+    }
+} 
