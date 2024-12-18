@@ -9,14 +9,15 @@
     <div class="row row-cols-2 row-cols-md-3 g-3">
         {{range .Slots}}
         <div class="col">
-            <div class="card h-100 border-0 shadow-sm">
+            <div class="card h-100 bg-dark border-secondary shadow-sm">
                 <div class="card-body text-center">
                     <h5 class="card-title mb-3">{{formatTime .StartTime}}</h5>
                     <button class="btn btn-primary w-100"
-                            hx-post="/api/appointments/book"
-                            hx-vals='{"slot_id": {{.SlotID}}}'
-                            hx-target="#booking-message"
-                            hx-swap="innerHTML">
+                            data-bs-toggle="modal" 
+                            data-bs-target="#confirmModal"
+                            data-slot-id="{{.SlotID}}"
+                            data-slot-date="{{formatDate .SlotDate}}"
+                            data-slot-time="{{formatTime .StartTime}}">
                         <i class="fas fa-calendar-check me-2"></i>
                         Agendar
                     </button>
@@ -27,7 +28,7 @@
     </div>
 </div>
 {{else}}
-<div class="alert alert-info">
+<div class="alert alert-info bg-primary border-0">
     <i class="fas fa-info-circle me-2"></i>
     Não há horários disponíveis para esta data.
 </div>

@@ -687,3 +687,12 @@ input[type="time"].end-time {
     filter: invert(83%) sepia(31%) saturate(436%) hue-rotate(314deg) brightness(95%) contrast(92%) !important;
 }
 
+/* Modal Styles */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.modal-content {
+    background-color: #212529 !important;
+}
+

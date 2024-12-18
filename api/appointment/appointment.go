@@ -16,6 +16,20 @@ var funcMap = template.FuncMap{
 	"formatWeekday": utils.FormatWeekday,
 	"formatDate":    utils.FormatDate,
 	"formatTime":    utils.FormatTime,
+	"now": func() string {
+		return time.Now().Format("2006-01-02")
+	},
+	"formatDateISO": func(t time.Time) string {
+		return t.Format("2006-01-02")
+	},
+	"groupSlotsByDate": func(slots []models.AvailableSlot) map[time.Time][]models.AvailableSlot {
+		grouped := make(map[time.Time][]models.AvailableSlot)
+		for _, slot := range slots {
+			date := slot.SlotDate
+			grouped[date] = append(grouped[date], slot)
+		}
+		return grouped
+	},
 }
 
 // GetNewAppointmentForm renderiza o formulário de novo agendamento
@@ -27,7 +41,7 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Buscar dados do supervisor
+		// Buscar dados do supervisor e slots disponíveis
 		var supervisor struct {
 			ID             int
 			FirstName      string
@@ -41,6 +55,7 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 				StartTime string
 				EndTime   string
 			}
+			AvailableSlots []models.AvailableSlot
 		}
 		supervisor.WeeklyHours = make(map[int]struct {
 			StartTime string
@@ -65,11 +80,15 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Buscar horários
+		// Buscar horários semanais
 		rows, err := db.Query(`
-			SELECT weekday, start_time, end_time 
+			SELECT 
+				weekday,
+				TO_CHAR(start_time, 'HH24:MI') as start_time,
+				TO_CHAR(end_time, 'HH24:MI') as end_time
 			FROM supervisor_weekly_hours 
-			WHERE supervisor_id = $1`,
+			WHERE supervisor_id = $1
+			ORDER BY weekday`,
 			supervisorID)
 		if err != nil {
 			http.Error(w, "Erro ao buscar horários", http.StatusInternalServerError)
@@ -87,13 +106,43 @@ func GetNewAppointmentForm(db *sql.DB) http.HandlerFunc {
 			supervisor.WeeklyHours[day] = struct {
 				StartTime string
 				EndTime   string
-			}{start, end}
+			}{StartTime: start, EndTime: end}
+		}
+
+		// Buscar slots disponíveis
+		slots, err := db.Query(`
+			SELECT id, 
+				   slot_date,
+				   TO_CHAR(start_time, 'HH24:MI') as start_time,
+				   TO_CHAR(end_time, 'HH24:MI') as end_time,
+				   status
+			FROM available_slots 
+			WHERE supervisor_id = $1 
+			AND slot_date >= CURRENT_DATE
+			AND status = 'available'
+			ORDER BY slot_date, start_time`,
+			supervisorID)
+		if err != nil {
+			http.Error(w, "Erro ao buscar slots", http.StatusInternalServerError)
+			return
+		}
+		defer slots.Close()
+
+		for slots.Next() {
+			var slot models.AvailableSlot
+			if err := slots.Scan(&slot.SlotID, &slot.SlotDate, &slot.StartTime, &slot.EndTime, &slot.Status); err != nil {
+				http.Error(w, "Erro ao ler slots", http.StatusInternalServerError)
+				return
+			}
+			supervisor.AvailableSlots = append(supervisor.AvailableSlots, slot)
 		}
 
 		// Renderizar template
 		tmpl := template.Must(template.New("schedule.html").
 			Funcs(funcMap).
 			ParseFiles("view/appointments/schedule.html"))
+
+		w.Header().Set("Content-Type", "text/html")
 		tmpl.Execute(w, map[string]interface{}{
 			"Supervisor": supervisor,
 		})
