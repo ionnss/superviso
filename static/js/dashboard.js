@@ -5,27 +5,33 @@ document.addEventListener('DOMContentLoaded', function() {
             roleWarning.style.display = 'none';
         }
     }
-});
 
-function hideRoleWarning() {
-    localStorage.setItem('roleWarningDismissed', 'true');
-    document.getElementById('roleWarning').style.display = 'none';
-} 
-
-
-document.addEventListener('click', function(e) {
+    // Only run navbar collapse code if navbar exists
     const navbar = document.getElementById('navbarResponsive');
     const toggler = document.querySelector('.navbar-toggler');
-        
-    if (navbar.classList.contains('show') && 
-        !navbar.contains(e.target) && 
-        !toggler.contains(e.target)) {
-        bootstrap.Collapse.getInstance(navbar).hide();
+    
+    if (navbar && toggler) {
+        document.addEventListener('click', function(e) {
+            if (navbar.classList.contains('show') && 
+                !navbar.contains(e.target) && 
+                !toggler.contains(e.target)) {
+                bootstrap.Collapse.getInstance(navbar).hide();
+            }
+        });
     }
 });
-    
 
-    
+// Listen for HTMX after-request to maintain state
+document.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.pathInfo.requestPath === '/api/profile/toggle-supervisor') {
+        const supervisorSettings = document.getElementById('supervisorSettings');
+        const supervisorToggle = document.getElementById('supervisorToggle');
+        if (supervisorSettings && supervisorToggle) {
+            supervisorSettings.style.display = supervisorToggle.checked ? 'block' : 'none';
+        }
+    }
+});
+
 // Função para verificar o papel do usuário via API
 function checkUserRole() {
     fetch('/api/profile/check-role')
