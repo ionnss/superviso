@@ -1,0 +1,5 @@
+db:5432 - accepting connections
+Iniciando backup em Thu Dec 19 03:00:00 -03 2024
+Backup criado com sucesso: superviso_20241219_030000.dump
+Removendo backups antigos...
+----------------------------------------
