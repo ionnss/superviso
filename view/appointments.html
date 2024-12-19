@@ -43,7 +43,9 @@
 </div>
 
 <!-- Scripts -->
-<script src="/static/js/appointment.js"></script>
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/notifications.js"></script>
+<script src="/static/js/appointments.js"></script>
 
 <!-- Template para lista de agendamentos -->
 {{define "appointment-list"}}
@@ -101,4 +103,15 @@
         </div>
     {{end}}
 {{end}}
+
+<!-- Main Content -->
+<div class="container py-5 mt-5">
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <!-- Toasts serão inseridos aqui dinamicamente -->
+    </div>
+
+    <div id="main-content">
+  </div>
+</div>
  

@@ -2,13 +2,16 @@ package appointment
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"superviso/api/auth"
+	"superviso/api/handlers"
 	"superviso/models"
 	"superviso/utils"
+	"superviso/websocket"
 	"time"
 )
 
@@ -272,7 +275,7 @@ func renderNoSlots(w http.ResponseWriter, date time.Time) {
 }
 
 // BookAppointment processa o agendamento de uma supervisão
-func BookAppointment(db *sql.DB) http.HandlerFunc {
+func BookAppointment(db *sql.DB, hub *websocket.Hub) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Iniciando processo de agendamento...")
 		log.Printf("Form values: %+v", r.Form)
@@ -352,25 +355,71 @@ func BookAppointment(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Criar agendamento
+		// Atualizar status do slot
+		_, err = tx.Exec(`
+			UPDATE available_slots 
+			SET status = 'pending' 
+			WHERE id = $1`,
+			slotID)
+		if err != nil {
+			log.Printf("Erro ao atualizar slot: %v", err)
+			http.Error(w, "Erro ao atualizar disponibilidade", http.StatusInternalServerError)
+			return
+		}
+
+		// Criar o agendamento
 		_, err = tx.Exec(`
 			INSERT INTO appointments 
-			(supervisor_id, supervisee_id, slot_id, status) 
-			VALUES ($1, $2, $3, 'pending')`,
+			(supervisor_id, supervisee_id, slot_id, status, created_at, updated_at)
+			VALUES ($1, $2, $3, 'pending', NOW(), NOW())`,
 			supervisorID, userID, slotID)
 		if err != nil {
+			log.Printf("Erro ao criar agendamento: %v", err)
 			http.Error(w, "Erro ao criar agendamento", http.StatusInternalServerError)
 			return
 		}
 
-		// Atualizar status do slot
-		_, err = tx.Exec(`
-			UPDATE available_slots 
-			SET status = 'booked' 
-			WHERE id = $1`,
-			slotID)
+		// Buscar informações para notificação
+		var superviseeName, supervisorEmail, supervisorName string
+		var slotDate, startTime string
+		err = tx.QueryRow(`
+			SELECT 
+				(SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = $1) as supervisee_name,
+				(SELECT email FROM users WHERE id = $2) as supervisor_email,
+				(SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = $2) as supervisor_name,
+				(SELECT TO_CHAR(slot_date, 'DD/MM/YYYY') FROM available_slots WHERE id = $3) as slot_date,
+				(SELECT TO_CHAR(start_time, 'HH24:MI') FROM available_slots WHERE id = $3) as start_time
+			FROM users 
+			WHERE id = $1`, userID, supervisorID, slotID).Scan(
+			&superviseeName, &supervisorEmail, &supervisorName,
+			&slotDate, &startTime)
+
 		if err != nil {
-			http.Error(w, "Erro ao atualizar slot", http.StatusInternalServerError)
+			log.Printf("Erro ao buscar detalhes: %v", err)
+			return
+		}
+
+		// Criar notificação para o supervisor
+		notificationMsg := fmt.Sprintf("Você recebeu uma nova solicitação de supervisão de %s para %s às %s",
+			superviseeName, slotDate, startTime)
+
+		if err = handlers.CreateNotificationWithEmail(db, tx, handlers.NotificationData{
+			UserID:       supervisorID,
+			Type:         "new_appointment",
+			Title:        "Nova Solicitação de Supervisão",
+			Message:      notificationMsg,
+			EmailSubject: "Nova Solicitação de Supervisão - Superviso",
+			EmailBody: fmt.Sprintf(`
+				<h2>Nova Solicitação de Supervisão</h2>
+				<p>Olá %s,</p>
+				<p>Você recebeu uma nova solicitação de supervisão.</p>
+				<p>Supervisionando: <strong>%s</strong></p>
+				<p>Data: <strong>%s</strong></p>
+				<p>Horário: <strong>%s</strong></p>
+				<p>Acesse a plataforma para aceitar ou rejeitar esta solicitação.</p>
+			`, supervisorName, superviseeName, slotDate, startTime),
+		}, hub); err != nil {
+			log.Printf("Erro ao criar notificação: %v", err)
 			return
 		}
 

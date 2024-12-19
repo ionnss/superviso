@@ -16,6 +16,16 @@ type EmailConfig struct {
 	Port     string
 }
 
+type EmailTemplateData struct {
+	Title      string
+	Message    template.HTML
+	LogoBase64 string
+	Date       string
+	Time       string
+	ActionURL  string
+	ActionText string
+}
+
 func getConfig() EmailConfig {
 	return EmailConfig{
 		From:     os.Getenv("EMAIL_ADDRESS"),
@@ -30,7 +40,7 @@ func SendVerificationEmail(to, token string) error {
 	auth := smtp.PlainAuth("", config.From, config.Password, config.Host)
 
 	// Ler a imagem do logo
-	logoPath := "static/assets/img/logo.png"
+	logoPath := "static/assets/email/logo.png"
 	logo, err := os.ReadFile(logoPath)
 	if err != nil {
 		return fmt.Errorf("erro ao ler logo: %v", err)
@@ -76,7 +86,7 @@ func SendEmail(to, subject, body string) error {
 	auth := smtp.PlainAuth("", config.From, config.Password, config.Host)
 
 	// Ler a imagem do logo
-	logoPath := "static/assets/img/logo.png"
+	logoPath := "static/assets/email/logo.png"
 	logo, err := os.ReadFile(logoPath)
 	if err != nil {
 		return fmt.Errorf("erro ao ler logo: %v", err)
@@ -85,17 +95,12 @@ func SendEmail(to, subject, body string) error {
 	// Converter logo para base64
 	logoBase64 := base64.StdEncoding.EncodeToString(logo)
 
-	// Preparar dados do template
-	templateData := struct {
-		Title      string
-		Message    template.HTML
-		LogoBase64 string
-		Date       string
-		Time       string
-	}{
+	templateData := EmailTemplateData{
 		Title:      subject,
 		Message:    template.HTML(body),
 		LogoBase64: logoBase64,
+		ActionURL:  "",
+		ActionText: "",
 	}
 
 	// Carregar e executar template

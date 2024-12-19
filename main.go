@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"superviso/api/routes"
 	"superviso/db"
+	"superviso/websocket"
 
 	"github.com/gorilla/mux"
 )
@@ -41,9 +42,13 @@ func main() {
 	// Executa as migrações
 	db.ExecuteMigrations(conn)
 
+	// Inicializar WebSocket hub
+	hub := websocket.NewHub()
+	go hub.Run()
+
 	// Configura o roteador
 	r := mux.NewRouter()
-	routes.ConfigureRoutes(r, conn)
+	routes.ConfigureRoutes(r, conn, hub)
 
 	// Inicia o servidor
 	log.Println("Servidor rodando na porta :8080 em http://localhost:8080/")

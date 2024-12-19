@@ -12,6 +12,7 @@ import (
 
 	"superviso/api/auth"
 	"superviso/api/email"
+	"superviso/websocket"
 
 	"github.com/gorilla/mux"
 )
@@ -50,13 +51,17 @@ func GetUnreadCountHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(auth.UserIDKey).(int)
 
-		notifications, err := models.GetUnreadNotifications(db, userID)
+		var count int
+		err := db.QueryRow(`
+			SELECT COUNT(*) 
+			FROM notifications 
+			WHERE user_id = $1 AND read = false`,
+			userID).Scan(&count)
 		if err != nil {
 			http.Error(w, "Erro ao buscar notificações", http.StatusInternalServerError)
 			return
 		}
 
-		count := len(notifications)
 		if count > 0 {
 			w.Write([]byte(fmt.Sprintf("%d", count)))
 		}
@@ -67,10 +72,21 @@ func GetNotificationsHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(auth.UserIDKey).(int)
 
-		notifications, err := models.GetUnreadNotifications(db, userID)
+		// Buscar todas as notificações, não apenas as não lidas
+		notifications, err := models.GetNotifications(db, userID)
 		if err != nil {
 			http.Error(w, "Erro ao buscar notificações", http.StatusInternalServerError)
 			return
+		}
+
+		// Marcar todas as notificações como lidas
+		_, err = db.Exec(`
+			UPDATE notifications 
+			SET read = true 
+			WHERE user_id = $1 AND read = false`,
+			userID)
+		if err != nil {
+			log.Printf("Erro ao marcar notificações como lidas: %v", err)
 		}
 
 		// Renderizar partial de notificações
@@ -122,16 +138,23 @@ type NotificationData struct {
 }
 
 // CreateNotificationWithEmail cria uma notificação no sistema e envia um email
-func CreateNotificationWithEmail(db *sql.DB, tx *sql.Tx, data NotificationData) error {
+func CreateNotificationWithEmail(db *sql.DB, tx *sql.Tx, data NotificationData, hub *websocket.Hub) error {
 	// Criar notificação no sistema
 	_, err := tx.Exec(`
-		INSERT INTO notifications (user_id, title, message, type)
-		VALUES ($1, $2, $3, $4)`,
+		INSERT INTO notifications (user_id, title, message, type, read)
+		VALUES ($1, $2, $3, $4, false)`,
 		data.UserID, data.Title, data.Message, data.Type)
 
 	if err != nil {
 		return fmt.Errorf("erro ao criar notificação: %v", err)
 	}
+
+	// Enviar notificação via WebSocket imediatamente
+	hub.SendToUser(data.UserID, map[string]interface{}{
+		"type":    data.Type,
+		"title":   data.Title,
+		"message": data.Message,
+	})
 
 	// Buscar email do usuário
 	var userEmail string
@@ -146,9 +169,12 @@ func CreateNotificationWithEmail(db *sql.DB, tx *sql.Tx, data NotificationData) 
 
 	// Enviar email de forma assíncrona
 	go func() {
+		log.Printf("Enviando email para %s com assunto: %s", userEmail, data.EmailSubject)
 		err := email.SendEmail(userEmail, data.EmailSubject, data.EmailBody)
 		if err != nil {
 			log.Printf("Erro ao enviar email: %v", err)
+		} else {
+			log.Printf("Email enviado com sucesso para %s", userEmail)
 		}
 	}()
 

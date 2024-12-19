@@ -12,11 +12,12 @@ import (
 	"superviso/api/user"
 
 	"superviso/api/handlers"
+	"superviso/websocket"
 
 	"github.com/gorilla/mux"
 )
 
-func ConfigureRoutes(r *mux.Router, db *sql.DB) {
+func ConfigureRoutes(r *mux.Router, db *sql.DB, hub *websocket.Hub) {
 	// Arquivos estáticos para web
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("static/assets/"))))
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("static/assets/img"))))
@@ -77,15 +78,18 @@ func ConfigureRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/resend-verification", user.ResendVerification(db)).Methods("POST")
 	r.HandleFunc("/schedule", auth.AuthMiddleware(handlers.GetScheduleHandler(db))).Methods("GET")
 	r.HandleFunc("/api/appointments/slots", auth.AuthMiddleware(appointment.GetAvailableSlots(db))).Methods("GET")
-	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db))).Methods("POST")
+	r.HandleFunc("/api/appointments/book", auth.AuthMiddleware(appointment.BookAppointment(db, hub))).Methods("POST")
 	r.HandleFunc("/api/supervisor/toggle-day-hours", auth.AuthMiddleware(supervisor.ToggleDayHours(db))).Methods("POST")
 	r.HandleFunc("/api/supervisor/update-availability", auth.AuthMiddleware(supervisor.UpdateAvailability(db))).Methods("POST")
 	r.HandleFunc("/api/supervisor/availability", auth.AuthMiddleware(supervisor.GetSupervisorAvailability(db))).Methods("GET")
 	r.HandleFunc("/appointments", auth.AuthMiddleware(handlers.AppointmentsHandler(db))).Methods("GET")
-	r.HandleFunc("/api/appointments/accept", auth.AuthMiddleware(handlers.AcceptAppointmentHandler(db))).Methods("POST")
-	r.HandleFunc("/api/appointments/reject", auth.AuthMiddleware(handlers.RejectAppointmentHandler(db))).Methods("POST")
+	r.HandleFunc("/api/appointments/accept", auth.AuthMiddleware(handlers.AcceptAppointmentHandler(db, hub))).Methods("POST")
+	r.HandleFunc("/api/appointments/reject", auth.AuthMiddleware(handlers.RejectAppointmentHandler(db, hub))).Methods("POST")
 	r.HandleFunc("/api/notifications/unread-count", auth.AuthMiddleware(handlers.GetUnreadCountHandler(db))).Methods("GET")
 	r.HandleFunc("/api/notifications", auth.AuthMiddleware(handlers.GetNotificationsHandler(db))).Methods("GET")
 	r.HandleFunc("/api/notifications/{id}/read", auth.AuthMiddleware(handlers.MarkNotificationAsReadHandler(db))).Methods("POST")
+
+	// WebSocket para notificações
+	r.HandleFunc("/ws", auth.AuthMiddleware(handlers.WebSocketHandler(hub))).Methods("GET")
 
 }
