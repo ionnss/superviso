@@ -67,8 +67,13 @@ body {
     color: #3a3a3a;
 }
 
+.sidebar .navbar-brand img {
+    height: 70px; /* Altura da logo */
+    width: auto;  /* Mantém proporção */
+}
+
 .navbar-brand img {
-    height: 40px; /* Altura da logo */
+    height: 70px; /* Altura da logo */
     width: auto;  /* Mantém proporção */
 }
 
@@ -792,17 +797,16 @@ input[type="time"].end-time {
 .sidebar .navbar-brand {
     display: flex;
     align-items: center;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
-    color: white !important;
-    font-size: 1.5rem;
-    text-decoration: none;
+    padding: 1rem;
+    font-size: 1.25rem;
+    color: #ffffff;
 }
 
 .sidebar .navbar-brand img {
     width: 35px;
     height: auto;
-    margin-right: 0.75rem;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
 .sidebar .navbar-nav {

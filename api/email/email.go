@@ -17,13 +17,14 @@ type EmailConfig struct {
 }
 
 type EmailTemplateData struct {
-	Title      string
-	Message    template.HTML
-	LogoBase64 string
-	Date       string
-	Time       string
-	ActionURL  string
-	ActionText string
+	Title         string
+	Message       template.HTML
+	LogoBase64    string
+	LogoPNGBase64 string
+	Date          string
+	Time          string
+	ActionURL     string
+	ActionText    string
 }
 
 func getConfig() EmailConfig {
@@ -39,14 +40,14 @@ func SendVerificationEmail(to, token string) error {
 	config := getConfig()
 	auth := smtp.PlainAuth("", config.From, config.Password, config.Host)
 
-	// Ler a imagem do logo
-	logoPath := "static/assets/email/logo.png"
+	// Ler o arquivo SVG
+	logoPath := "static/assets/email/logo.svg"
 	logo, err := os.ReadFile(logoPath)
 	if err != nil {
 		return fmt.Errorf("erro ao ler logo: %v", err)
 	}
 
-	// Converter logo para base64
+	// Converter SVG para base64
 	logoBase64 := base64.StdEncoding.EncodeToString(logo)
 
 	templateData := struct {
@@ -81,26 +82,37 @@ func SendVerificationEmail(to, token string) error {
 	return nil
 }
 
+func encodeSVGForEmail(svgData []byte) string {
+	// First encode to base64
+	b64 := base64.StdEncoding.EncodeToString(svgData)
+
+	// Ensure SVG data is properly formatted for email
+	return b64
+}
+
 func SendEmail(to, subject, body string) error {
 	config := getConfig()
 	auth := smtp.PlainAuth("", config.From, config.Password, config.Host)
 
-	// Ler a imagem do logo
-	logoPath := "static/assets/email/logo.png"
-	logo, err := os.ReadFile(logoPath)
+	// Read SVG logo
+	logoSVG, err := os.ReadFile("static/assets/img/logo.svg")
 	if err != nil {
-		return fmt.Errorf("erro ao ler logo: %v", err)
+		return fmt.Errorf("erro ao ler logo SVG: %v", err)
 	}
 
-	// Converter logo para base64
-	logoBase64 := base64.StdEncoding.EncodeToString(logo)
-
+	// Initialize template data with properly encoded SVG
 	templateData := EmailTemplateData{
 		Title:      subject,
 		Message:    template.HTML(body),
-		LogoBase64: logoBase64,
+		LogoBase64: encodeSVGForEmail(logoSVG),
 		ActionURL:  "",
 		ActionText: "",
+	}
+
+	// Try to read PNG fallback if available
+	logoPNG, err := os.ReadFile("static/assets/img/logo.png")
+	if err == nil {
+		templateData.LogoPNGBase64 = base64.StdEncoding.EncodeToString(logoPNG)
 	}
 
 	// Carregar e executar template
