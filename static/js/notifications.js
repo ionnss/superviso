@@ -59,6 +59,7 @@ if (typeof window.NotificationManager === 'undefined') {
 
                 this.ws.onmessage = (event) => {
                     const data = JSON.parse(event.data);
+                    console.log('WebSocket message received:', data);
                     
                     switch (data.type) {
                         case 'slot_update':
@@ -67,10 +68,18 @@ if (typeof window.NotificationManager === 'undefined') {
                         case 'appointment_update':
                             this.handleAppointmentUpdate(data);
                             break;
-                        default:
-                            // Atualizar contador e lista de notificações
+                        case 'new_appointment':
+                        case 'appointment_accepted':
+                        case 'appointment_confirmed':
                             this.updateNotificationBadge();
                             this.addNotificationToList(data);
+                            if (this.soundEnabled) {
+                                this.playNotificationSound();
+                            }
+                            this.showBrowserNotification(data);
+                            break;
+                        default:
+                            console.log('Unknown notification type:', data.type);
                             break;
                     }
                 };
@@ -115,25 +124,24 @@ if (typeof window.NotificationManager === 'undefined') {
 
         addNotificationToList(notification) {
             const list = document.getElementById('notificationsList');
-            if (list) {
-                // Verificar se já existe uma notificação similar
-                const similarNotification = this.findSimilarNotification(notification);
-                if (similarNotification) {
-                    // Atualizar contador na notificação existente
-                    const counter = similarNotification.querySelector('.notification-counter');
-                    if (counter) {
-                        const count = parseInt(counter.dataset.count || '1') + 1;
-                        counter.textContent = `(${count})`;
-                        counter.dataset.count = count;
-                        return;
-                    }
-                }
-
-                htmx.ajax('GET', '/api/notifications', {target: '#notificationsList'});
-                this.cleanOldNotifications();
-                this.playNotificationSound();
-                this.showBrowserNotification(notification);
+            if (!list) {
+                console.warn('Notifications list element not found');
+                return;
             }
+
+            console.log('Adding notification to list:', notification);
+
+            htmx.ajax('GET', '/api/notifications', {
+                target: '#notificationsList',
+                swap: 'innerHTML',
+                values: {},
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            this.cleanOldNotifications();
+            this.updateNotificationBadge();
         }
 
         findSimilarNotification(notification) {
