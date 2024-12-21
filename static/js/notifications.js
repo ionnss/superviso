@@ -87,15 +87,21 @@ if (typeof window.NotificationManager === 'undefined') {
                         const unreadCount = parseInt(count) || 0;
                         console.log('Unread count:', unreadCount);
                         
-                        // Update badge text and visibility
+                        // Update badge text
                         badge.textContent = unreadCount > 0 ? unreadCount.toString() : '';
                         
+                        // Update visibility with a small animation
                         if (unreadCount > 0) {
                             badge.style.display = 'flex';
-                            badge.style.opacity = '1';
-                        } else {
-                            badge.style.display = 'none';
                             badge.style.opacity = '0';
+                            setTimeout(() => {
+                                badge.style.opacity = '1';
+                            }, 50);
+                        } else {
+                            badge.style.opacity = '0';
+                            setTimeout(() => {
+                                badge.style.display = 'none';
+                            }, 200);
                         }
 
                         // Dispatch event for other components
