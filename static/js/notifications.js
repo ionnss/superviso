@@ -87,21 +87,15 @@ if (typeof window.NotificationManager === 'undefined') {
                         const unreadCount = parseInt(count) || 0;
                         console.log('Unread count:', unreadCount);
                         
-                        // Update badge text
+                        // Update badge text and visibility
                         badge.textContent = unreadCount > 0 ? unreadCount.toString() : '';
                         
-                        // Update visibility with a small animation
                         if (unreadCount > 0) {
                             badge.style.display = 'flex';
-                            badge.style.opacity = '0';
-                            setTimeout(() => {
-                                badge.style.opacity = '1';
-                            }, 50);
+                            badge.style.opacity = '1';
                         } else {
+                            badge.style.display = 'none';
                             badge.style.opacity = '0';
-                            setTimeout(() => {
-                                badge.style.display = 'none';
-                            }, 200);
                         }
 
                         // Dispatch event for other components
@@ -363,11 +357,19 @@ if (typeof window.NotificationManager === 'undefined') {
         }
 
         playNotificationSound() {
-            // Tocar som apenas se a página não estiver em foco
-            if (!document.hasFocus()) {
-                this.notificationSound.play().catch(err => {
-                    console.log('Erro ao tocar som:', err);
-                });
+            if (this.soundEnabled) {
+                console.log('Attempting to play notification sound');
+                this.notificationSound.play()
+                    .then(() => {
+                        console.log('Notification sound played successfully');
+                    })
+                    .catch(err => {
+                        console.error('Error playing notification sound:', err);
+                        // Try to reload the audio in case it failed to load initially
+                        this.notificationSound.load();
+                    });
+            } else {
+                console.log('Notification sound is disabled');
             }
         }
     }
