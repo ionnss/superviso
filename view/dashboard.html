@@ -30,7 +30,6 @@
         <div class="sidebar-content">
             <a class="navbar-brand" href="/dashboard">
                 <img src="static/assets/img/logo.svg" alt="Superviso">
-                Superviso
             </a>
             <ul class="navbar-nav">
                 <li class="nav-item">
@@ -111,7 +110,19 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-uppercase">Próxima Supervisão</h6>
-                                    <h4 class="mb-0">Em breve</h4>
+                                    {{if .NextAppointment}}
+                                        <h5 class="mb-0">{{formatDate .NextAppointment.Date}}</h5>
+                                        <small>
+                                            {{if .IsSupervisor}}
+                                                {{.NextAppointment.SuperviseeName}}
+                                            {{else}}
+                                                {{.NextAppointment.SupervisorName}}
+                                            {{end}}
+                                            às {{.NextAppointment.StartTime}}
+                                        </small>
+                                    {{else}}
+                                        <p class="mb-0">Nenhuma agendada</p>
+                                    {{end}}
                                 </div>
                                 <i class="fas fa-calendar fa-2x"></i>
                             </div>
@@ -125,7 +136,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-uppercase">Supervisões Realizadas</h6>
-                                    <h4 class="mb-0">0</h4>
+                                    <h4 class="mb-0">{{.CompletedSessions}}</h4>
                                 </div>
                                 <i class="fas fa-check-circle fa-2x"></i>
                             </div>
@@ -139,7 +150,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-uppercase">Notificações</h6>
-                                    <h4 class="mb-0">0</h4>
+                                    <h4 class="mb-0">{{.UnreadNotifications}}</h4>
                                 </div>
                                 <i class="fas fa-bell fa-2x"></i>
                             </div>
@@ -153,7 +164,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-uppercase">Supervisores Favoritos</h6>
-                                    <h4 class="mb-0">0</h4>
+                                    <h4 class="mb-0">{{.FavoriteSupervisors}}</h4>
                                 </div>
                                 <i class="fas fa-star fa-2x"></i>
                             </div>
@@ -170,7 +181,29 @@
                             <h5 class="card-title mb-0">Atividades Recentes</h5>
                         </div>
                         <div class="card-body">
-                            <p class="text-muted">Nenhuma atividade recente.</p>
+                            {{if .RecentActivities}}
+                                <div class="activity-timeline">
+                                    {{range .RecentActivities}}
+                                        <div class="activity-item mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon me-3">
+                                                    {{if eq .Type "appointment"}}
+                                                        <i class="fas fa-calendar-check text-primary"></i>
+                                                    {{else}}
+                                                        <i class="fas fa-bell text-info"></i>
+                                                    {{end}}
+                                                </div>
+                                                <div class="activity-content">
+                                                    <p class="mb-1">{{.Message}}</p>
+                                                    <small class="text-muted">{{formatDate .Timestamp}}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{end}}
+                                </div>
+                            {{else}}
+                                <p class="text-muted mb-0">Nenhuma atividade recente.</p>
+                            {{end}}
                         </div>
                     </div>
                 </div>

@@ -1,24 +1,42 @@
-<div class="container mt-4">
-    <h2 class="mb-4">{{if .IsSupervisor}}Solicitações de Supervisão{{else}}Meus Agendamentos{{end}}</h2>
-    
+<div class="container py-5">
+
+    <!-- Breadcrumb e Botão Voltar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded shadow-sm">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item active">{{if .IsSupervisor}}Solicitações de Supervisão{{else}}Meus
+                    Agendamentos{{end}}</li>
+            </ol>
+        </nav>
+        <a href="/dashboard" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    </div>
+
+
+    <!-- Tabs -->
     <div class="nav-tabs-wrapper mb-4">
         <ul class="nav nav-tabs" id="appointmentTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">
                     <i class="fas fa-clock me-2"></i>Pendentes
-                    {{if .PendingAppointments}}<span class="badge bg-primary ms-2">{{len .PendingAppointments}}</span>{{end}}
+                    {{if .PendingAppointments}}<span class="badge bg-primary ms-2">{{len
+                        .PendingAppointments}}</span>{{end}}
                 </a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="confirmed-tab" data-bs-toggle="tab" href="#confirmed" role="tab">
                     <i class="fas fa-check-circle me-2"></i>Confirmados
-                    {{if .ConfirmedAppointments}}<span class="badge bg-success ms-2">{{len .ConfirmedAppointments}}</span>{{end}}
+                    {{if .ConfirmedAppointments}}<span class="badge bg-success ms-2">{{len
+                        .ConfirmedAppointments}}</span>{{end}}
                 </a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="historic-tab" data-bs-toggle="tab" href="#historic" role="tab">
                     <i class="fas fa-history me-2"></i>Histórico
-                    {{if .HistoricAppointments}}<span class="badge bg-secondary ms-2">{{len .HistoricAppointments}}</span>{{end}}
+                    {{if .HistoricAppointments}}<span class="badge bg-secondary ms-2">{{len
+                        .HistoricAppointments}}</span>{{end}}
                 </a>
             </li>
         </ul>
@@ -40,78 +58,73 @@
             {{template "appointment-list" dict "Appointments" .HistoricAppointments "IsSupervisor" .IsSupervisor}}
         </div>
     </div>
-</div>
 
-<!-- Scripts -->
-<script src="/static/js/dashboard.js"></script>
-<script src="/static/js/notifications.js"></script>
-<script src="/static/js/appointments.js"></script>
 
-<!-- Template para lista de agendamentos -->
-{{define "appointment-list"}}
+    <!-- Scripts -->
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/notifications.js"></script>
+    <script src="/static/js/appointments.js"></script>
+
+    <!-- Template para lista de agendamentos -->
+    {{define "appointment-list"}}
     {{if not .Appointments}}
-        <div class="alert alert-info">
-            <i class="fas fa-calendar-times"></i>
-            Nenhum agendamento encontrado.
-        </div>
+    <div class="alert alert-info">
+        <i class="fas fa-calendar-times"></i>
+        Nenhum agendamento encontrado.
+    </div>
     {{else}}
-        <div class="row">
-            {{range .Appointments}}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card appointment-card">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            {{if $.IsSupervisor}}
-                                Supervisionando: {{.SuperviseeName}}
-                            {{else}}
-                                Supervisor: {{.SupervisorName}}
-                            {{end}}
-                        </h5>
-                        <div class="appointment-details">
-                            <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
-                            <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
-                            <span class="status-badge status-{{.Status}}">
-                                {{if eq .Status "pending"}}Pendente{{end}}
-                                {{if eq .Status "confirmed"}}Confirmado{{end}}
-                                {{if eq .Status "rejected"}}Rejeitado{{end}}
-                            </span>
-                        </div>
-                        {{if and (eq .Status "pending") $.IsSupervisor}}
-                            <div class="appointment-actions mt-3">
-                                <button class="btn btn-success btn-sm accept-btn" 
-                                        data-id="{{.ID}}"
-                                        onclick="this.disabled = true"
-                                        hx-post="/api/appointments/accept"
-                                        hx-vals='{"id": "{{.ID}}"}'
-                                        hx-target="#main-content"
-                                        hx-indicator="#spinner-{{.ID}}">
-                                    <i class="fas fa-check"></i> 
-                                    <span class="htmx-indicator-hidden">Aceitar</span>
-                                    <span id="spinner-{{.ID}}" class="htmx-indicator">
-                                        <span class="spinner-border spinner-border-sm"></span>
-                                    </span>
-                                </button>
-                                <button class="btn btn-danger btn-sm reject-btn" data-id="{{.ID}}">
-                                    <i class="fas fa-times"></i> Rejeitar
-                                </button>
-                            </div>
+    <div class="row">
+        {{range .Appointments}}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card appointment-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{if $.IsSupervisor}}
+                        Supervisionando: {{.SuperviseeName}}
+                        {{else}}
+                        Supervisor: {{.SupervisorName}}
                         {{end}}
+                    </h5>
+                    <div class="appointment-details">
+                        <p><i class="fas fa-calendar"></i> {{formatDate .Date}}</p>
+                        <p><i class="fas fa-clock"></i> {{formatTime .StartTime}} - {{formatTime .EndTime}}</p>
+                        <span class="status-badge status-{{.Status}}">
+                            {{if eq .Status "pending"}}Pendente{{end}}
+                            {{if eq .Status "confirmed"}}Confirmado{{end}}
+                            {{if eq .Status "rejected"}}Rejeitado{{end}}
+                        </span>
                     </div>
+                    {{if and (eq .Status "pending") $.IsSupervisor}}
+                    <div class="appointment-actions mt-3">
+                        <button class="btn btn-success btn-sm accept-btn" data-id="{{.ID}}"
+                            onclick="this.disabled = true" hx-post="/api/appointments/accept"
+                            hx-vals='{"id": "{{.ID}}"}' hx-target="#main-content" hx-indicator="#spinner-{{.ID}}">
+                            <i class="fas fa-check"></i>
+                            <span class="htmx-indicator-hidden">Aceitar</span>
+                            <span id="spinner-{{.ID}}" class="htmx-indicator">
+                                <span class="spinner-border spinner-border-sm"></span>
+                            </span>
+                        </button>
+                        <button class="btn btn-danger btn-sm reject-btn" data-id="{{.ID}}">
+                            <i class="fas fa-times"></i> Rejeitar
+                        </button>
+                    </div>
+                    {{end}}
                 </div>
             </div>
-            {{end}}
         </div>
-    {{end}}
-{{end}}
-
-<!-- Main Content -->
-<div class="container py-5 mt-5">
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <!-- Toasts serão inseridos aqui dinamicamente -->
+        {{end}}
     </div>
+    {{end}}
+    {{end}}
 
-    <div id="main-content">
-  </div>
-</div>
- 
+    <!-- Main Content -->
+    <div class="container py-5 mt-5">
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <!-- Toasts serão inseridos aqui dinamicamente -->
+        </div>
+
+        <div id="main-content">
+        </div>
+    </div>

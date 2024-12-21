@@ -1,1 +1,8 @@
-{{if gt .UnreadCount 0}}{{.UnreadCount}}{{end}} 
+<span id="notificationCount" 
+      class="badge rounded-pill bg-danger position-absolute" 
+      style="display: none; top: -5px; right: -10px; min-width: 18px;"
+      hx-get="/api/notifications/unread-count"
+      hx-trigger="notification-read from:body"
+      hx-swap="innerHTML">
+    {{if gt .UnreadCount 0}}{{.UnreadCount}}{{end}}
+</span> 

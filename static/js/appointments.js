@@ -1,21 +1,18 @@
 class AppointmentManager {
     constructor() {
-        this.initializeWebSocket();
+        this.initializeEventListeners();
         this.initializeAutoRefresh();
     }
 
-    initializeWebSocket() {
-        window.notificationManager.ws.addEventListener('message', (event) => {
-            const data = JSON.parse(event.data);
-            
-            switch (data.type) {
-                case 'slot_update':
-                    this.handleSlotUpdate(data);
-                    break;
-                case 'appointment_update':
-                    this.handleAppointmentUpdate(data);
-                    break;
-            }
+    initializeEventListeners() {
+        // Listen for slot updates
+        window.addEventListener('slotUpdate', (event) => {
+            this.handleSlotUpdate(event.detail);
+        });
+
+        // Listen for appointment updates
+        window.addEventListener('appointmentUpdate', (event) => {
+            this.handleAppointmentUpdate(event.detail);
         });
     }
 
@@ -27,6 +24,7 @@ class AppointmentManager {
     }
 
     handleSlotUpdate(data) {
+        console.log('AppointmentManager handling slot update:', data);
         // Atualizar o status do slot na interface
         const slotElement = document.querySelector(`[data-slot-id="${data.slot_id}"]`);
         if (slotElement) {
@@ -36,66 +34,52 @@ class AppointmentManager {
     }
 
     handleAppointmentUpdate(data) {
-        // Atualizar a lista de agendamentos
-        if (data.status === 'confirmed' || data.status === 'rejected') {
-            htmx.trigger('#appointmentsList', 'refresh');
-            
-            // Limpar toasts antigos
-            const toastContainer = document.querySelector('.toast-container');
-            Array.from(toastContainer.children).forEach(toast => {
-                const bsToast = bootstrap.Toast.getInstance(toast);
-                if (bsToast) {
-                    bsToast.dispose();
-                }
-                toast.remove();
-            });
-            
-            // Mostrar toast de feedback
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${data.status === 'confirmed' ? 'success' : 'danger'} border-0`;
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${data.message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            `;
-            document.querySelector('.toast-container').appendChild(toast);
-            new bootstrap.Toast(toast).show();
+        console.log('AppointmentManager handling appointment update:', data);
+        const appointmentsList = document.getElementById('appointmentsList');
+        if (appointmentsList) {
+            htmx.trigger(appointmentsList, 'refresh');
         }
     }
 
-    updateSlotAppearance(element, status) {
-        // Atualizar classes CSS e texto baseado no status
-        element.className = `slot-item ${status}`;
-        let statusText = '';
-        let buttonClass = '';
+    updateSlotAppearance(slotElement, status) {
+        // Remove existing status classes
+        slotElement.classList.remove('available', 'pending', 'booked');
+        // Add new status class
+        slotElement.classList.add(status);
+        
+        // Update button state
+        const bookButton = slotElement.querySelector('button');
+        if (bookButton) {
+            bookButton.disabled = status !== 'available';
+            bookButton.textContent = this.getButtonText(status);
+        }
+    }
 
+    getButtonText(status) {
         switch (status) {
             case 'available':
-                statusText = 'Disponível';
-                buttonClass = 'btn-success';
-                element.disabled = false;
-                break;
+                return 'Agendar';
             case 'pending':
-                statusText = 'Pendente';
-                buttonClass = 'btn-warning';
-                element.disabled = true;
-                break;
+                return 'Pendente';
             case 'booked':
-                statusText = 'Reservado';
-                buttonClass = 'btn-secondary';
-                element.disabled = true;
-                break;
+                return 'Reservado';
+            default:
+                return 'Indisponível';
         }
-
-        element.textContent = statusText;
-        element.className = `btn ${buttonClass} slot-item ${status}`;
     }
 }
 
-// Inicializar quando o DOM estiver pronto
+// Initialize when DOM is loaded and NotificationManager is ready
+function initializeAppointmentManager() {
+    if (window.notificationManager) {
+        console.log('Initializing AppointmentManager');
+        window.appointmentManager = new AppointmentManager();
+    } else {
+        console.log('Waiting for NotificationManager...');
+        setTimeout(initializeAppointmentManager, 100);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    window.appointmentManager = new AppointmentManager();
+    initializeAppointmentManager();
 }); 

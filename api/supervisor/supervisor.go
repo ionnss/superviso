@@ -4,7 +4,9 @@ package supervisor
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"superviso/models"
 	"superviso/utils"
 	"text/template"
@@ -36,22 +38,46 @@ var funcMap = template.FuncMap{
 // GetSupervisors retorna a lista de supervisores disponíveis
 func GetSupervisors(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Buscar supervisores com seus horários
-		rows, err := db.Query(`
-				SELECT DISTINCT 
-					u.id,
-					u.first_name,
-					u.last_name,
-					u.crp,
-					u.theory_approach,
-					sp.session_price,
-					sap.start_date,
-					sap.end_date
-				FROM users u
-				JOIN supervisor_profiles sp ON u.id = sp.user_id
-				JOIN supervisor_availability_periods sap ON sp.user_id = sap.supervisor_id
-				WHERE sap.end_date >= CURRENT_DATE
-				ORDER BY u.first_name, u.last_name`)
+		// Get filter parameters
+		approach := r.URL.Query().Get("approach")
+		maxPrice := r.URL.Query().Get("max_price")
+
+		// Build the query with filters
+		query := `
+			SELECT DISTINCT 
+				u.id,
+				u.first_name,
+				u.last_name,
+				u.crp,
+				u.theory_approach,
+				sp.session_price,
+				sap.start_date,
+				sap.end_date
+			FROM users u
+			JOIN supervisor_profiles sp ON u.id = sp.user_id
+			JOIN supervisor_availability_periods sap ON sp.user_id = sap.supervisor_id
+			WHERE sap.end_date >= CURRENT_DATE`
+
+		var params []interface{}
+		paramCount := 1
+
+		if approach != "" {
+			query += fmt.Sprintf(" AND LOWER(u.theory_approach) LIKE LOWER($%d)", paramCount)
+			params = append(params, "%"+approach+"%")
+			paramCount++
+		}
+
+		if maxPrice != "" {
+			if price, err := strconv.ParseFloat(maxPrice, 64); err == nil && price > 0 {
+				query += fmt.Sprintf(" AND sp.session_price <= $%d", paramCount)
+				params = append(params, price)
+			}
+		}
+
+		query += " ORDER BY u.first_name, u.last_name"
+
+		// Execute the query with filters
+		rows, err := db.Query(query, params...)
 		if err != nil {
 			http.Error(w, "Erro ao buscar supervisores", http.StatusInternalServerError)
 			return

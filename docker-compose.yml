@@ -11,7 +11,7 @@ services:
     volumes:
       - ./templates:/superviso/templates
       - ./static:/superviso/static
-    command: ["/wait-for-it.sh", "db:5432", "-t", "30", "--", "/superviso/app_superviso"]
+    command: ["/wait-for-it.sh", "db:5432", "-t", "45", "--", "/superviso/app_superviso"]
     networks:
       - superviso_network
 

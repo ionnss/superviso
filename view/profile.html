@@ -50,50 +50,60 @@
                             <label class="form-label">Email</label>
                             <input type="email" class="form-control" value="{{.Email}}" readonly>
                         </div>
-
-                        <div class="border-top my-4"></div>
-
-                        <!-- Toggle Supervisor -->
-                        <div class="mb-3 col-md-8 mx-auto">
-                            <div class="border border-danger rounded p-3 bg-danger bg-opacity-10">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-1 text-center">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" 
-                                                   name="is_supervisor" 
-                                                   id="supervisorToggle"
-                                                   {{if .IsSupervisor}}checked{{end}}
-                                                   hx-post="/api/profile/toggle-supervisor"
-                                                   hx-target="#supervisorFields"
-                                                   hx-swap="innerHTML"
-                                                   onchange="toggleSupervisorWarning(this)">
-                                            <label class="form-check-label" for="supervisorToggle">
-                                                <i class="fas fa-user-tie me-1"></i>
-                                                Quero ser supervisor
-                                            </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="max-auto mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Configurações de Supervisor</h4>
+                </div>
+                <div class="card-body">
+                            <!-- Toggle Supervisor -->
+                            <div class="mt-4 mb-4 col-md-8 mx-auto">
+                                <div class="border border-danger rounded p-3 bg-danger bg-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="flex-1 text-center">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" 
+                                                    name="is_supervisor" 
+                                                    id="supervisorToggle"
+                                                    {{if .IsSupervisor}}checked{{end}}
+                                                    hx-post="/api/profile/toggle-supervisor"
+                                                    hx-target="#supervisorFields"
+                                                    hx-swap="innerHTML"
+                                                    onchange="toggleSupervisorWarning(this)">
+                                                <label class="form-check-label" for="supervisorToggle">
+                                                    <i class="fas fa-user-tie me-1"></i>
+                                                    Quero ser supervisor
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Campos de Supervisor -->
-                        <div id="supervisorFields" class="border border-danger rounded p-3 bg-danger bg-opacity-10 {{if .IsSupervisor}}supervisor-visible{{else}}supervisor-hidden{{end}}">
-                            <!-- Será preenchido via HTMX quando o toggle for ativado -->
-                        </div>
-                        
+                            <!-- Campos de Supervisor -->
+                            <div id="supervisorFields" class="border border-danger rounded p-3 bg-danger bg-opacity-10 {{if .IsSupervisor}}supervisor-visible{{else}}supervisor-hidden{{end}}">
+                                <!-- Será preenchido via HTMX quando o toggle for ativado -->
+                            </div>
+                            
 
-                        <div id="message-container"></div>
-                        
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-primary">
-                                Salvar Alterações
-                            </button>
-                        </div>
-                    </form>
+                            <div id="message-container"></div>
+                            
+                            <div class="mt-4 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    Salvar Alterações
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -101,7 +111,24 @@
 <script>
 function toggleSupervisorWarning(checkbox) {
     const warningDiv = document.getElementById('supervisorWarning');
-    document.getElementById('supervisorFields').style.display = checkbox.checked ? 'block' : 'none';
-    warningDiv.style.display = checkbox.checked ? 'block' : 'none';
+    const fieldsDiv = document.getElementById('supervisorFields');
+    
+    if (checkbox.checked) {
+        fieldsDiv.classList.remove('supervisor-hidden');
+        fieldsDiv.classList.add('supervisor-visible');
+        warningDiv.classList.remove('d-none');
+    } else {
+        fieldsDiv.classList.remove('supervisor-visible');
+        fieldsDiv.classList.add('supervisor-hidden');
+        warningDiv.classList.add('d-none');
+    }
 }
+
+// Initialize state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('supervisorToggle');
+    if (checkbox) {
+        toggleSupervisorWarning(checkbox);
+    }
+});
 </script> 

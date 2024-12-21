@@ -68,12 +68,12 @@ body {
 }
 
 .sidebar .navbar-brand img {
-    height: 70px; /* Altura da logo */
+    height: 60%; /* Increased from 70px */
     width: auto;  /* Mantém proporção */
 }
 
 .navbar-brand img {
-    height: 70px; /* Altura da logo */
+    height: 60px; /* Increased from 70px */
     width: auto;  /* Mantém proporção */
 }
 
@@ -152,11 +152,11 @@ footer {
 }
 
 .supervisor-visible {
-    display: block;
+    display: block !important;
 }
 
 .supervisor-hidden {
-    display: none;
+    display: none !important;
 }
 
 /* Ajuste do espaçamento do conteúdo principal */
@@ -213,6 +213,8 @@ footer {
 .breadcrumb-item + .breadcrumb-item::before {
     color: rgba(255, 255, 255, 0.3) !important;
 }
+
+
 
 /* Inputs e forms em tema escuro */
 .form-control {
@@ -779,7 +781,8 @@ input[type="time"].end-time {
     position: fixed;
     left: 0;
     top: 0;
-    background: linear-gradient(180deg, #f2a50a, #ff6f61, #1c1c1c);
+    /*background: linear-gradient(180deg, #f2a50a, #ff6f61, #1c1c1c);*/
+    background: linear-gradient(180deg, rgba(28, 28, 28), rgba(28, 28, 28), rgba(28, 28, 28));
     padding: 0;
     margin: 0;
     z-index: 1030;
@@ -797,13 +800,14 @@ input[type="time"].end-time {
 .sidebar .navbar-brand {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 1rem;
     font-size: 1.25rem;
     color: #ffffff;
 }
 
 .sidebar .navbar-brand img {
-    width: 35px;
+    width: 120px;
     height: auto;
     margin-right: 10px;
     vertical-align: middle;
@@ -847,9 +851,25 @@ input[type="time"].end-time {
 }
 
 .sidebar .nav-item.mt-auto {
-    margin-top: auto !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 15px !important;
     padding-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.sidebar .nav-item.mt-auto .nav-link {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 8px;
+    color: #dc3545 !important;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-item.mt-auto .nav-link:hover {
+    background-color: rgba(220, 53, 69, 0.3);
+    border-color: rgba(220, 53, 69, 0.4);
+    transform: translateY(-2px);
+    color: #fff !important;
 }
 
 /* Adjust main content */
@@ -1043,5 +1063,233 @@ input[type="time"].end-time {
     display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
+}
+
+/* Appointment Styles */
+.appointments-container {
+    margin-top: 20px;
+    display: block;
+}
+
+.appointment-card {
+    background: rgba(28, 28, 28, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    transition: transform 0.2s;
+    margin-bottom: 15px;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.appointment-details {
+    margin: 15px 0;
+}
+
+.appointment-details p {
+    margin: 5px 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.appointment-details i {
+    width: 20px;
+    margin-right: 10px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.status-pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-confirmed {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-rejected {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* Appointment Tabs */
+.nav-tabs-wrapper {
+    background: rgba(28, 28, 28, 0.8);
+    border-radius: 8px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+}
+
+.nav-tabs {
+    border-bottom: none;
+}
+
+.nav-tabs .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+    background: rgba(40, 40, 40, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-tabs .nav-link.active {
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-tabs .nav-link .badge {
+    background: rgba(52, 152, 219, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.nav-tabs .nav-link.active .badge {
+    background: rgba(52, 152, 219, 0.5) !important;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.appointment-actions .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.appointment-actions .btn-success {
+    background: rgba(40, 167, 69, 0.2);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    color: #28a745;
+}
+
+.appointment-actions .btn-danger {
+    background: rgba(220, 53, 69, 0.2);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+.appointment-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+.alert-info {
+    background: rgba(28, 28, 28, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.alert-info i {
+    margin-right: 8px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Dashboard Activity Timeline */
+.activity-timeline {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.activity-item {
+    position: relative;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.activity-icon i {
+    font-size: 1.2rem;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-content p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.activity-content small {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Dashboard Cards Hover Effect */
+.card.bg-primary, .card.bg-success, .card.bg-info, .card.bg-warning {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.card.bg-primary:hover, .card.bg-success:hover, .card.bg-info:hover, .card.bg-warning:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card.bg-primary {
+    background: linear-gradient(45deg, #4e73df, #224abe) !important;
+}
+
+.card.bg-success {
+    background: linear-gradient(45deg, #1cc88a, #13855c) !important;
+}
+
+.card.bg-info {
+    background: linear-gradient(45deg, #36b9cc, #258391) !important;
+}
+
+.card.bg-warning {
+    background: linear-gradient(45deg, #f6c23e, #dda20a) !important;
 }
 

@@ -1,4 +1,5 @@
 <div class="container py-5">
+
     <!-- Breadcrumb e Botão Voltar -->
     <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded shadow-sm">
         <nav aria-label="breadcrumb">
@@ -11,39 +12,55 @@
             <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
         </a>
     </div>
-    
-    <h2 class="mb-4">Supervisores Disponíveis</h2>
-    
+
+
+
     <!-- Filtros -->
     <div class="card mb-4">
         <div class="card-body">
-            <form hx-get="/api/supervisors" 
-                  hx-target="#supervisor-list"
-                  hx-trigger="change">
+            <form id="filterForm" hx-get="/api/supervisors" hx-target="#supervisor-list"
+                hx-trigger="submit, input[type='text'] changed delay:500ms">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label">Abordagem</label>
-                        <input type="text" 
-                               name="approach" 
-                               class="form-control"
-                               placeholder="Ex: Psicanálise">
+                        <input type="text" name="approach" class="form-control" placeholder="Ex: Psicanálise">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Valor Máximo</label>
-                        <input type="number" 
-                               name="max_price" 
-                               class="form-control"
-                               placeholder="R$">
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" name="max_price" class="form-control" min="0" step="0.01"
+                                placeholder="0,00">
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearFilters()">
+                            <i class="fas fa-times me-2"></i>
+                            Limpar Filtros
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
+
+        <!-- Lista de Supervisores -->
+        <div id="supervisor-list" hx-get="/api/supervisors" hx-trigger="load">
+            <!-- Será preenchido via HTMX -->
+        </div>
     </div>
-    
-    <!-- Lista de Supervisores -->
-    <div id="supervisor-list" 
-         hx-get="/api/supervisors" 
-         hx-trigger="load">
-        <!-- Será preenchido via HTMX -->
-    </div>
-</div> 
+
+    <script>
+        function clearFilters() {
+            document.querySelector('input[name="approach"]').value = '';
+            document.querySelector('input[name="max_price"]').value = '';
+            document.getElementById('filterForm').dispatchEvent(new Event('submit'));
+        }
+    </script>
