@@ -327,7 +327,6 @@ func AcceptAppointmentHandler(db *sql.DB, hub *websocket.Hub) http.HandlerFunc {
 			Message:      notificationMsg,
 			EmailSubject: "Agendamento Confirmado - Superviso",
 			EmailBody: fmt.Sprintf(`
-				<img src="static/assets/email/logo.png" alt="Superviso" style="width: 200px; margin-bottom: 20px;">
 				<h2>Confirmação</h2>
 				<p>Olá %s,</p>
 				<p>Você recebeu uma confirmação de agendamento.</p>
@@ -501,7 +500,6 @@ func RejectAppointmentHandler(db *sql.DB, hub *websocket.Hub) http.HandlerFunc {
 			Message:      notificationMsg,
 			EmailSubject: "Agendamento Rejeitado - Superviso",
 			EmailBody: fmt.Sprintf(`
-				<img src="static/assets/email/logo.png" alt="Superviso" style="width: 200px; margin-bottom: 20px;">
 				<h2>Rejeição</h2>
 				<p>Olá %s,</p>
 				<p>Seu agendamento foi rejeitado.</p>
@@ -667,7 +665,6 @@ func BookAppointment(db *sql.DB, hub *websocket.Hub) http.HandlerFunc {
 			Message:      notificationMsg,
 			EmailSubject: "Nova Solicitação de Supervisão - Superviso",
 			EmailBody: fmt.Sprintf(`
-				<img src="static/assets/email/logo.png" alt="Superviso" style="width: 200px; margin-bottom: 20px;">
 				<h2>Nova Solicitação</h2>
 				<p>Olá %s,</p>
 				<p>Você recebeu uma nova solicitação de supervisão.</p>
